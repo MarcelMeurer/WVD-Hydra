@@ -111,10 +111,10 @@
                      "Microsoft.OperationalInsights/workspaces",
                      "Microsoft.Sql/servers",
                      "Microsoft.KeyVault/vaults",
-                     "Microsoft.Sql/servers",
                      "Microsoft.Web/serverfarms",
                      "Microsoft.Insights/components",
-					 "Microsoft.Storage/storageAccounts"
+					 "Microsoft.Storage/storageAccounts",
+					 "Microsoft.Web/sites"
                   ]
                }
             ]
