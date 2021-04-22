@@ -113,7 +113,8 @@
                      "Microsoft.KeyVault/vaults",
                      "Microsoft.Sql/servers",
                      "Microsoft.Web/serverfarms",
-                     "Microsoft.Insights/components"
+                     "Microsoft.Insights/components",
+					 "Microsoft.Storage/storageAccounts"
                   ]
                }
             ]
