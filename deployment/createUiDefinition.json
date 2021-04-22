@@ -16,11 +16,11 @@
             "name":"siteName",
             "type":"Microsoft.Common.TextBox",
             "label":"Name of your deployment",
-            "toolTip":"The name should include 1-49 letters, digits or '-'. The '-' shouldn't be the first symbol. The name will be appended by a unique identifier.",
+            "toolTip":"The name should include 1-10 letters, digits or '-'. The '-' shouldn't be the first symbol. The name will be appended by a unique identifier.",
             "constraints":{
                "required":true,
-               "regex":"^[a-z0-9A-Z]{1}[a-z0-9A-Z-]{0,48}$",
-               "validationMessage":"The name should include 1-49 letters, digits or '-'. The '-' shouldn't be the first symbol. The name will be appended by a unique identifier."
+               "regex":"^[a-z0-9A-Z]{1}[a-z0-9A-Z-]{0,9}$",
+               "validationMessage":"The name should include 1-10 letters, digits or '-'. The '-' shouldn't be the first symbol. The name will be appended by a unique identifier."
             }
          }
       ],
