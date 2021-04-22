@@ -368,7 +368,8 @@
          ],
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]"
+            "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
+			"[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
          ]
       }
    ]
