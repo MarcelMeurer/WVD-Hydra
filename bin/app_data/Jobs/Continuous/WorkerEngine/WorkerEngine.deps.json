@@ -1,12 +1,12 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v3.1/win-x86",
+    "name": ".NETCoreApp,Version=v3.1/win-x64",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.1": {},
-    ".NETCoreApp,Version=v3.1/win-x86": {
+    ".NETCoreApp,Version=v3.1/win-x64": {
       "WorkerEngine/1.0.0": {
         "dependencies": {
           "AutoMapper": "10.1.1",
@@ -23,13 +23,13 @@
           "Microsoft.Extensions.Configuration.UserSecrets": "5.0.0",
           "Microsoft.Extensions.Hosting": "5.0.0",
           "Newtonsoft.Json": "12.0.3",
-          "runtimepack.Microsoft.NETCore.App.Runtime.win-x86": "3.1.14"
+          "runtimepack.Microsoft.NETCore.App.Runtime.win-x64": "3.1.14"
         },
         "runtime": {
           "WorkerEngine.dll": {}
         }
       },
-      "runtimepack.Microsoft.NETCore.App.Runtime.win-x86/3.1.14": {
+      "runtimepack.Microsoft.NETCore.App.Runtime.win-x64/3.1.14": {
         "runtime": {
           "Microsoft.CSharp.dll": {
             "assemblyVersion": "4.0.5.0",
@@ -661,10 +661,7 @@
           }
         },
         "native": {
-          "API-MS-Win-core-xstate-l2-1-0.dll": {
-            "fileVersion": "10.0.17134.12"
-          },
-          "Microsoft.DiaSymReader.Native.x86.dll": {
+          "Microsoft.DiaSymReader.Native.amd64.dll": {
             "fileVersion": "14.12.25830.2"
           },
           "SOS_README.md": {
@@ -818,7 +815,7 @@
           "mscordaccore.dll": {
             "fileVersion": "4.700.21.16201"
           },
-          "mscordaccore_x86_x86_4.700.21.16201.dll": {
+          "mscordaccore_amd64_amd64_4.700.21.16201.dll": {
             "fileVersion": "4.700.21.16201"
           },
           "mscordbi.dll": {
@@ -1396,10 +1393,10 @@
       },
       "Microsoft.Data.SqlClient.SNI.runtime/2.0.1": {
         "native": {
-          "runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.dll": {
+          "runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.dll": {
             "fileVersion": "2.0.1.0"
           },
-          "runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.pdb": {
+          "runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.pdb": {
             "fileVersion": "0.0.0.0"
           }
         }
@@ -3126,7 +3123,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "runtimepack.Microsoft.NETCore.App.Runtime.win-x86/3.1.14": {
+    "runtimepack.Microsoft.NETCore.App.Runtime.win-x64/3.1.14": {
       "type": "runtimepack",
       "serviceable": false,
       "sha512": ""
@@ -4629,126 +4626,126 @@
     }
   },
   "runtimes": {
-    "win-x86": [
+    "win-x64": [
       "win",
       "any",
       "base"
     ],
-    "win-x86-aot": [
+    "win-x64-aot": [
       "win-aot",
-      "win-x86",
+      "win-x64",
       "win",
       "aot",
       "any",
       "base"
     ],
-    "win10-x86": [
+    "win10-x64": [
       "win10",
-      "win81-x86",
+      "win81-x64",
       "win81",
-      "win8-x86",
+      "win8-x64",
       "win8",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86",
+      "win-x64",
       "win",
       "any",
       "base"
     ],
-    "win10-x86-aot": [
+    "win10-x64-aot": [
       "win10-aot",
-      "win10-x86",
+      "win10-x64",
       "win10",
-      "win81-x86-aot",
+      "win81-x64-aot",
       "win81-aot",
-      "win81-x86",
+      "win81-x64",
       "win81",
-      "win8-x86-aot",
+      "win8-x64-aot",
       "win8-aot",
-      "win8-x86",
+      "win8-x64",
       "win8",
-      "win7-x86-aot",
+      "win7-x64-aot",
       "win7-aot",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86-aot",
+      "win-x64-aot",
       "win-aot",
-      "win-x86",
+      "win-x64",
       "win",
       "aot",
       "any",
       "base"
     ],
-    "win7-x86": [
+    "win7-x64": [
       "win7",
-      "win-x86",
+      "win-x64",
       "win",
       "any",
       "base"
     ],
-    "win7-x86-aot": [
+    "win7-x64-aot": [
       "win7-aot",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86-aot",
+      "win-x64-aot",
       "win-aot",
-      "win-x86",
+      "win-x64",
       "win",
       "aot",
       "any",
       "base"
     ],
-    "win8-x86": [
+    "win8-x64": [
       "win8",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86",
+      "win-x64",
       "win",
       "any",
       "base"
     ],
-    "win8-x86-aot": [
+    "win8-x64-aot": [
       "win8-aot",
-      "win8-x86",
+      "win8-x64",
       "win8",
-      "win7-x86-aot",
+      "win7-x64-aot",
       "win7-aot",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86-aot",
+      "win-x64-aot",
       "win-aot",
-      "win-x86",
+      "win-x64",
       "win",
       "aot",
       "any",
       "base"
     ],
-    "win81-x86": [
+    "win81-x64": [
       "win81",
-      "win8-x86",
+      "win8-x64",
       "win8",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86",
+      "win-x64",
       "win",
       "any",
       "base"
     ],
-    "win81-x86-aot": [
+    "win81-x64-aot": [
       "win81-aot",
-      "win81-x86",
+      "win81-x64",
       "win81",
-      "win8-x86-aot",
+      "win8-x64-aot",
       "win8-aot",
-      "win8-x86",
+      "win8-x64",
       "win8",
-      "win7-x86-aot",
+      "win7-x64-aot",
       "win7-aot",
-      "win7-x86",
+      "win7-x64",
       "win7",
-      "win-x86-aot",
+      "win-x64-aot",
       "win-aot",
-      "win-x86",
+      "win-x64",
       "win",
       "aot",
       "any",
