@@ -54,8 +54,15 @@
                },
                {
                   "name":"spSecret",
-                  "type":"Microsoft.Common.TextBox",
-                  "label":"The secret of the service principal",
+                  "type":"Microsoft.Common.PasswordBox",
+
+				                  "label": {
+                    "password": "The secret of the service principal",
+                    "confirmPassword": "Confirm password"
+                },
+				                "options": {
+                    "hideConfirmation": true
+                },
                   "toolTip":"A secret string with a least one character",
                   "constraints":{
                      "required":true,

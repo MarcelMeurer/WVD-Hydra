@@ -301,7 +301,7 @@
                "apiVersion":"2016-08-01",
                "properties":{
                   "RepoUrl":"https://github.com/MarcelMeurer/WVD-Hydra.git",
-                  "branch":"master",
+                  "branch":"main",
                   "IsManualIntegration":true
                },
                "dependsOn":[
