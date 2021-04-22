@@ -248,10 +248,7 @@
             "targetWorkerCount":0,
             "targetWorkerSizeId":0
          },
-         "dependsOn":[
-            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]",
-            "[resourceId('Microsoft.OperationalInsights/workspaces',variables('siteNameUnique'))]"
-         ]
+         "dependsOn":[]
       },
       {
          "type":"Microsoft.Insights/components",
@@ -266,9 +263,7 @@
          "properties":{
             "Application_Type":"web"
          },
-         "dependsOn":[
-            
-         ]
+         "dependsOn":[]
       },
       {
          "type":"Microsoft.Web/sites",
@@ -324,7 +319,6 @@
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
             "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]",
 			"[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ]
       }
