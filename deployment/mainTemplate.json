@@ -14,6 +14,10 @@
          "defaultValue":"Service principal secret",
          "type":"string"
       },
+      "admins":{
+         "defaultValue":"Administrators of this solutions",
+         "type":"string"
+      },
       "location":{
          "type":"string",
          "defaultValue":"[resourceGroup().location]",
@@ -95,7 +99,10 @@
             "softDeleteRetentionInDays":90
          },
          "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+			"[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
+			"[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
+            "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]"
          ]
       },
       {
@@ -269,7 +276,7 @@
       {
          "type":"Microsoft.Web/sites",
          "apiVersion":"2018-02-01",
-         "name":"[concat(variables('siteNameUnique'),'')]",
+         "name":"[variables('siteNameUnique')]",
          "location":"[resourceGroup().location]",
          "identity":{
             "type":"SystemAssigned"
@@ -285,7 +292,15 @@
                "appSettings":[
                   {
                      "name":"APPINSIGHTS_INSTRUMENTATIONKEY",
-                     "value":"[reference(concat('microsoft.insights/components/', variables('siteNameUnique'))).InstrumentationKey]"
+                     "value":"[reference(resourceId('microsoft.insights/components/', variables('siteNameUnique'))).InstrumentationKey]"
+                  },
+                  {
+                     "name":"config:Administrators",
+                     "value":"[parameters('admins)]"
+                  },
+                  {
+                     "name":"config:KeyVaultUri",
+                     "value":"[reference(resourceId('Microsoft.KeyVault/vaults/', variables('siteNameUnique'))).vaultUri]"
                   },
                   {
                      "name":"PROJECT",
@@ -305,14 +320,15 @@
                   "IsManualIntegration":true
                },
                "dependsOn":[
-                  "[resourceId('Microsoft.Web/sites', concat(variables('siteNameUnique'),''))]"
+                  "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
                ]
             }
          ],
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
             "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]"
+            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]",
+			"[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ]
       }
    ]

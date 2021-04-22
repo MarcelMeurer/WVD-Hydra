@@ -72,6 +72,35 @@
             ]
          },
          {
+            "name":"Administration",
+            "label":"Administration",
+            "elements":[
+               {
+                  "name":"textAdmin",
+                  "type":"Microsoft.Common.TextBlock",
+                  "visible":true,
+                  "options":{
+                     "text":"Enter the UPN of the administrator, who should have unlimited permission in the solution - the user must exist or be invited in this tenant. This UPN can log on after the deployment and configuration. This setting can be changed in the configuration of the deployed web app. It's possible to add more users or groups (object ids of the groups) comma-delimited. E.g: 'admin@contoso.com'",
+                     "link":{
+                        "label":"Learn more",
+                        "uri":"https://github.com/MarcelMeurer/WVD-Hydra"
+                     }
+                  }
+               },
+               {
+                  "name":"admins",
+                  "type":"Microsoft.Common.TextBox",
+                  "label":"Administrator(s) of the solution",
+                  "toolTip":"Comma-delimited list of full admins of the solutions (at least one UPN)",
+                  "constraints":{
+                     "required":true,
+                     "regex":"^([\\w+-.%]+@[\\w-.]+\\.[A-Za-z]{2,4},?)+$",
+                     "validationMessage":"At least one UPN mus be entered (admin@contoso.com)"
+                  }
+               }
+            ]
+         },
+         {
             "name":"tags",
             "label":"Tags",
             "elements":[
@@ -95,6 +124,7 @@
          "spSecret":"[steps('ServicePrincipal').spSecret]",
          "location":"[location()]",
          "siteName":"[basics('siteName')]",
+         "admins":"[steps('Administration').admins]",
          "tagsByResource":"[steps('tags').tagsByResource]"
       }
    }
