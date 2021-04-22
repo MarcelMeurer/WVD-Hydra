@@ -27,7 +27,8 @@
       }
    },
    "variables":{
-      "connectionString":"[concat('Server=tcp:',parameters('siteName'),'.database.windows.net,1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]"
+      "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId)),'.database.windows.net,1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
+	  "siteNameUnique":"[concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId))]"
    },
    "resources":[
       {
@@ -48,7 +49,7 @@
       {
          "type":"Microsoft.Sql/servers",
          "apiVersion":"2015-05-01-preview",
-         "name":"[parameters('siteName')]",
+         "name":"[variables('siteNameUnique')]",
          "location":"[resourceGroup().location]",
          "kind":"v12.0",
          "properties":{
@@ -59,7 +60,7 @@
       },
       {
          "type":"Microsoft.KeyVault/vaults",
-         "name":"[parameters('siteName')]",
+         "name":"[variables('siteNameUnique')]",
          "apiVersion":"2016-10-01",
          "location":"[resourceGroup().location]",
          "properties":{
@@ -71,7 +72,7 @@
             "accessPolicies":[
                {
                   "tenantId":"[subscription().tenantid]",
-                  "objectId":"[reference(resourceId('Microsoft.Web/sites', parameters('siteName')),'2019-08-01', 'full').identity.principalId]",
+                  "objectId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
                   "permissions":{
                      "keys":[
                         
@@ -94,16 +95,16 @@
             "softDeleteRetentionInDays":90
          },
          "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'AzureAd--ClientId')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'AzureAd--ClientId')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
             "value":"[parameters('spId')]"
@@ -112,10 +113,10 @@
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'AzureAd--ClientSecret')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'AzureAd--ClientSecret')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
             "value":"[parameters('spSecret')]"
@@ -124,10 +125,10 @@
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'AzureAd--TenantId')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'AzureAd--TenantId')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
             "value":"[subscription().tenantid]"
@@ -136,10 +137,10 @@
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'Hydra-CryptoKey')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-CryptoKey')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
             "value":"[base64(uniqueString('secHash',guid(resourceGroup().id, deployment().name)))]"
@@ -148,10 +149,10 @@
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'Hydra-DbConnectionString')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-DbConnectionString')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
             "value":"[variables('connectionString')]"
@@ -160,31 +161,31 @@
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'Hydra-LogAnalyticsDefaultId')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-LogAnalyticsDefaultId')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
-            "value":"[reference(resourceId('Microsoft.OperationalInsights/workspaces',parameters('siteName'))).customerId]"
+            "value":"[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('siteNameUnique'))).customerId]"
          }
       },
       {
          "type":"Microsoft.KeyVault/vaults/secrets",
          "apiVersion":"2019-09-01",
-         "name":"[concat(parameters('siteName'), '/', 'Hydra-LogAnalyticsDefaultKey')]",
+         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-LogAnalyticsDefaultKey')]",
          "location":"[resourceGroup().location]",
          "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', parameters('siteName'))]"
+            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
-            "value":"[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', parameters('siteName')), '2015-03-20').primarySharedKey]"
+            "value":"[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique')), '2015-03-20').primarySharedKey]"
          }
       },
       {
          "type":"Microsoft.Sql/servers/databases",
          "apiVersion":"2017-03-01-preview",
-         "name":"[concat(parameters('siteName'), '/Hydra')]",
+         "name":"[concat(variables('siteNameUnique'), '/Hydra')]",
          "location":"[resourceGroup().location]",
          "sku":{
             "name":"S0",
@@ -196,15 +197,15 @@
             "catalogCollation":"SQL_Latin1_General_CP1_CI_AS"
          },
          "dependsOn":[
-            "[resourceId('Microsoft.Sql/servers', parameters('siteName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
          ]
       },
       {
          "type":"Microsoft.Sql/servers/firewallRules",
          "apiVersion":"2015-05-01-preview",
-         "name":"[concat(parameters('siteName'), '/AllowAllWindowsAzureIps')]",
+         "name":"[concat(variables('siteNameUnique'), '/AllowAllWindowsAzureIps')]",
          "dependsOn":[
-            "[resourceId('Microsoft.Sql/servers', parameters('siteName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
          ],
          "properties":{
             "startIpAddress":"0.0.0.0",
@@ -213,7 +214,7 @@
       },
       {
          "apiVersion":"2017-03-15-preview",
-         "name":"[parameters('siteName')]",
+         "name":"[variables('siteNameUnique')]",
          "type":"Microsoft.OperationalInsights/workspaces",
          "location":"[resourceGroup().location]",
          "properties":{
@@ -226,7 +227,7 @@
       {
          "type":"Microsoft.Web/serverfarms",
          "apiVersion":"2016-09-01",
-         "name":"[parameters('siteName')]",
+         "name":"[variables('siteNameUnique')]",
          "location":"[resourceGroup().location]",
          "sku":{
             "name":"S1",
@@ -237,21 +238,21 @@
          },
          "kind":"app",
          "properties":{
-            "name":"[parameters('siteName')]",
+            "name":"[variables('siteNameUnique')]",
             "perSiteScaling":false,
             "reserved":false,
             "targetWorkerCount":0,
             "targetWorkerSizeId":0
          },
          "dependsOn":[
-            "[resourceId('Microsoft.Sql/servers/databases', parameters('siteName'), 'Hydra')]",
-            "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('siteName'))]"
+            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]",
+            "[resourceId('Microsoft.OperationalInsights/workspaces',variables('siteNameUnique'))]"
          ]
       },
       {
          "type":"Microsoft.Insights/components",
          "kind":"web",
-         "name":"[parameters('siteName')]",
+         "name":"[variables('siteNameUnique')]",
          "apiVersion":"2015-05-01",
          "location":"[resourceGroup().location]",
          "tags":{
@@ -268,7 +269,7 @@
       {
          "type":"Microsoft.Web/sites",
          "apiVersion":"2018-02-01",
-         "name":"[concat(parameters('siteName'),'')]",
+         "name":"[concat(variables('siteNameUnique'),'')]",
          "location":"[resourceGroup().location]",
          "identity":{
             "type":"SystemAssigned"
@@ -276,7 +277,7 @@
          "kind":"app",
          "properties":{
             "enabled":true,
-            "serverFarmId":"[resourceId('Microsoft.Web/serverfarms',parameters('siteName'))]",
+            "serverFarmId":"[resourceId('Microsoft.Web/serverfarms',variables('siteNameUnique'))]",
             "httpsOnly":true,
             "siteConfig":{
                "alwaysOn":true,
@@ -284,7 +285,7 @@
                "appSettings":[
                   {
                      "name":"APPINSIGHTS_INSTRUMENTATIONKEY",
-                     "value":"[reference(concat('microsoft.insights/components/', parameters('siteName'))).InstrumentationKey]"
+                     "value":"[reference(concat('microsoft.insights/components/', variables('siteNameUnique'))).InstrumentationKey]"
                   },
                   {
                      "name":"PROJECT",
@@ -304,14 +305,14 @@
                   "IsManualIntegration":true
                },
                "dependsOn":[
-                  "[resourceId('Microsoft.Web/sites', concat(parameters('siteName'),''))]"
+                  "[resourceId('Microsoft.Web/sites', concat(variables('siteNameUnique'),''))]"
                ]
             }
          ],
          "dependsOn":[
-            "[resourceId('Microsoft.Web/serverfarms', parameters('siteName'))]",
-            "[resourceId('Microsoft.Insights/components', parameters('siteName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', parameters('siteName'), 'Hydra')]"
+            "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
+            "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]"
          ]
       }
    ]
