@@ -31,7 +31,7 @@
       }
    },
    "variables":{
-      "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId)),'.database.windows.net,1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
+      "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId)),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
 	  "siteNameUnique":"[concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId))]"
    },
    "resources":[
@@ -99,10 +99,7 @@
             "softDeleteRetentionInDays":90
          },
          "dependsOn":[
-			"[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
-			"[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('siteNameUnique'), 'Hydra')]"
+			"[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]"
          ]
       },
       {
