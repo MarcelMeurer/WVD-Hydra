@@ -279,7 +279,7 @@
          "apiVersion":"2016-09-01",
          "name":"[variables('siteNameUnique')]",
          "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'MicMicrosoft.Web/serverfarmss'), parameters('tagsByResource')['Microsoft.Web/serverfarms'], json('{}')) ]",
+         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/serverfarms'), parameters('tagsByResource')['Microsoft.Web/serverfarms'], json('{}')) ]",
          "sku":{
             "name":"S1",
             "tier":"Standard",
@@ -314,6 +314,15 @@
             
          ]
       },
+	          {
+            "type": "Microsoft.Web/sites/siteextensions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('siteNameUnique'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+            ]
+        },
       {
          "type":"Microsoft.Web/sites",
          "apiVersion":"2018-02-01",
