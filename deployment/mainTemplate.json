@@ -296,7 +296,7 @@
                   },
                   {
                      "name":"config:Administrators",
-                     "value":"[parameters('admins)]"
+                     "value":"[parameters('admins')]"
                   },
                   {
                      "name":"config:KeyVaultUri",
