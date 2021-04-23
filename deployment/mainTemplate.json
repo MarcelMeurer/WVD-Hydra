@@ -50,10 +50,7 @@
             "mode":"Incremental",
             "template":{
                "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-               "contentVersion":"1.0.0.0",
-               "resources":[
-                  
-               ]
+               "contentVersion":"1.0.0.0"
             }
          }
       },
@@ -98,16 +95,10 @@
                   "tenantId":"[subscription().tenantid]",
                   "objectId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
                   "permissions":{
-                     "keys":[
-                        
-                     ],
                      "secrets":[
                         "get",
                         "list",
                         "set"
-                     ],
-                     "certificates":[
-                        
                      ]
                   }
                }
@@ -294,35 +285,17 @@
             "reserved":false,
             "targetWorkerCount":0,
             "targetWorkerSizeId":0
-         },
-         "dependsOn":[
-            
-         ]
+         }
       },
       {
-         "type":"Microsoft.Insights/components",
-         "kind":"web",
-         "name":"[variables('siteNameUnique')]",
-         "apiVersion":"2015-05-01",
+         "type":"Microsoft.Web/sites/siteextensions",
+         "apiVersion":"2018-11-01",
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
          "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Insights/components'), parameters('tagsByResource')['Microsoft.Insights/components'], json('{}')) ]",
-         "scale":null,
-         "properties":{
-            "Application_Type":"web"
-         },
          "dependsOn":[
-            
+            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
-	          {
-            "type": "Microsoft.Web/sites/siteextensions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(variables('siteNameUnique'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-            ]
-        },
       {
          "type":"Microsoft.Web/sites",
          "apiVersion":"2018-02-01",
@@ -341,10 +314,6 @@
                "alwaysOn":true,
                "use32BitWorkerProcess":false,
                "appSettings":[
-                  {
-                     "name":"APPINSIGHTS_INSTRUMENTATIONKEY",
-                     "value":"[reference(resourceId('microsoft.insights/components/', variables('siteNameUnique'))).InstrumentationKey]"
-                  },
                   {
                      "name":"config:Administrators",
                      "value":"[parameters('admins')]"
@@ -377,8 +346,7 @@
          ],
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Insights/components', variables('siteNameUnique'))]",
-			"[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
          ]
       }
    ]
