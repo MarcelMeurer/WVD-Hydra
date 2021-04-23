@@ -39,7 +39,7 @@
    "variables":{
       "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId)),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
       "siteNameUnique":"[concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId))]",
-      "storageName":"[toLower(concat('Hydra', uniqueString(resourceGroup().id,subscription().subscriptionId)))]"
+      "storageName":"[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]"
    },
    "resources":[
       {
