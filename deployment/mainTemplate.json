@@ -32,7 +32,7 @@
          }
       },
       "SqlPassword":{
-         "defaultValue":"[base64(substring(concat(utcNow('u'),guid(resourceGroup().id, deployment().name),'fwew##sfkf!3!sdiur239zr2983diuwer3929239823752937423988er98fefervberjv'),0,32)]",
+         "defaultValue":"[base64(concat(utcNow('u'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name)))]",
          "type":"securestring"
       }
    },
@@ -168,7 +168,7 @@
             "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
          ],
          "properties":{
-            "value":"[base64(uniqueString('secHash',guid(resourceGroup().id, deployment().name)))]"
+            "value":"[base64(substring(concat(uniqueString('secHash',guid(resourceGroup().id, deployment().name)),uniqueString(subscription().id),'842983489234989823!'),0,32))]"
          }
       },
       {
