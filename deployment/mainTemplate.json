@@ -43,14 +43,15 @@
    },
    "resources":[
       {
-         "apiVersion":"2018-02-01",
+         "apiVersion":"2020-06-01",
          "name":"pid-1046f72e-14d8-44db-81d1-5cfb2bec048a",
          "type":"Microsoft.Resources/deployments",
          "properties":{
             "mode":"Incremental",
             "template":{
                "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-               "contentVersion":"1.0.0.0"
+               "contentVersion":"1.0.0.0",
+			   "resources":[]
             }
          }
       },
@@ -253,7 +254,7 @@
          }
       },
       {
-         "apiVersion":"2020-03-01-preview ",
+         "apiVersion":"2020-10-01",
          "name":"[variables('siteNameUnique')]",
          "type":"Microsoft.OperationalInsights/workspaces",
          "location":"[parameters('location')]",
