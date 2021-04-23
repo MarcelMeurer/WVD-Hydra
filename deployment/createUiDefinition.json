@@ -59,10 +59,10 @@
 
 				                  "label": {
                     "password": "The secret of the service principal",
-                    "confirmPassword": "Confirm password"
+                    "confirmPassword": "Confirm secret"
                 },
 				                "options": {
-                    "hideConfirmation": true
+                    "hideConfirmation": false
                 },
                   "toolTip":"A secret string with a least one character",
                   "constraints":{
@@ -104,10 +104,11 @@
          {
             "name":"tags",
             "label":"Tags",
-            "elements":[
+			"elements":[
                {
                   "name":"tagsByResource",
                   "type":"Microsoft.Common.TagsByResource",
+				  "toolTip":"Add tags to the resources for governance reason",
                   "resources":[
                      "Microsoft.OperationalInsights/workspaces",
 					 "Microsoft.Sql/servers",

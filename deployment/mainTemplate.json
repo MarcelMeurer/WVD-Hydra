@@ -1,5 +1,5 @@
 {
-   "$schema":"https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+   "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
    "contentVersion":"1.0.0.0",
    "parameters":{
       "siteName":{
@@ -12,7 +12,7 @@
       },
       "spSecret":{
          "defaultValue":"Service principal secret",
-         "type":"string"
+         "type":"secureString"
       },
       "admins":{
          "defaultValue":"Administrators of this solutions",
@@ -56,7 +56,7 @@
       },
       {
          "type":"Microsoft.Sql/servers",
-         "apiVersion":"2015-05-01-preview",
+         "apiVersion":"2019-06-01-preview",
          "name":"[variables('siteNameUnique')]",
          "location":"[parameters('location')]",
          "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Sql/servers'), parameters('tagsByResource')['Microsoft.Sql/servers'], json('{}')) ]",
@@ -71,7 +71,7 @@
          "type":"Microsoft.Storage/storageAccounts",
          "kind":"Storage",
          "name":"[variables('storageName')]",
-         "apiVersion":"2016-01-01",
+         "apiVersion":"2019-06-01",
          "sku":{
             "name":"Standard_LRS"
          },
@@ -81,7 +81,7 @@
       {
          "type":"Microsoft.KeyVault/vaults",
          "name":"[variables('siteNameUnique')]",
-         "apiVersion":"2016-10-01",
+         "apiVersion":"2019-09-01",
          "location":"[parameters('location')]",
          "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.KeyVault/vaults'), parameters('tagsByResource')['Microsoft.KeyVault/vaults'], json('{}')) ]",
          "properties":{
@@ -224,7 +224,7 @@
       },
       {
          "type":"Microsoft.Sql/servers/databases",
-         "apiVersion":"2017-03-01-preview",
+         "apiVersion":"2019-06-01-preview",
          "name":"[concat(variables('siteNameUnique'), '/Hydra')]",
          "location":"[parameters('location')]",
          "sku":{
@@ -253,7 +253,7 @@
          }
       },
       {
-         "apiVersion":"2017-03-15-preview",
+         "apiVersion":"2020-03-01-preview ",
          "name":"[variables('siteNameUnique')]",
          "type":"Microsoft.OperationalInsights/workspaces",
          "location":"[parameters('location')]",
@@ -267,7 +267,7 @@
       },
       {
          "type":"Microsoft.Web/serverfarms",
-         "apiVersion":"2016-09-01",
+         "apiVersion":"2019-08-01",
          "name":"[variables('siteNameUnique')]",
          "location":"[parameters('location')]",
          "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/serverfarms'), parameters('tagsByResource')['Microsoft.Web/serverfarms'], json('{}')) ]",
@@ -298,7 +298,7 @@
       },
       {
          "type":"Microsoft.Web/sites",
-         "apiVersion":"2018-02-01",
+         "apiVersion":"2019-08-01",
          "name":"[variables('siteNameUnique')]",
          "location":"[parameters('location')]",
          "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/sites'), parameters('tagsByResource')['Microsoft.Web/sites'], json('{}')) ]",
@@ -333,7 +333,7 @@
             {
                "name":"web",
                "type":"sourcecontrols",
-               "apiVersion":"2016-08-01",
+               "apiVersion":"2019-08-01",
                "properties":{
                   "RepoUrl":"https://github.com/MarcelMeurer/WVD-Hydra.git",
                   "branch":"main",
