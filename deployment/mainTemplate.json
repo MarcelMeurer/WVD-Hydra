@@ -11,7 +11,7 @@
          "type":"string"
       },
       "spSecret":{
-         "defaultValue":"Service principal secret",
+         "defaultValue":"",
          "type":"secureString"
       },
       "admins":{
@@ -32,13 +32,13 @@
          }
       },
       "SqlPassword":{
-         "defaultValue":"[base64(concat(utcNow('u'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name)))]",
+         "defaultValue":"[base64(concat(utcNow('u'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name,newGuid())))]",
          "type":"securestring"
       }
    },
    "variables":{
       "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId)),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
-      "siteNameUnique":"[concat(parameters('siteName'),'-', uniqueString(resourceGroup().id,subscription().subscriptionId))]",
+      "siteNameUnique":"[concat(parameters('siteName'),'')]",
       "storageName":"[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]"
    },
    "resources":[

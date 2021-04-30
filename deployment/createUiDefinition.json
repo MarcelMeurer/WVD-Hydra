@@ -7,21 +7,62 @@
          "Microsoft.OperationalInsights/workspaces",
          "Microsoft.Sql/servers",
          "Microsoft.KeyVault/vaults",
-         "Microsoft.Sql/servers",
          "Microsoft.Web/serverfarms",
 		 "Microsoft.Storage/storageAccounts",
 		 "Microsoft.Web/sites"
       ],
       "basics":[
+             {
+    "name": "nameApiWeb",
+    "type": "Microsoft.Solutions.ArmApiControl",
+    "request": {
+      "method": "POST",
+      "path": "[concat(subscription().id,'/providers/Microsoft.Web/checkNameAvailability?api-version=2019-08-01')]",
+      "body": "[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Web/sites\"}',''))]"
+    }
+},
+{
+    "name": "nameApiSql",
+    "type": "Microsoft.Solutions.ArmApiControl",
+    "request": {
+      "method": "POST",
+      "path": "[concat(subscription().id,'/providers/Microsoft.Sql/checkNameAvailability?api-version=2014-04-01')]",
+      "body": "[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Sql/servers\"}',''))]"
+    }
+},
+{
+    "name": "nameApiKeyVault",
+    "type": "Microsoft.Solutions.ArmApiControl",
+    "request": {
+      "method": "POST",
+      "path": "[concat(subscription().id,'/providers/Microsoft.KeyVault/checkNameAvailability?api-version=2019-09-01')]",
+      "body": "[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.KeyVault/vaults\"}',''))]"
+    }
+},
          {
             "name":"siteName",
             "type":"Microsoft.Common.TextBox",
             "label":"Name of your deployment",
-            "toolTip":"The name should include 1-10 letters, digits or '-'. The '-' shouldn't be the first symbol. The name will be appended by a unique identifier.",
+            "toolTip":"The name should include 4-22 letters, digits or '-'. The '-' shouldn't be the first symbol.",
             "constraints":{
                "required":true,
-               "regex":"^[a-z0-9A-Z]{1}[a-z0-9A-Z-]{0,9}$",
-               "validationMessage":"The name should include 1-10 letters, digits or '-'. The '-' shouldn't be the first symbol. The name will be appended by a unique identifier."
+               "regex":"^[a-z0-9A-Z]{1}[a-z0-9A-Z-]{3,21}$",
+               "validationMessage":"The name should include 4-22 letters, digits or '-'. The '-' shouldn't be the first symbol.",
+      "validations": [
+        {
+          "isValid": "[or(less(length(basics('siteName')),4),not(equals(basics('nameApiWeb').nameAvailable, false)))]",
+          "message": "Please use another name. The name is not available for a web site"
+        },
+        {
+          "isValid": "[or(less(length(basics('siteName')),4),not(equals(basics('nameApiSql').available, false)))]",
+          "message": "Please use another name. The name is not available for a SQL instance"
+        },
+        {
+          "isValid": "[or(less(length(basics('siteName')),4),not(equals(basics('nameApiKeyVault').nameAvailable, false)))]",
+          "message": "Please use another name. The name is not available for a key vault"
+        }
+
+      ]
             }
          }
       ],
@@ -35,10 +76,10 @@
                   "type":"Microsoft.Common.TextBlock",
                   "visible":true,
                   "options":{
-                     "text":"A service principal is needed to authenticate to the web app. Please create a service principal based on the documentation and enter the application id and secret. Optionally: Id and secret can be changed on the deployed Key Vault after the deployment. ",
+                     "text":"[concat('A service principal is needed to authenticate to the web app. Please create a service principal based on the documentation and enter the application id and secret. Optionally: Id and secret can be changed on the deployed Key Vault after the deployment. The redirect URI is \"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"')]",
                      "link":{
                         "label":"Learn more",
-                        "uri":"https://github.com/MarcelMeurer/WVD-Hydra"
+                        "uri":"[concat('https://github.com/MarcelMeurer/WVD-Hydra/WebApp-ServicePrinciaplCode?redirectUri=https://',basics('siteName'),'.azurewebsites.net/signin-oidc')]"
                      }
                   }
                },
