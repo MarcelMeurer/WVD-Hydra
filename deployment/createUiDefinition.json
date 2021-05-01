@@ -79,7 +79,7 @@
                      "text":"[concat('A service principal is needed to authenticate to the web app. Please create a service principal based on the documentation and enter the application id and secret. Optionally: Id and secret can be changed on the deployed Key Vault after the deployment. The redirect URI is \"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"')]",
                      "link":{
                         "label":"Learn more",
-                        "uri":"[concat('https://github.com/MarcelMeurer/WVD-Hydra/WebApp-ServicePrinciaplCode?redirectUri=https://',basics('siteName'),'.azurewebsites.net/signin-oidc')]"
+                        "uri":"[concat('https://github.com/MarcelMeurer/WVD-Hydra/portalHelper/WebApp-ServicePrinciaplCode.md?redirectUri=https://',basics('siteName'),'.azurewebsites.net/signin-oidc')]"
                      }
                   }
                },
