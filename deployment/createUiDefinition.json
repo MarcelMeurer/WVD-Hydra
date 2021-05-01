@@ -8,37 +8,37 @@
          "Microsoft.Sql/servers",
          "Microsoft.KeyVault/vaults",
          "Microsoft.Web/serverfarms",
-		 "Microsoft.Storage/storageAccounts",
-		 "Microsoft.Web/sites"
+         "Microsoft.Storage/storageAccounts",
+         "Microsoft.Web/sites"
       ],
       "basics":[
-             {
-    "name": "nameApiWeb",
-    "type": "Microsoft.Solutions.ArmApiControl",
-    "request": {
-      "method": "POST",
-      "path": "[concat(subscription().id,'/providers/Microsoft.Web/checkNameAvailability?api-version=2019-08-01')]",
-      "body": "[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Web/sites\"}',''))]"
-    }
-},
-{
-    "name": "nameApiSql",
-    "type": "Microsoft.Solutions.ArmApiControl",
-    "request": {
-      "method": "POST",
-      "path": "[concat(subscription().id,'/providers/Microsoft.Sql/checkNameAvailability?api-version=2014-04-01')]",
-      "body": "[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Sql/servers\"}',''))]"
-    }
-},
-{
-    "name": "nameApiKeyVault",
-    "type": "Microsoft.Solutions.ArmApiControl",
-    "request": {
-      "method": "POST",
-      "path": "[concat(subscription().id,'/providers/Microsoft.KeyVault/checkNameAvailability?api-version=2019-09-01')]",
-      "body": "[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.KeyVault/vaults\"}',''))]"
-    }
-},
+         {
+            "name":"nameApiWeb",
+            "type":"Microsoft.Solutions.ArmApiControl",
+            "request":{
+               "method":"POST",
+               "path":"[concat(subscription().id,'/providers/Microsoft.Web/checkNameAvailability?api-version=2019-08-01')]",
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Web/sites\"}',''))]"
+            }
+         },
+         {
+            "name":"nameApiSql",
+            "type":"Microsoft.Solutions.ArmApiControl",
+            "request":{
+               "method":"POST",
+               "path":"[concat(subscription().id,'/providers/Microsoft.Sql/checkNameAvailability?api-version=2014-04-01')]",
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Sql/servers\"}',''))]"
+            }
+         },
+         {
+            "name":"nameApiKeyVault",
+            "type":"Microsoft.Solutions.ArmApiControl",
+            "request":{
+               "method":"POST",
+               "path":"[concat(subscription().id,'/providers/Microsoft.KeyVault/checkNameAvailability?api-version=2019-09-01')]",
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.KeyVault/vaults\"}',''))]"
+            }
+         },
          {
             "name":"siteName",
             "type":"Microsoft.Common.TextBox",
@@ -48,21 +48,20 @@
                "required":true,
                "regex":"^[a-z0-9A-Z]{1}[a-z0-9A-Z-]{3,21}$",
                "validationMessage":"The name should include 4-22 letters, digits or '-'. The '-' shouldn't be the first symbol.",
-      "validations": [
-        {
-          "isValid": "[or(less(length(basics('siteName')),4),not(equals(basics('nameApiWeb').nameAvailable, false)))]",
-          "message": "Please use another name. The name is not available for a web site"
-        },
-        {
-          "isValid": "[or(less(length(basics('siteName')),4),not(equals(basics('nameApiSql').available, false)))]",
-          "message": "Please use another name. The name is not available for a SQL instance"
-        },
-        {
-          "isValid": "[or(less(length(basics('siteName')),4),not(equals(basics('nameApiKeyVault').nameAvailable, false)))]",
-          "message": "Please use another name. The name is not available for a key vault"
-        }
-
-      ]
+               "validations":[
+                  {
+                     "isValid":"[or(less(length(basics('siteName')),4),not(equals(basics('nameApiWeb').nameAvailable, false)))]",
+                     "message":"Please use another name. The name is not available for a web site"
+                  },
+                  {
+                     "isValid":"[or(less(length(basics('siteName')),4),not(equals(basics('nameApiSql').available, false)))]",
+                     "message":"Please use another name. The name is not available for a SQL instance"
+                  },
+                  {
+                     "isValid":"[or(less(length(basics('siteName')),4),not(equals(basics('nameApiKeyVault').nameAvailable, false)))]",
+                     "message":"Please use another name. The name is not available for a key vault"
+                  }
+               ]
             }
          }
       ],
@@ -97,18 +96,27 @@
                {
                   "name":"spSecret",
                   "type":"Microsoft.Common.PasswordBox",
-
-				                  "label": {
-                    "password": "The secret of the service principal",
-                    "confirmPassword": "Confirm secret"
-                },
-				                "options": {
-                    "hideConfirmation": false
-                },
+                  "label":{
+                     "password":"The secret of the service principal",
+                     "confirmPassword":"Confirm secret"
+                  },
+                  "options":{
+                     "hideConfirmation":false
+                  },
                   "toolTip":"A secret string with a least one character",
                   "constraints":{
                      "required":true,
                      "validationMessage":"A secret string with a least one character"
+                  }
+               },
+               {
+                  "name":"infoBoxSp",
+                  "type":"Microsoft.Common.InfoBox",
+                  "visible":true,
+                  "options":{
+                     "icon":"Info",
+                     "label":" XXX",
+                     "text":"[concat('<b>Create the service principl in the Azure PowerShell Cloud Shell</b><br/><br/>Invoke-Command {<br/>$AppName=\"svc-HydraWebAuthentication\"<br/>$ReplyUri=\"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"<br/>Connect-AzureAD<br/>$App=New-AzureADApplication -DisplayName $AppName -GroupMembershipClaims \"SecurityGroup\" -AvailableToOtherTenants $true -ReplyUrls $ReplyUri<br/>$AppSecret = New-AzureADApplicationPasswordCredential -ObjectId $App.ObjectId -EndDate ([System.DateTime]::Now.AddYears(2).ToString(\"o\"))<br/>write-host \"-----------------------------------------------\"<br/>write-host \"Application Id:        $($app.AppId)\"<br/>write-host \"Secret:                $($AppSecret.Value)\"<br/>write-host \"-----------------------------------------------\"}','')]"
                   }
                }
             ]
@@ -145,18 +153,18 @@
          {
             "name":"tags",
             "label":"Tags",
-			"elements":[
+            "elements":[
                {
                   "name":"tagsByResource",
                   "type":"Microsoft.Common.TagsByResource",
-				  "toolTip":"Add tags to the resources for governance reason",
+                  "toolTip":"Add tags to the resources for governance reason",
                   "resources":[
                      "Microsoft.OperationalInsights/workspaces",
-					 "Microsoft.Sql/servers",
+                     "Microsoft.Sql/servers",
                      "Microsoft.KeyVault/vaults",
                      "Microsoft.Web/serverfarms",
-					 "Microsoft.Storage/storageAccounts",
-					 "Microsoft.Web/sites"
+                     "Microsoft.Storage/storageAccounts",
+                     "Microsoft.Web/sites"
                   ]
                }
             ]
