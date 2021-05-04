@@ -24,9 +24,9 @@ Please make sure to send feedback and update the solution regularly.
 
 - Multi-tenancy
 - Management of user sessions
-- - Logoff, messages
+  - Logoff, messages
 - Management of session hosts
-- - Start, Stop, Delete, Restart, Automatically change disk types
+  - Start, Stop, Delete, Restart, Automatically change disk types
 - Autoscale
   - Multi-Session hosts
     - Power-on-connect support
