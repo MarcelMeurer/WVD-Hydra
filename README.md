@@ -23,36 +23,22 @@ Please make sure to send feedback and update the solution regularly.
 ## Preview Features
 
 - Multi-tenancy
-
 - Management of user sessions
-
 - - Logoff, messages
-
 - Management of session hosts
-
 - - Start, Stop, Delete, Restart, Automatically change disk types
-
 - Autoscale
-
-- - Multi-Session hosts
-
-  - - Power-on-connect support
+  - Multi-Session hosts
+    - Power-on-connect support
     - Schedules
     - Deploy hosts on demand
-
   - VDI
-
-  - - (this week): Auto deallocate session hosts)
-
+    - Auto deallocate session hosts)
 - Session Timeouts
-
 - Session host definitions
-
-- - Per host pool
-  - Copy
-
+  - Per host pool
+  - Copy configuration
 - Auto Health
 
   - Remove orphan sessions (not yet configurable)
-
 - ...
