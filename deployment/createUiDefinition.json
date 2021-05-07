@@ -46,7 +46,7 @@
             "name":"siteName",
             "type":"Microsoft.Common.TextBox",
             "label":"Name of your deployment",
-            "toolTip":"The name should include 4-22 lower-case letters, digits or '-'. The '-' shouldn't be the first symbol.",
+            "toolTip":"That is the name of the web portal (e.g.: my-wvd-portal - you can late access this site by using my-wvd-portal.azurewebsites.net).\nThe name should include 4-22 lower-case letters, digits or '-'. The '-' shouldn't be the first symbol.",
             "constraints":{
                "required":true,
                "regex":"^[a-z0-9]{1}[a-z0-9-]{3,21}$",
