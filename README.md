@@ -29,6 +29,7 @@ Please make sure to send feedback and update the solution regularly.
   - Multi-Session hosts
     - Power-on-connect support
     - Schedules
+    - Autopilot: Automatically scales up/down/create/remove based on the usage of a host pool
     - Deploy hosts on demand - including ephemeral VMs based on a custom image
   - VDI
     - Auto deallocate session hosts
