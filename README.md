@@ -1,7 +1,5 @@
 # WVD-Hydra
 
-**Use this solution on invitation only.**
-
 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
@@ -31,12 +29,13 @@ Please make sure to send feedback and update the solution regularly.
   - Multi-Session hosts
     - Power-on-connect support
     - Schedules
-    - Deploy hosts on demand
+    - Deploy hosts on demand - including ephemeral VMs based on a custom image
   - VDI
-    - Auto deallocate session hosts)
+    - Auto deallocate session hosts
 - Session Timeouts
 - Session host definitions
   - Per host pool
+  - Images and shared images
   - Copy configuration
 - Auto Health
 
