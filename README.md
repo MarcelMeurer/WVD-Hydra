@@ -12,7 +12,7 @@
 
 Project "Hydra" is an upcoming solution to manage Windows Virtual Desktop for one or more tenants. It's currently in preview, which means that it can be tested in some environments without any support nor warranty, at your own risk, and without the right of indemnity. However, I am trying to publish the preview releases in high quality.
 
-The project will be made available in the future as a community edition and as a supported licensable product.
+The project will be made available in the future as a community edition (planed: up to 6 session hosts per host pool and one tenant - even for commercial use) and as a supported licensable product ($2 per concurrent user/month). In general, Hydra will work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or number of hosts/tenants.
 
 Please make sure to send feedback and update the solution regularly.
 
@@ -39,7 +39,6 @@ Please make sure to send feedback and update the solution regularly.
   - Images and shared images
   - Copy configuration
 - Auto Health
-
   - Remove orphan sessions (not yet configurable)
 - ...
 
@@ -55,24 +54,24 @@ During the deployment, you have to enter the following information:
 
 - Basics
 
-- - Subscription
+  - Subscription
   - Resource group
   - Region
   - Name of your deployment: That name becomes the hostname of the hydra-portal e.g., "myhydrainstance.azurewebsites.net". The name must be unique for some resource types. Press "Tab" to let Azure check the availability of the name
 
 - Service Principal
 
-- - A (web) service principal is needed to let users log in to the hydra-portal website. Create the service principal with the PowerShell script in the Cloud Shell. Copy the following data into the fields: 
+  - A (web) service principal is needed to let users log in to the hydra-portal website. Create the service principal with the PowerShell script in the Cloud Shell. Copy the following data into the fields: 
   - Application Id
   - The secret of the service principal and Confirm secret.
 
 - Administration
 
-- - Add the UPN of the master administrator into the field. You can add multiple administrators separated with a comma. These users have full access to the solution and can add other users with specific permissions in one of the following updates.
+  - Add the UPN of the master administrator into the field. You can add multiple administrators separated with a comma. These users have full access to the solution and can add other users with specific permissions in one of the following updates.
 
 - Tags
 
-- - Are optional to tag the resources
+  - Are optional to tag the resources
 
 After that, click "Create" to install your instance of Project Hydra into your subscription. The deployment will take some minutes.
 
@@ -94,21 +93,21 @@ You can use WVDAdmin credentials if you have or create a new service principal:
 
 - Click "New registration"
 
-- - Enter a name for the service principal, e.g., "svc-Hydra_Engine"
+  - Enter a name for the service principal, e.g., "svc-Hydra_Engine"
   - Click "Register"
 
 - Click "Certificates & secrets"
 
-- - Click "New client secret"
+  - Click "New client secret"
   - Select an expiration date, e.g., 18 month
   - Click "Add"
   - Directly copy the value (the secret) for later use
 
 - Click "Overview"
 
-- - Copy the following data to configure the service principal in Project Hydra
+  - Copy the following data to configure the service principal in Project Hydra
 
-  - - Directory (tenant) ID -> Tenant id
+    - Directory (tenant) ID -> Tenant id
     - Application (client) ID -> Application id
     - The secret from the previous step -> Secret
 
