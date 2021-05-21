@@ -48,7 +48,10 @@ Please make sure to send feedback and update the solution regularly.
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
 
-Use the "Deploy to Azure" button to roll out your instance of Project Hydra into your subscription. 
+Use the "Deploy to Azure" button to roll out your instance of Project Hydra into your subscription.
+
+<a href="https://youtu.be/GaRrotF0peM" target="_blank">See the installation and basic configuration on YouTube</a>
+
 
 During the deployment, you have to enter the following information:
 
