@@ -21,7 +21,7 @@
             "request":{
                "method":"POST",
                "path":"[concat(subscription().id,'/providers/Microsoft.Web/checkNameAvailability?api-version=2019-08-01')]",
-               "body":"[parse(concat('{\\"name\\":\\"',basics('siteName'),'\\",\\"type\\":\\"Microsoft.Web/sites\\"}',''))]"
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Web/sites\"}',''))]"
             }
          },
          {
@@ -30,7 +30,7 @@
             "request":{
                "method":"POST",
                "path":"[concat(subscription().id,'/providers/Microsoft.Sql/checkNameAvailability?api-version=2014-04-01')]",
-               "body":"[parse(concat('{\\"name\\":\\"',basics('siteName'),'\\",\\"type\\":\\"Microsoft.Sql/servers\\"}',''))]"
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Sql/servers\"}',''))]"
             }
          },
          {
@@ -39,14 +39,14 @@
             "request":{
                "method":"POST",
                "path":"[concat(subscription().id,'/providers/Microsoft.KeyVault/checkNameAvailability?api-version=2019-09-01')]",
-               "body":"[parse(concat('{\\"name\\":\\"',basics('siteName'),'\\",\\"type\\":\\"Microsoft.KeyVault/vaults\\"}',''))]"
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.KeyVault/vaults\"}',''))]"
             }
          },
          {
             "name":"siteName",
             "type":"Microsoft.Common.TextBox",
             "label":"Name of your deployment",
-            "toolTip":"That is the name of the web portal (e.g.: my-wvd-portal - you can late access this site by using my-wvd-portal.azurewebsites.net).\\nThe name should include 4-22 lower-case letters, digits or '-'. The '-' shouldn't be the first symbol.",
+            "toolTip":"That is the name of the web portal (e.g.: my-wvd-portal - you can late access this site by using my-wvd-portal.azurewebsites.net).\nThe name should include 4-22 lower-case letters, digits or '-'. The '-' shouldn't be the first symbol.",
             "constraints":{
                "required":true,
                "regex":"^[a-z0-9]{1}[a-z0-9-]{3,21}$",
@@ -78,7 +78,7 @@
                   "type":"Microsoft.Common.TextBlock",
                   "visible":true,
                   "options":{
-                     "text":"[concat('A service principal is needed to authenticate to the web app. Please create a service principal based on the documentation and enter the application id and secret. Optionally: Id and secret can be changed on the deployed Key Vault after the deployment. The redirect URI is \\"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\\"')]",
+                     "text":"[concat('A service principal is needed to authenticate to the web app. Please create a service principal based on the documentation and enter the application id and secret. Optionally: Id and secret can be changed on the deployed Key Vault after the deployment. The redirect URI is \"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"')]",
                      "link":{
                         "label":"Learn more",
                         "uri":"[concat('https://github.com/MarcelMeurer/WVD-Hydra/portalHelper/WebApp-ServicePrincipalCode.md?redirectUri=https://',basics('siteName'),'.azurewebsites.net/signin-oidc')]"
@@ -119,7 +119,7 @@
                   "options":{
                      "icon":"Info",
                      "label":" XXX",
-                     "text":"[concat('<b>Create the service principal with powershell in the Cloud Shell</b><br/><br/>Invoke-Command {<br/>$AppName=\\"svc-HydraWebAuthentication\\"<br/>$ReplyUri=\\"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\\"<br/>$RequiredGrants = [Microsoft.Open.AzureAD.Model.RequiredResourceAccess]::new(\\"00000003-0000-0000-c000-000000000000\\",@([Microsoft.Open.AzureAD.Model.ResourceAccess]::new(\\"e1fe6dd8-ba31-4d61-89e7-88639da4683d\\",\\"Scope\\"),[Microsoft.Open.AzureAD.Model.ResourceAccess]::new(\\"b340eb25-3456-403f-be2f-af7a0d370277\\",\\"Scope\\")))<br/><br/>Connect-AzureAD<br/><br/>$App=New-AzureADApplication -DisplayName $AppName -GroupMembershipClaims \\"SecurityGroup\\" -AvailableToOtherTenants $true -ReplyUrls $ReplyUri -RequiredResourceAccess $RequiredGrants<br/>$AppSecret = New-AzureADApplicationPasswordCredential -ObjectId $App.ObjectId -EndDate ([System.DateTime]::Now.AddYears(2).ToString(\\"o\\"))<br/>write-host \\"--------------------------------------------------------------------------\\"<br/>write-host \\"Application Id:        $($app.AppId)\\"<br/>write-host \\"Secret:                $($AppSecret.Value)\\"<br/>write-host \\"--------------------------------------------------------------------------\\"}','')]"
+                     "text":"[concat('<b>Create the service principal with powershell in the Cloud Shell</b><br/><br/>Invoke-Command {<br/>$AppName=\"svc-HydraWebAuthentication\"<br/>$ReplyUri=\"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"<br/>$RequiredGrants = [Microsoft.Open.AzureAD.Model.RequiredResourceAccess]::new(\"00000003-0000-0000-c000-000000000000\",@([Microsoft.Open.AzureAD.Model.ResourceAccess]::new(\"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\"Scope\"),[Microsoft.Open.AzureAD.Model.ResourceAccess]::new(\"b340eb25-3456-403f-be2f-af7a0d370277\",\"Scope\")))<br/><br/>Connect-AzureAD<br/><br/>$App=New-AzureADApplication -DisplayName $AppName -GroupMembershipClaims \"SecurityGroup\" -AvailableToOtherTenants $true -ReplyUrls $ReplyUri -RequiredResourceAccess $RequiredGrants<br/>$AppSecret = New-AzureADApplicationPasswordCredential -ObjectId $App.ObjectId -EndDate ([System.DateTime]::Now.AddYears(2).ToString(\"o\"))<br/>write-host \"--------------------------------------------------------------------------\"<br/>write-host \"Application Id:        $($app.AppId)\"<br/>write-host \"Secret:                $($AppSecret.Value)\"<br/>write-host \"--------------------------------------------------------------------------\"}','')]"
                   }
                }
             ]
