@@ -147,7 +147,7 @@
                   "toolTip":"Comma-delimited list of full admins of the solutions (at least one UPN)",
                   "constraints":{
                      "required":true,
-                     "regex":"^([\\w+-.%]+@[\\w-.]+\\.[A-Za-z]{2,4},?)+$",
+                     "regex":"^[\W]*([\w+\-.%]+@[\w\-.]+\.[A-Za-z]+[\W]*,{1}[\W]*)*([\w+\-.%]+@[\w\-.]+\.[A-Za-z]+)[\W]*$",
                      "validationMessage":"At least one UPN mus be entered (admin@contoso.com)"
                   }
                }
