@@ -40,6 +40,8 @@ Please make sure to send feedback and update the solution regularly.
   - Copy configuration
 - Auto Health
   - Remove orphan sessions (not yet configurable)
+- Automatic disk change
+  - Disk size is automatically changed on start/deallocation based on the VM tag "WVD.AdvDiskType", e.g., "Premium_LRS" will change the disk type to premium on start and to hdd after deallocation
 - ...
 
 
@@ -80,7 +82,7 @@ After that, click "Create" to install your instance of Project Hydra into your s
 
 
 
-## Adding your a tenant
+## Adding a tenant
 
 Open your Project Hydra instance in a web browser by entering https://myhydrainstance.azurewebsites.net (myhydrainstance is the name of your deployment from the basic step).
 
