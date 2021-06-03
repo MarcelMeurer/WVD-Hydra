@@ -123,3 +123,157 @@ Before you complete the configuration in Project Hydra, go to your Azure subscri
 
 
 Go back to the configuration and give your new tenant configuration a display name and check "Enabled". You can test the service principal by clicking "Test primary". After that, click "Save". Please reload the website after a few minutes to see your environment in Project Hydra.
+
+
+
+## Scaling
+
+Scaling can be essential in a WVD environment regarding the costs. For example, running virtual machines costs money - independent if users are connected or not. Additionally, the storage costs 24/7 - even for a deallocated virtual machine. Typically in WVD, the number of user sessions changed from time to time, and in a best-case, the number of running session hosts correspondent to the actual count of user sessions.
+
+Hydra can scale pooled session hosts (multi-session) and persistent (VDI) host pools in a very smart way - like an autopilot for host pools. And: It can create temporary session hosts on demand if needed and delete them later, saving costs for the non-existing virtual disks.
+
+
+
+### Scaling of pooled host pools
+
+A pooled host pool should have always had enough running session host to provide capacity to host the upcoming users (but not more) or should use Power-on-Connect to start the first session host while a user begins the connection.
+
+While hydra autoscaling and autoshutdown works perfectly with Power-on-Connect, I recommend [enabling this feature](https://blog.itprocloud.de/Custom-Role-for-Power-On-Connect-Preview/). Additionally, Power-on-Connect allows deallocating all session hosts if no user is connected.
+
+
+
+***Dashboard -> Three dots icon (configuration) on the host pool -> Autoscale & Autoshutdown***
+
+
+
+Enable the configuration and configure the basic settings:
+
+- Use Power-On-Connect (preview feature):
+  Check this (and configure Power-on-Connect) to bring the host pool down to zero session hosts
+- Session hosts running 24/7:
+  With Power-on-Connect you can go down to 0. If you have reserved instanced, it is a good option to let some session hosts running permanently (users don't have to wait for the start of a session host)
+- Default Loadbalancer Type:
+  Should be "Depth-First"
+- Min. number of available sessions:
+  A minimum amount of a free session capacity. If you set it to 5 then always enough session hosts are available to host 5 more sessions. 0 is the most cost-saving value (brings the host pool down to zero session hosts)
+- Min. number of hosts without sessions:
+  A minimum amount of session hosts without user sessions. 0 is the most cost-saving value (brings the host pool down to zero session hosts)
+- Temporarily rollout new session hosts up to a max. number of hosts in the pool:
+  If a default rollout profile is configured, autoscale can create new session hosts if needed. This configuration limits the total amount of session hosts in the pool. Temporarily created session hosts will be removed automatically if no longer needed. Note: Power-On-Connect cannot trigger the creation of a new session host
+- Concurrent starts/rollout of session hosts at the same time:
+  Limits the number of parallel starts/creation of session hosts. In a huger environment, increase this value to start more session hosts at the same time
+
+
+
+Additionally, you can configure schedules to have several session hosts running in the peak time of the logons (e.g. between 7:00 am and 9:00 am). Hint: You don't need to cover the working hours - if more session hosts are needed, autoscale will start or create new hosts (like an auto-pilot).
+
+
+
+Add a new schedule and configure:
+
+- Min. Hosts:
+  The min. number of hosts running in the time frame. If fewer hosts are running, autoscale will start/create additional hosts
+- Weekdays, from, to:
+  The time when this schedule is active
+- Load-Balancer: 
+  You can change the load-balancer type for the time frame to breadth-first to spread the logons around all available session hosts. That increases the performance dramatically in a logon-storm-phase
+- Build-First:
+  If a default rollout profile is configured, you can use this option to temporarily roll out a new session host to reach the minimum level of hosts for this time frame. Temporarily created session hosts will be removed automatically if no longer needed. Note: This is a great option with Power-on-Connect: Let the engine create 60% of the needed hosts in the morning and left the existing host deallocated for Power-on-Connect
+- Note: Configure the time zone of the host pool in the "Base" tab
+
+
+
+**Pro-Tip:**
+
+- Create a default rollout profile in the "New session host rollout" tab and test it 
+- User Power-on-Connect to bring down the host pools to 0 hosts
+- Have several session hosts deployed permanently to (with Hydra or WVDAdmin). These hosts are proposed to start them if new hosts are needed (starting is faster than creating)
+- Use a schedule to provide temporarily created hosts in the rush hour (typically in the morning). These hosts will be deleted if no longer needed (and that saves the costs for the non-existing disks as well)
+- Configure "Session Timeouts" to log off disconnected sessions
+
+
+
+**Pro-Pro-Tip:** 
+
+- Use ephemeral disks for more saving and higher performance)
+
+
+
+**Example:**
+
+![](media/Scale-Pooled-01.png)
+
+
+
+### Scaling of persistent host pools
+
+A persistent host pool contains assigned session hosts for named users. A user can start the session hosts directly with the WVD client: If the session host is deallocated, a click to the desktop icon will start the session host using the [Power-on-Connect](https://blog.itprocloud.de/Custom-Role-for-Power-On-Connect-Preview/) feature.
+
+
+
+To deallocate unused hosts automatically, configure "Autoscale & Autoshutdown" in Hydra:
+
+
+
+***Dashboard -> Three dots icon (configuration) on the host pool -> Autoscale & Autoshutdown***
+
+
+
+Add a new schedule and configure:
+
+- Timeouts in minutes:
+  The time after an unused session host will be deallocated
+- Weekdays, from, to:
+  The time when this schedule is active
+- Note: Configure the time zone of the host pool in the "Base" tab
+
+
+
+**Example:**
+
+![](media/Scale-Persistent-01.png)
+
+The example shutdown unused session hosts after 20 minutes for every day and time in a week.
+
+Note: 
+
+- You can add multiple schedules for different times
+- Configure "Session Timeouts" to log off disconnected sessions
+- Only session hosts without sessions are deallocated after the timeout
+
+
+
+## Session timeouts
+
+Session timeouts a very helpful to log off disconnected sessions fast. Disconnected sessions are log out automatically after a timeout. That is important to allow autoscale to deallocate session hosts. You can define different timeouts based on the weekdays and times (like in the example below):
+
+
+
+***Dashboard -> Three dots icon (configuration) on the host pool -> Session Timeouts***
+
+
+
+Add a new schedule and configure:
+
+- Timeouts in minutes:
+  The time after a disconnected session will be deallocated
+- Weekdays, from, to:
+  The time when this schedule is active
+- Note: Configure the time zone of the host pool in the "Base" tab
+
+
+
+**Example:**
+
+![](media/SessionTimeouts-01.png)
+
+For the example, disconnected sessions will be logged off:
+
+- Mo-Fr between 7:00 am and 8:00 pm, after 120 minutes (working hours, enough time to have a lunch or a meeting)
+- Mo-Fr outside 7:00 am and 8:00, after 20 minutes
+- On the weekend, after 20 minutes
+
+Note: 
+
+- You can add multiple schedules for different times
+- Session timeouts work for pooled and persistent host pools
