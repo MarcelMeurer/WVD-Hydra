@@ -324,8 +324,8 @@
                      "value":"[concat('https://',variables('siteNameUnique'),environment().suffixes.keyvaultDns)]"
                   },
                   {
-                     "name":"AzureAd:Instance",
-                     "value":"[environment().authentication.loginEndpoint]"
+                     "name":"AzureAd:Cloud",
+                     "value":"[environment().name]"
                   },
                   {
                      "name":"PROJECT",
