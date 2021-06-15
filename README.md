@@ -46,6 +46,15 @@ Please make sure to send feedback and update the solution regularly.
 
 
 
+## Updates and releases
+
+- 1.0.0.5	(2021/06/15)
+  Role-base access and mirroring of user sessions (click on the play icon in the user overview of an active session)
+
+
+
+
+
 ## Installation
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
