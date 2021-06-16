@@ -49,7 +49,10 @@ Please make sure to send feedback and update the solution regularly.
 ## Updates and releases
 
 - 1.0.0.5	(2021/06/15)
-  Role-base access and mirroring of user sessions (click on the play icon in the user overview of an active session)
+  - Role-base access and mirroring of user sessions (click on the play icon in the user overview of an active session)
+- 1.0.0.6	(2021/06/16)
+  - 'Auto-change disk type' can be configured on the host pool level (base settings) to switch to disks to SSD/Premium on start and HDD after deallocating (saving money for the storage).
+  - Autoscale schedules can now include serving a minimum number of free sessions.
 
 
 
