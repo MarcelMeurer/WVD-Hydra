@@ -58,29 +58,6 @@
          }
       },
       {
-         "type":"Microsoft.Authorization/roleDefinitions",
-         "apiVersion":"2018-07-01",
-         "name":"[guid(subscription().id, 'start VM on connect')]",
-         "properties":{
-            "roleName":"Start VM on connect",
-            "description":"Custom role for AVD Power-On-Connect",
-            "type":"customRole",
-            "isCustom":true,
-            "permissions":[
-               {
-                  "actions":[
-                     "Microsoft.Compute/virtualMachines/start/action",
-                     "Microsoft.Compute/virtualMachines/read"
-                  ],
-                  "notActions":""
-               }
-            ],
-            "assignableScopes":[
-               "[subscription().id]"
-            ]
-         }
-      },
-      {
          "type":"Microsoft.Sql/servers",
          "apiVersion":"2019-06-01-preview",
          "name":"[variables('siteNameUnique')]",
