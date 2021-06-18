@@ -35,20 +35,23 @@ Please make sure to send feedback and update the solution regularly.
   - VDI
     - Auto deallocate session hosts
 - Session Timeouts
-- Session host definitions
+- Session host definitions for rollouts
   - Per host pool
   - Images and shared images
   - Copy configuration
 - Auto Health
-  - Remove orphan sessions (not yet configurable)
+  - Remove orphan sessions
 - Automatic disk change
   - Disk size is automatically changed on start/deallocation based on the VM tag "WVD.AdvDiskType", e.g., "Premium_LRS" will change the disk type to premium on start and to hdd after deallocation
+  - From version 1.0.0.6: Can be configured on the host pool level
 - ...
 
 
 
 ## Updates and releases
 
+- 1.0.0.8	(2021/06/18)
+  - Auto health can be configured on the host pool level for orphan sessions
 - 1.0.0.7	(2021/06/17)
   - Bugfix: 'Auto-change disk type' can now be disabled
 - 1.0.0.6	(2021/06/16)
@@ -186,6 +189,8 @@ Add a new schedule and configure:
 
 - Min. Hosts:
   The min. number of hosts running in the time frame. If fewer hosts are running, autoscale will start/create additional hosts
+- Min. Free Sessions:
+  Optionally: Minimum number of available (free) sessions during the schedule. The engine keeps care that enough session hosts are running to handle this number of new sessions (the engine will start additional hosts)
 - Weekdays, from, to:
   The time when this schedule is active
 - Load-Balancer: 
