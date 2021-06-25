@@ -1,360 +1,395 @@
 {
-   "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-   "contentVersion":"1.0.0.0",
-   "parameters":{
-      "siteName":{
-         "defaultValue":"Enter a unique hostname for SQL, Web Server and Log Analytics ",
-         "type":"string"
-      },
-      "spId":{
-         "defaultValue":"Service principal id",
-         "type":"string"
-      },
-      "spSecret":{
-         "defaultValue":"",
-         "type":"secureString"
-      },
-      "admins":{
-         "defaultValue":"Administrators of this solutions",
-         "type":"string"
-      },
-      "location":{
-         "type":"string",
-         "defaultValue":"[parameters('location')]",
-         "metadata":{
-            "description":"Location for all resources."
-         }
-      },
-      "tagsByResource":{
-         "type":"object",
-         "defaultValue":{
-            
-         }
-      },
-      "SqlPassword":{
-         "defaultValue":"[base64(concat(utcNow('u'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name,newGuid())))]",
-         "type":"securestring"
-      }
-   },
-   "variables":{
-      "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
-      "siteNameUnique":"[concat(parameters('siteName'),'')]",
-      "storageName":"[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]"
-   },
-   "resources":[
-      {
-         "apiVersion":"2020-06-01",
-         "name":"pid-1046f72e-14d8-44db-81d1-5cfb2bec048a",
-         "type":"Microsoft.Resources/deployments",
-         "properties":{
-            "mode":"Incremental",
-            "template":{
-               "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-               "contentVersion":"1.0.0.0",
-               "resources":[
-                  
-               ]
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "siteName": {
+            "defaultValue": "Enter a unique hostname for SQL, Web Server and Log Analytics ",
+            "type": "string"
+        },
+        "spId": {
+            "defaultValue": "Service principal id",
+            "type": "string"
+        },
+        "spSecret": {
+            "defaultValue": "",
+            "type": "secureString"
+        },
+        "admins": {
+            "defaultValue": "Administrators of this solutions",
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
             }
-         }
-      },
-      {
-         "type":"Microsoft.Sql/servers",
-         "apiVersion":"2019-06-01-preview",
-         "name":"[variables('siteNameUnique')]",
-         "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Sql/servers'), parameters('tagsByResource')['Microsoft.Sql/servers'], json('{}')) ]",
-         "kind":"v12.0",
-         "properties":{
-            "administratorLogin":"dbadmin",
-            "administratorLoginPassword":"[parameters('SqlPassword')]",
-            "version":"12.0"
-         }
-      },
-      {
-         "type":"Microsoft.Storage/storageAccounts",
-         "kind":"Storage",
-         "name":"[variables('storageName')]",
-         "apiVersion":"2019-06-01",
-         "sku":{
-            "name":"Standard_LRS"
-         },
-         "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Storage/storageAccounts'), parameters('tagsByResource')['Microsoft.Storage/storageAccounts'], json('{}')) ]"
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults",
-         "name":"[variables('siteNameUnique')]",
-         "apiVersion":"2019-09-01",
-         "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.KeyVault/vaults'), parameters('tagsByResource')['Microsoft.KeyVault/vaults'], json('{}')) ]",
-         "properties":{
-            "sku":{
-               "family":"A",
-               "name":"standard"
+        },
+        "tagsByResource": {
+            "type": "object",
+            "defaultValue": {}
+        },
+        "SqlPassword": {
+            "defaultValue": "[base64(concat(utcNow('u'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name,newGuid())))]",
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "connectionString": "[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
+        "siteNameUnique": "[concat(parameters('siteName'),'')]",
+        "storageName": "[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-06-01",
+            "name": "pid-1046f72e-14d8-44db-81d1-5cfb2bec048a",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleDefinitions",
+            "apiVersion": "2018-07-01",
+            "name": "[guid(subscription().id, 'start VM on connect')]",
+            "properties": {
+                "roleName": "Start VM on connect",
+                "description": "Custom role for WVD Power-On-Connect",
+                "type": "customRole",
+                "isCustom": true,
+                "permissions": [
+                    {
+                        "actions": [
+                            "Microsoft.Compute/virtualMachines/start/action",
+                            "Microsoft.Compute/virtualMachines/read"
+                        ]
+                    }
+                ],
+                "assignableScopes": [
+                    "[subscription().id]",
+                    "[resourceGroup().id]"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2019-06-01-preview",
+            "name": "[variables('siteNameUnique')]",
+            "location": "[parameters('location')]",
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Sql/servers'), parameters('tagsByResource')['Microsoft.Sql/servers'], json('{}')) ]",
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "dbadmin",
+                "administratorLoginPassword": "[parameters('SqlPassword')]",
+                "version": "12.0"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "kind": "Storage",
+            "name": "[variables('storageName')]",
+            "apiVersion": "2019-06-01",
+            "sku": {
+                "name": "Standard_LRS"
             },
-            "tenantId":"[subscription().tenantid]",
-            "accessPolicies":[
-               {
-                  "tenantId":"[subscription().tenantid]",
-                  "objectId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
-                  "permissions":{
-                     "secrets":[
-                        "get",
-                        "list",
-                        "set"
-                     ]
-                  }
-               }
+            "location": "[parameters('location')]",
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Storage/storageAccounts'), parameters('tagsByResource')['Microsoft.Storage/storageAccounts'], json('{}')) ]"
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('siteNameUnique')]",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('location')]",
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.KeyVault/vaults'), parameters('tagsByResource')['Microsoft.KeyVault/vaults'], json('{}')) ]",
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "tenantId": "[subscription().tenantid]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantid]",
+                        "objectId": "[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
+                        "permissions": {
+                            "secrets": [
+                                "get",
+                                "list",
+                                "set"
+                            ]
+                        }
+                    }
+                ],
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false,
+                "enableSoftDelete": true,
+                "softDeleteRetentionInDays": 90
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'AzureAd--ClientId')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
             ],
-            "enabledForDeployment":false,
-            "enabledForDiskEncryption":false,
-            "enabledForTemplateDeployment":false,
-            "enableSoftDelete":true,
-            "softDeleteRetentionInDays":90
-         },
-         "dependsOn":[
-            "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-         ]
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'AzureAd--ClientId')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[parameters('spId')]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'AzureAd--ClientSecret')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[parameters('spSecret')]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'AzureAd--TenantId')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[subscription().tenantid]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-CryptoKey')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[base64(substring(concat(uniqueString('secHash',guid(resourceGroup().id, deployment().name)),uniqueString(subscription().id),'842983489234989823!'),0,32))]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-DbConnectionString')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[variables('connectionString')]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-LogAnalyticsDefaultId')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('siteNameUnique'))).customerId]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-StorageAccountUri')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[concat(variables('storageName'),'.',environment().suffixes.storage)]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-StorageAccountKey')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value]"
-         }
-      },
-      {
-         "type":"Microsoft.KeyVault/vaults/secrets",
-         "apiVersion":"2019-09-01",
-         "name":"[concat(variables('siteNameUnique'), '/', 'Hydra-LogAnalyticsDefaultKey')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "value":"[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique')), '2015-03-20').primarySharedKey]"
-         }
-      },
-      {
-         "type":"Microsoft.Sql/servers/databases",
-         "apiVersion":"2019-06-01-preview",
-         "name":"[concat(variables('siteNameUnique'), '/Hydra')]",
-         "location":"[parameters('location')]",
-         "sku":{
-            "name":"S0",
-            "tier":"Standard"
-         },
-         "kind":"v12.0,user",
-         "properties":{
-            "collation":"SQL_Latin1_General_CP1_CI_AS",
-            "catalogCollation":"SQL_Latin1_General_CP1_CI_AS"
-         },
-         "dependsOn":[
-            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
-         ]
-      },
-      {
-         "type":"Microsoft.Sql/servers/firewallRules",
-         "apiVersion":"2015-05-01-preview",
-         "name":"[concat(variables('siteNameUnique'), '/AllowAllWindowsAzureIps')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
-         ],
-         "properties":{
-            "startIpAddress":"0.0.0.0",
-            "endIpAddress":"0.0.0.0"
-         }
-      },
-      {
-         "apiVersion":"2020-10-01",
-         "name":"[variables('siteNameUnique')]",
-         "type":"Microsoft.OperationalInsights/workspaces",
-         "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.OperationalInsights/workspaces'), parameters('tagsByResource')['Microsoft.OperationalInsights/workspaces'], json('{}')) ]",
-         "properties":{
-            "sku":{
-               "Name":"PerGB2018"
+            "properties": {
+                "value": "[parameters('spId')]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'AzureAd--ClientSecret')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[parameters('spSecret')]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'AzureAd--TenantId')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[subscription().tenantid]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'Hydra-CryptoKey')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[base64(substring(concat(uniqueString('secHash',guid(resourceGroup().id, deployment().name)),uniqueString(subscription().id),'842983489234989823!'),0,32))]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'Hydra-DbConnectionString')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[variables('connectionString')]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'Hydra-LogAnalyticsDefaultId')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('siteNameUnique'))).customerId]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'Hydra-StorageAccountUri')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[concat(variables('storageName'),'.',environment().suffixes.storage)]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'Hydra-StorageAccountKey')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2021-04-01').keys[0].value]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('siteNameUnique'), '/', 'Hydra-LogAnalyticsDefaultKey')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique')), '2021-06-01').primarySharedKey]"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2019-06-01-preview",
+            "name": "[concat(variables('siteNameUnique'), '/Hydra')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "S0",
+                "tier": "Standard"
             },
-            "retentionInDays":90
-         }
-      },
-      {
-         "type":"Microsoft.Web/serverfarms",
-         "apiVersion":"2019-08-01",
-         "name":"[variables('siteNameUnique')]",
-         "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/serverfarms'), parameters('tagsByResource')['Microsoft.Web/serverfarms'], json('{}')) ]",
-         "sku":{
-            "name":"S1",
-            "tier":"Standard",
-            "size":"S1",
-            "family":"S",
-            "capacity":1
-         },
-         "kind":"app",
-         "properties":{
-            "name":"[variables('siteNameUnique')]",
-            "perSiteScaling":false,
-            "reserved":false,
-            "targetWorkerCount":0,
-            "targetWorkerSizeId":0
-         }
-      },
-      {
-         "type":"Microsoft.Web/sites/siteextensions",
-         "apiVersion":"2018-11-01",
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-         ]
-      },
-      {
-         "type":"Microsoft.Web/sites",
-         "apiVersion":"2019-08-01",
-         "name":"[variables('siteNameUnique')]",
-         "location":"[parameters('location')]",
-         "tags":"[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/sites'), parameters('tagsByResource')['Microsoft.Web/sites'], json('{}')) ]",
-         "identity":{
-            "type":"SystemAssigned"
-         },
-         "kind":"app",
-         "properties":{
-            "enabled":true,
-            "serverFarmId":"[resourceId('Microsoft.Web/serverfarms',variables('siteNameUnique'))]",
-            "httpsOnly":true,
-            "siteConfig":{
-               "alwaysOn":true,
-               "use32BitWorkerProcess":false,
-               "appSettings":[
-                  {
-                     "name":"config:Administrators",
-                     "value":"[parameters('admins')]"
-                  },
-                  {
-                     "name":"config:KeyVaultUri",
-                     "value":"[concat('https://',variables('siteNameUnique'),environment().suffixes.keyvaultDns)]"
-                  },
-                  {
-                     "name":"AzureAd:Cloud",
-                     "value":"[environment().name]"
-                  },
-                  {
-                     "name":"PROJECT",
-                     "value":"bin"
-                  }
-               ]
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(variables('siteNameUnique'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
             }
-         },
-         "resources":[
-            {
-               "name":"web",
-               "type":"sourcecontrols",
-               "apiVersion":"2019-08-01",
-               "properties":{
-                  "RepoUrl":"https://github.com/MarcelMeurer/WVD-Hydra.git",
-                  "branch":"main",
-                  "IsManualIntegration":true
-               },
-               "dependsOn":[
-                  "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-               ]
+        },
+        {
+            "name": "[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(resourceGroup().id))]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/roleAssignments",
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '73c42c96-874c-492b-b04d-ab87d138a893')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
+                "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]"
+            ]
+        },
+        {
+            "apiVersion": "2020-10-01",
+            "name": "[variables('siteNameUnique')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "location": "[parameters('location')]",
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.OperationalInsights/workspaces'), parameters('tagsByResource')['Microsoft.OperationalInsights/workspaces'], json('{}')) ]",
+            "properties": {
+                "sku": {
+                    "Name": "PerGB2018"
+                },
+                "retentionInDays": 90
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2019-08-01",
+            "name": "[variables('siteNameUnique')]",
+            "location": "[parameters('location')]",
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/serverfarms'), parameters('tagsByResource')['Microsoft.Web/serverfarms'], json('{}')) ]",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "app",
+            "properties": {
+                "name": "[variables('siteNameUnique')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
             }
-         ],
-         "dependsOn":[
-            "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
-         ]
-      }
-   ]
+        },
+        {
+            "type": "Microsoft.Web/sites/siteextensions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('siteNameUnique'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "name": "[variables('siteNameUnique')]",
+            "location": "[parameters('location')]",
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/sites'), parameters('tagsByResource')['Microsoft.Web/sites'], json('{}')) ]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('siteNameUnique'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "use32BitWorkerProcess": false,
+                    "appSettings": [
+                        {
+                            "name": "config:Administrators",
+                            "value": "[parameters('admins')]"
+                        },
+                        {
+                            "name": "config:KeyVaultUri",
+                            "value": "[concat('https://',variables('siteNameUnique'),environment().suffixes.keyvaultDns)]"
+                        },
+                        {
+                            "name": "AzureAd:Cloud",
+                            "value": "[environment().name]"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "bin"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "apiVersion": "2019-08-01",
+                    "properties": {
+                        "RepoUrl": "https://github.com/MarcelMeurer/WVD-Hydra.git",
+                        "branch": "main",
+                        "IsManualIntegration": true
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
+            ]
+        }
+    ]
 }
