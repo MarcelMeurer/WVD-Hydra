@@ -52,6 +52,7 @@ Please make sure to send feedback and update the solution regularly.
 
 - 1.0.0.9	(2021/06/24)
   - Deployment tags can be configure on a per host pool level
+  - Note: The update removes the temporary stored session statistic for the last 12 hours (once to create an index to show the data faster)
 - 1.0.0.8	(2021/06/18)
   - Auto health can be configured on the host pool level for orphan sessions
 - 1.0.0.7	(2021/06/17)
