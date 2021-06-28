@@ -322,3 +322,4 @@ In both cases, the profiles are deleted from the storage account. The profile pa
   - Hint: For Azure Files, give the service account *"Storage File Data SMB Share Elevated Contributor"* permission on the storage account. Note: That can take a while. I made progress after creating one folder on the share in the context of the service account.
 - An available session host in the selected host pool
 
+![](media/Delete-FSLogix-01.png)
