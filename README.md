@@ -23,7 +23,7 @@ Please make sure to send feedback and update the solution regularly.
 - Multi-tenancy
 - Role-based access
 - Management of user sessions
-  - Logoff, messages, shadow user sessions
+  - Logoff, messages, shadow user sessions, delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu)
 - Management of session hosts
   - Start, Stop, Delete, Restart, Automatically change disk types
 - Autoscale
@@ -50,6 +50,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 
+- 1.0.1.0	(2021/06/28)
+  - Delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu) from the user sessions menu
 - 1.0.0.9	(2021/06/24)
   - Deployment tags can be configure on a per host pool level
   - Note: The update removes the temporary stored session statistic for the last 12 hours (once to create an index to show the data faster)
@@ -298,3 +300,25 @@ Note:
 
 - You can add multiple schedules for different times
 - Session timeouts work for pooled and persistent host pools
+
+
+
+## Delete FSLogix profiles from the user sessions menu
+
+Users and administrators with the role ***User and profile manager*** or higher can delete FSLogix profiles in two ways:
+- Select the users -> Burger menu ->Delete FSLogix Profile (left)
+
+  - The users are logged off, and the FSLogix profile will be deleted from the storage
+
+- Burger menu ->Delete FSLogix Profile (left)
+
+  - Select a host pool and enter the user names (UPN, e.g., user1@contoso.com;user2@contoso.com) into the text field
+
+
+In both cases, the profiles are deleted from the storage account. The profile path is read from one available session host in the host pool.
+
+**Prerequisites:**
+- Enter a service account of your local AD domain into the basic setting of each host pool where you want to use this feature. The service account is used to authenticate to the storage account, NetApp files, etc., and needs proper permission to delete files.
+  - Hint: For Azure Files, give the service account *"Storage File Data SMB Share Elevated Contributor"* permission on the storage account. Note: That can take a while. I made progress after creating one folder on the share in the context of the service account.
+- An available session host in the selected host pool
+
