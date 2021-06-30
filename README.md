@@ -50,6 +50,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 
+- 1.0.1.1	(2021/06/30)
+  - Deploy new session host in drain-mode (optional)
 - 1.0.1.0	(2021/06/28)
   - Delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu) from the user sessions menu
 - 1.0.0.9	(2021/06/24)
