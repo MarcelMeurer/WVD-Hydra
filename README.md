@@ -26,6 +26,8 @@ Please make sure to send feedback and update the solution regularly.
   - Logoff, messages, shadow user sessions, delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu)
 - Management of session hosts
   - Start, Stop, Delete, Restart, Automatically change disk types
+  - Create new session hosts with a click (with classic disks or ephemeral)
+  - Create new session hosts directly into the drain-mode
 - Autoscale
   - Multi-Session hosts
     - Power-on-connect support
@@ -50,6 +52,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 
+- 1.0.1.3	(2021/07/01)
+  - Fix: Change of an icon and rendering of a table in the schedule configuration
 - 1.0.1.2	(2021/07/01)
   - Improvement of displaying the time chart in the host pool
 - 1.0.1.1	(2021/06/30)
@@ -117,9 +121,9 @@ Click "Tenants" and "Add" to add your first or a new tenant. Next, you need a se
 
 
 
-You can use WVDAdmin credentials if you have or create a new service principal:
+You can use **[WVDAdmin](https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/)** credentials if you have or create a new service principal:
 
-- Open https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps
+- Open [https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
 
 - Click "New registration"
 
