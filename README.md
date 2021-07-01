@@ -50,6 +50,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 
+- 1.0.1.2	(2021/07/01)
+  - Improvement of displaying the time chart in the host pool
 - 1.0.1.1	(2021/06/30)
   - Deploy new session host in drain-mode (optional)
 - 1.0.1.0	(2021/06/28)
