@@ -12,7 +12,7 @@
 
 Project "Hydra" is an upcoming solution to manage Azure Virtual Desktop (Azure Virtual Desktop) for one or more tenants. It's currently in preview, which means that it can be tested in some environments without any support nor warranty, at your own risk, and without the right of indemnity. However, I am trying to publish the preview releases in high quality.
 
-The project will be made available in the future as a community edition (planed: up to 6 session hosts per host pool and one tenant - even for commercial use) and as a supported licensable product (less than $2 per concurrent user/month). In general, Hydra will work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or number of hosts/tenants.
+The project will be made available in the future as a **free community edition - even for commercial use** (planed: up to 6 session hosts per host pool and one tenant ) and as a supported licensable product (less than $2 per concurrent user/month). In general, Hydra will work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or number of hosts/tenants.
 
 Please make sure to send feedback and update the solution regularly.
 
