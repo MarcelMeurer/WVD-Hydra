@@ -52,6 +52,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 
+- 1.0.1.3	(2021/07/04)
+  - Add: Action log is now repeatable (GUI integration coming soon) and encrypt given secrets
 - 1.0.1.3	(2021/07/01)
   - Fix: Change of an icon and rendering of a table in the schedule configuration
 - 1.0.1.2	(2021/07/01)
