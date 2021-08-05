@@ -28,6 +28,7 @@ Please make sure to send feedback and update the solution regularly.
   - Start, Stop, Delete, Restart, Automatically change disk types
   - Create new session hosts with a click (with classic disks or ephemeral)
   - Create new session hosts directly into the drain-mode
+  - Automation scripts and script collections
 - Autoscale
   - Multi-Session hosts
     - Power-on-connect support
@@ -51,7 +52,8 @@ Please make sure to send feedback and update the solution regularly.
 
 
 ## Updates and releases
-
+- 1.0.1.5	(2021/08/05)
+  - Add: Scripts and script collections are available to manage session hosts. Can be applied after a rollout of a new host or by selecting session hosts and a script/collection; Fix: Some fine tunings, like session timeouts, performance, etc.
 - 1.0.1.4	(2021/07/04)
   - Add: Action log is now repeatable (GUI integration coming soon) and encrypt given secrets
 - 1.0.1.3	(2021/07/01)

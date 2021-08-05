@@ -56,10 +56,10 @@
         {
             "type": "Microsoft.Authorization/roleDefinitions",
             "apiVersion": "2018-07-01",
-            "name": "[guid(subscription().id, 'start VM on connect')]",
+            "name": "ae89bf09-d855-41d8-829a-d71c3d4e9ab3",
             "properties": {
-                "roleName": "Start VM on connect",
-                "description": "Custom role for WVD Power-On-Connect",
+                "roleName": "Start VM on-connect",
+                "description": "Custom role for AVD Power-On-Connect",
                 "type": "customRole",
                 "isCustom": true,
                 "permissions": [
