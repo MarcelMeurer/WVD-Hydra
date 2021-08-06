@@ -47,7 +47,7 @@ Please make sure to send feedback and update the solution regularly.
 - Automatic disk change
   - Disk size is automatically changed on start/deallocation based on the VM tag "WVD.AdvDiskType", e.g., "Premium_LRS" will change the disk type to premium on start and to hdd after deallocation
   - From version 1.0.0.6: Can be configured on the host pool level
-- [Scripts and Script Collections](#Scripts and Script Collections)
+- [Scripts and Script Collections](#Scripts-and-Script-Collections)
   - Run Powershell scripts on session hosts
   - Orchestarte hosts with multiple scripts and tasks: Drain mode on -> Logoff users -> Start the VM -> Run a script -> Restart -> Drain mode off
   - Built-in scripts/collections for Windows Update, Windows 10 optimization, ...
