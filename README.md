@@ -47,6 +47,10 @@ Please make sure to send feedback and update the solution regularly.
 - Automatic disk change
   - Disk size is automatically changed on start/deallocation based on the VM tag "WVD.AdvDiskType", e.g., "Premium_LRS" will change the disk type to premium on start and to hdd after deallocation
   - From version 1.0.0.6: Can be configured on the host pool level
+- [Scripts and Script Collections](#Scripts and Script Collections)
+  - Run Powershell scripts on session hosts
+  - Orchestarte hosts with multiple scripts and tasks: Drain mode on -> Logoff users -> Start the VM -> Run a script -> Restart -> Drain mode off
+  - Built-in scripts/collections for Windows Update, Windows 10 optimization, ...
 - ...
 
 
@@ -330,8 +334,61 @@ Users and administrators with the role ***User and profile manager*** or higher 
 In both cases, the profiles are deleted from the storage account. The profile path is read from one available session host in the host pool.
 
 **Prerequisites:**
+
 - Enter a service account of your local AD domain into the basic setting of each host pool where you want to use this feature. The service account is used to authenticate to the storage account, NetApp files, etc., and needs proper permission to delete files.
   - Hint: For Azure Files, give the service account *"Storage File Data SMB Share Elevated Contributor"* permission on the storage account. Note: That can take a while. I made progress after creating one folder on the share in the context of the service account.
 - An available session host in the selected host pool
 
 ![](media/Delete-FSLogix-01.png)
+
+## Scripts and Script Collections
+
+Scripts and script collections. Both are intended to automize Azure VMs, and Azure Virtual Desktop (AVD) from the management perspective.
+
+### Script
+
+A Powershell script for a session host. The script runs in the system context with system permissions, variables containing data about the host pool, session hosts, etc. Optionally, a Powershell credential object (PSC) can be used to connect to other services, like files shares (the service account can be configured on the host pool level).
+
+![](media/Script-01.png)
+
+### Script Collections
+
+A script collection is a collection of scripts and tasks in any sequence. E.g.: Drain mode on -> Logoff users -> Start the VM -> Run a script -> Restart -> Drain mode off
+
+![](media/ScriptCollection-01.png)
+
+Additionally, parameters can be set for a script, and error handling is built-in. Script collections are very useful to orchestrate several tasks and scripts to session hosts.
+
+
+
+Both can be assigned/triggered in different ways:
+
+- Directly in the session host list
+
+  ![](media/ScriptCollectionAssign-SessionHosts-01.png)
+
+- Automatically after the rollout of a new session host
+  ![](media/ScriptCollectionAssign-Rollout-01.png)
+
+- By a schedule (coming next)
+
+
+
+### Built-in scripts and collections
+
+There are several built-in scripts and collections, and new scripts and collections are provided continuously. Built-in scripts can be updated with the "Update" button in the upper-right corner.
+
+![](media/ScriptCollectionSync-01.png)
+
+
+
+Scripts and script collections can be triggered by *Host pool administrators* and edited by *Full administrators*.
+
+
+
+To add a custom script or script collection, copy the *"BuiltIn: 1st Template Script"* or *"BuiltIn: 1st Template Script Collection"*. Then start building the new one. Make sure to save the new script/collection with a click of the disk symbol. There is no warning right now if you close the browser or if you navigate to another site.
+
+![](media/ScriptCollectionSaveBar-01.png)
+
+
+
