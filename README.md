@@ -56,8 +56,10 @@ Please make sure to send feedback and update the solution regularly.
 
 
 ## Updates and releases
+- 1.0.1.6	(2021/08/08)
+  - Add: Scripts and script collections can be triggered by schedules on a host pool level (e.g., to automatically update Windows across a host poll Sunday morning, ...)
 - 1.0.1.5	(2021/08/05)
-  - Add: Scripts and script collections are available to manage session hosts. Can be applied after a rollout of a new host or by selecting session hosts and a script/collection; Fix: Some fine tunings, like session timeouts, performance, etc.
+  - Add: Scripts and script collections are available to manage session hosts. Can be applied after a rollout of a new host or by selecting session hosts and a script/collection or with a schedule on the host pool level; Fix: Some fine tunings, like session timeouts, performance, etc.
 - 1.0.1.4	(2021/07/04)
   - Add: Action log is now repeatable (GUI integration coming soon) and encrypt given secrets
 - 1.0.1.3	(2021/07/01)
@@ -359,21 +361,6 @@ A script collection is a collection of scripts and tasks in any sequence. E.g.: 
 
 Additionally, parameters can be set for a script, and error handling is built-in. Script collections are very useful to orchestrate several tasks and scripts to session hosts.
 
-
-
-Both can be assigned/triggered in different ways:
-
-- Directly in the session host list
-
-  ![](media/ScriptCollectionAssign-SessionHosts-01.png)
-
-- Automatically after the rollout of a new session host
-  ![](media/ScriptCollectionAssign-Rollout-01.png)
-
-- By a schedule (coming next)
-
-
-
 ### Built-in scripts and collections
 
 There are several built-in scripts and collections, and new scripts and collections are provided continuously. Built-in scripts can be updated with the "Update" button in the upper-right corner.
@@ -382,13 +369,47 @@ There are several built-in scripts and collections, and new scripts and collecti
 
 
 
-Scripts and script collections can be triggered by *Host pool administrators* and edited by *Full administrators*.
-
-
-
 To add a custom script or script collection, copy the *"BuiltIn: 1st Template Script"* or *"BuiltIn: 1st Template Script Collection"*. Then start building the new one. Make sure to save the new script/collection with a click of the disk symbol. There is no warning right now if you close the browser or if you navigate to another site.
 
 ![](media/ScriptCollectionSaveBar-01.png)
+
+
+
+### Triggering a script or script collection
+
+Scripts and script collections can be triggered by *Host pool administrators* and edited by *Full administrators*.
+
+Both can be assigned/triggered in different ways:
+
+#### For selected hosts
+
+![](media/ScriptCollectionAssign-SessionHosts-01.png)
+
+#### Automatically after the rollout of a new session host
+
+![](media/ScriptCollectionAssign-Rollout-01.png)
+
+#### By a schedule
+
+Schedules can be used on a host pool level to run a script or collection unattended on session hosts of the pool. Comparable to other schedules, weekday(s) and start time define the plan. The following parameters can be used to fine-tune the schedule:
+
+- Hosts
+
+- - Run on all hosts
+  - Run only on hosts without user sessions
+  - Run only on hosts in drain-mode
+
+- Simultaneously
+
+- - Starts directly on all hosts
+  - Start on max. 5 session hosts at the same time (if one finished, the script/collection will be started on the next host)
+  - ...
+
+![](media/ScriptCollectionAssign-Schedule-01.png)
+
+This example runs Windows Update on all session hosts Sunday, 1:00 am. Including drain mode, start, update, restart, drain mode off.
+
+
 
 
 

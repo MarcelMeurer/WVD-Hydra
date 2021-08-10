@@ -234,6 +234,11 @@ if ($mode -eq "Generalize") {
 		LogWriter("AAD only is selected. Skipping joining to a native AD, joining AAD")
 		$aadPath=@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows")[@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows").count-1].fullname
 		Start-Process -wait -FilePath "$aadPath\AADLoginForWindowsHandler.exe" -WorkingDirectory $aadPath -ArgumentList 'enable' -RedirectStandardOutput "$($LogDir)\Avd.AadJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.AadJoin.Warning.txt"
+		if ($JoinMem -eq "1") {
+			LogWriter("Joining Microsoft Endpoint Manamgement is selected. Try to register to MEM")
+			Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/AzureSecureVMJoin /debug /MdmId 0000000a-0000-0000-c000-000000000000" -RedirectStandardOutput "$($LogDir)\Avd.MemJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.MemJoin.Warning.txt"
+
+		}
 	}
 	# check for disk handling
 	$modifyDrives=$false
@@ -275,12 +280,12 @@ if ($mode -eq "Generalize") {
 		}
 	}
 
-	# install WVD Agent if a registration key given
+	# install AVD Agent if a registration key given
 	if ($WvdRegistrationKey -ne "") {
 		if ([System.Environment]::OSVersion.Version.Major -gt 6) {
-			LogWriter("Installing WVD boot loader - current path is ${LocalConfig}")
+			LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
 			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/q"
-			LogWriter("Installing WVD agent")
+			LogWriter("Installing AVD agent")
 			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/q RegistrationToken=${WvdRegistrationKey}"
 		} else {
 			if ((Test-Path "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi") -eq $false) {
