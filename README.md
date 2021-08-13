@@ -8,11 +8,13 @@
 
 
 
-## Preview Terms
+## Terms
 
-Project "Hydra" is an upcoming solution to manage Azure Virtual Desktop (Azure Virtual Desktop) for one or more tenants. It's currently in preview, which means that it can be tested in some environments without any support nor warranty, at your own risk, and without the right of indemnity. However, I am trying to publish the preview releases in high quality.
+"Hydra" is solution to manage Azure Virtual Desktop (Azure Virtual Desktop) for one or more tenants. It's a working solution and can be installed in any subscription. The solution can be used at your own risk, and without the right of indemnity. However, I am trying to publish the preview releases in high quality.
 
-The project will be made available in the future as a **free community edition - even for commercial use** (planed: up to 6 session hosts per host pool and one tenant ) and as a supported licensable product (less than $2 per concurrent user/month). In general, Hydra will work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or number of hosts/tenants.
+The project is available as a **free community edition - even for commercial use** (up to 6 session hosts per host pool and a single tenant) and as a supported licensable product ($2 per concurrent user/month). In general, Hydra will work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or to get an commercial offer.
+
+The owner of this solution is ITProCloud GmbH, info@itprocloud.com.
 
 Please make sure to send feedback and update the solution regularly.
 
