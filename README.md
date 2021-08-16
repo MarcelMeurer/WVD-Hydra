@@ -58,6 +58,8 @@ Please make sure to send feedback and update the solution regularly.
 
 
 ## Updates and releases
+- 1.0.1.7	(2021/08/16)
+  - Add: Change: Change the rollout process to be more reliable if you deploy a lot of hosts at once; Fix: Secrets can now have special characters
 - 1.0.1.6	(2021/08/08)
   - Add: Scripts and script collections can be triggered by schedules on a host pool level (e.g., to automatically update Windows across a host poll Sunday morning, ...)
 - 1.0.1.5	(2021/08/05)

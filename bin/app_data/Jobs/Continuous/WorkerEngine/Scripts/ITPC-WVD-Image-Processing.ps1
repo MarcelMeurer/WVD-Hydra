@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 3.3
+# Current Version of this script: 3.4
 
 param(
 
@@ -7,7 +7,7 @@ param(
 
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize','JoinDomain','DataPartition')]
+	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader')]
 	[string] $Mode,
 	[string] $LocalAdminName='localAdmin',				#Currently not used in this script
 	[string] $LocalAdminPassword='',
@@ -38,7 +38,6 @@ function ShowDrives() {
 		LogWriter("Name: '$($drive.Name)', Letter: '$($drive.DriveLetter)', Label: '$($drive.Label)'")
 	}
 }
-
 function ShowPageFiles() {
 	$pageFiles = Get-WmiObject -Class Win32_PageFileSetting	
 
@@ -48,11 +47,13 @@ function ShowPageFiles() {
 	}
 }
 
+
+
 # Define static variables
 $LocalConfig="C:\ITPC-WVD-PostCustomizing"
 
 # Define logfile
-$LogFile=$LogDir+"\WVD.Customizing.log"
+$LogFile=$LogDir+"\AVD.Customizing.log"
 
 # Main
 LogWriter("Starting ITPC-WVD-Image-Processing in mode ${Mode}")
@@ -86,9 +87,11 @@ if ((Test-Path ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 	} else {Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig+"\")}
 }
 
+# updating local script (from maybe an older version from the last image process)
+Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1") -Force -ErrorAction SilentlyContinue
+
+
 if ($mode -eq "Generalize") {
-	# updating local script (from maybe an older version from the last image process)
-	Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Agent Boot Loader"}
 	if ($app -ne $null) {$app.uninstall()}
@@ -256,8 +259,8 @@ if ($mode -eq "Generalize") {
 				$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
 				$settingsSet = New-ScheduledTaskSettingsSet
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
-				Register-ScheduledTask -TaskName 'ITPC-WVD-Disk-Mover-Helper' -InputObject $task
-				LogWriter("Added new startup task")
+				Register-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper' -InputObject $task
+				LogWriter("Added new startup task for the disk handling")
 
 				# change c:\pagefile.sys to e:\pagefile.sys
 				ShowPageFiles
@@ -283,10 +286,38 @@ if ($mode -eq "Generalize") {
 	# install AVD Agent if a registration key given
 	if ($WvdRegistrationKey -ne "") {
 		if ([System.Environment]::OSVersion.Version.Major -gt 6) {
-			LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
-			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/q"
 			LogWriter("Installing AVD agent")
-			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/q RegistrationToken=${WvdRegistrationKey}"
+			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
+
+			if ($false) {
+				LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
+				Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
+				LogWriter("Waiting for the service RDAgentBootLoader")
+				$bootloaderServiceName = "RDAgentBootLoader"
+				$retryCount = 0
+				while ( -not (Get-Service "RDAgentBootLoader" -ErrorAction SilentlyContinue)) {
+					$retry = ($retryCount -lt 6)
+					LogWriter("Service RDAgentBootLoader was not found")
+					if ($retry) { 
+						LogWriter("Retrying again in 30 seconds, this will be retry $retryCount")
+					} 
+					else {
+						LogWriter("Retry limit exceeded" )
+						throw "RDAgentBootLoader didn't become available after 6 retries"
+					}            
+					$retryCount++
+					Start-Sleep -Seconds 30
+				}
+			} else {
+				LogWriter("Preparing AVD boot loader task")
+				$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RDAgentBootloader`""
+				$trigger = New-ScheduledTaskTrigger	-AtStartup
+				$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
+				$settingsSet = New-ScheduledTaskSettingsSet
+				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
+				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -InputObject $task
+				LogWriter("Added new startup task for RDAgentBootloader")
+			}
 		} else {
 			if ((Test-Path "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi") -eq $false) {
 				LogWriter("Downloading Microsoft.RDInfra.WVDAgent.msi")
@@ -310,8 +341,9 @@ if ($mode -eq "Generalize") {
 		LogWriter("Running VDI Optimization script")
 		Start-Process -wait -FilePath PowerShell.exe -WorkingDirectory "C:\ProgramData\Optimize" -ArgumentList '-ExecutionPolicy Bypass -File "C:\ProgramData\Optimize\Win10_VirtualDesktop_Optimize.ps1 -AcceptEULA -Optimizations WindowsMediaPlayer,AppxPackages,ScheduledTasks,DefaultUserSettings,Autologgers,Services,NetworkOptimizations"' -RedirectStandardOutput "$($LogDir)\VirtualDesktop_Optimize.Stage2.Out.txt" -RedirectStandardError "$($LogDir)\VirtualDesktop_Optimize.Stage2.Warning.txt"
 	}
+
+	# Final reboot
 	LogWriter("Finally restarting session host")
-	# final reboot
 	Restart-Computer -Force
 } elseif ($Mode -eq "DataPartition") {
 
@@ -395,10 +427,36 @@ if ($mode -eq "Generalize") {
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
-		Disable-ScheduledTask -TaskName 'ITPC-WVD-Disk-Mover-Helper'
-		LogWriter("scheduled task disabled")
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper'
 	}
 	catch {
-		LogWriter("remove scheduled task failed: " + $_.Exception.Message)
+		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
+	}
+} elseif ($Mode -eq "RDAgentBootloader") {
+	LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
+	Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
+	LogWriter("Waiting for the service RDAgentBootLoader")
+	$bootloaderServiceName = "RDAgentBootLoader"
+	$retryCount = 0
+	while ( -not (Get-Service "RDAgentBootLoader" -ErrorAction SilentlyContinue)) {
+		$retry = ($retryCount -lt 6)
+		LogWriter("Service RDAgentBootLoader was not found")
+		if ($retry) { 
+			LogWriter("Retrying again in 30 seconds, this will be retry $retryCount")
+		} 
+		else {
+			LogWriter("Retry limit exceeded" )
+			throw "RDAgentBootLoader didn't become available after 6 retries"
+		}            
+		$retryCount++
+		Start-Sleep -Seconds 30
+	}
+	LogWriter("Disable scheduled task")
+	try {
+		# disable startup scheduled task
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
+	}
+	catch {
+		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
 	}
 }
