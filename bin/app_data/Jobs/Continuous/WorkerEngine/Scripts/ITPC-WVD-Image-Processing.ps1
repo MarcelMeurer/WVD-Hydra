@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 3.4
+# Current Version of this script: 3.6
 
 param(
 
@@ -258,8 +258,9 @@ if ($mode -eq "Generalize") {
 				$trigger = New-ScheduledTaskTrigger	-AtStartup
 				$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
 				$settingsSet = New-ScheduledTaskSettingsSet
-				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
-				Register-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper' -InputObject $task
+				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet
+				Register-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper' -InputObject $task -ErrorAction Ignore
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper'
 				LogWriter("Added new startup task for the disk handling")
 
 				# change c:\pagefile.sys to e:\pagefile.sys
@@ -315,7 +316,8 @@ if ($mode -eq "Generalize") {
 				$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
 				$settingsSet = New-ScheduledTaskSettingsSet
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
-				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -InputObject $task
+				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -InputObject $task -ErrorAction Ignore
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
 				LogWriter("Added new startup task for RDAgentBootloader")
 			}
 		} else {
