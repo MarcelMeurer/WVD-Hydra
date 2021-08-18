@@ -213,6 +213,15 @@ if ($mode -eq "Generalize") {
 
 } elseif ($mode -eq "JoinDomain")
 {
+	# Removing existing agent if exist
+	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
+	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Agent Boot Loader"}
+	if ($app -ne $null) {$app.uninstall()}
+	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
+	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Services Infrastructure Agent"}
+	if ($app -ne $null) {$app.uninstall()}
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+
 	# Checking for a saved time zone information
 	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime") {
 		$timeZone=(Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -ErrorAction Ignore)."TimeZone.Origin"
