@@ -59,6 +59,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.9	(2021/08/24)
+  - Add: For shared host pools - Autoscaling: Delete and rebuild hosts after logoff - If a rollout profile exists and the last user has logged off from a session host, the session host will be deleted, and a new one will be rolled out (test carefully)
 - 1.0.1.8	(2021/08/24)
   - Fix: In some circumstances deallocating a session host shows an error while the host deallocates correctly
 - 1.0.1.7	(2021/08/16)
