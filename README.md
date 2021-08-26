@@ -59,6 +59,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.11	(2021/08/26)
+  - Fix: If prediction in autoscaling is disabled, under some circumstance, the value "Min. number of available sessions" was ignored
 - 1.0.1.10	(2021/08/25)
   - Add: User list shows the disconnected time of users; Add: Azure AD Join + MEM (Intune join) is available
 - 1.0.1.9	(2021/08/24)
