@@ -52,7 +52,8 @@
         "connectionString": "[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
         "siteNameUnique": "[concat(parameters('siteName'),'')]",
         "storageName": "[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]",
-		"automationAccount": "[concat(parameters('siteName'),'-automation')]"
+		"automationAccount": "[concat(parameters('siteName'),'-automation')]",
+		"automationSetupURL": "[uri(parameters('_artifactsLocation'), concat('automation.json', parameters('_artifactsLocationSasToken')))]"
     },
     "resources": [
         {
@@ -116,6 +117,38 @@
           }
         ]
       },
+	  {
+            "name": "SettingUpAutomation",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('automationSetupURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "automationAccount": {
+                        "value": "[variables('automationAccount')]"
+                    },
+                    "subscriptionId": {
+                        "value": "[subscription().SubscriptionId]"
+                    },
+                    "resourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "webAppName": {
+                        "value": "[variables('site')]"
+                    }
+                }
+            },
+			"dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
+            ]
+        },
        
         {
             "type": "Microsoft.Storage/storageAccounts",
