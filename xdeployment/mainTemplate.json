@@ -122,11 +122,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('automationSetupURL')]",
-                    "contentVersion": "1.0.0.0"
-                },
+                "mode": "Incremental"
                 "parameters": {
                     "location": {
                         "value": "[parameters('location')]"
