@@ -129,7 +129,7 @@
                "properties":{
                   "isEncrypted":false,
                   "description":"SubscriptionId",
-                  "value":"[concat('\"', parameters('subscriptionId'), '\"')]"
+                  "value":"[concat('\"', subscription().subscriptionId, '\"')]"
                }
             },
             {
@@ -155,7 +155,7 @@
                "properties":{
                   "isEncrypted":false,
                   "description":"ResourceGroupName",
-                  "value":"[concat('\"', parameters('resourceGroupName'), '\"')]"
+                  "value":"[concat('\"', resourceGroup().name, '\"')]"
                }
             }
          ]
@@ -407,7 +407,7 @@
       },
 	  {
          "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('2',resourceGroup().id)))]",
-         "type":"Microsoft.OperationalInsights/workspaces/providers/roleAssignments",
+         "type":"Microsoft.Web/sites/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
             "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
