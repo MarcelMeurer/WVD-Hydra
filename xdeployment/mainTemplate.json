@@ -123,7 +123,7 @@
                "apiVersion":"2020-01-13-preview",
                "name":"subscriptionId",
                "dependsOn":[
-                  "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationAccount'))]"
+                  "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
                ],
                "properties":{
                   "isEncrypted":false,
