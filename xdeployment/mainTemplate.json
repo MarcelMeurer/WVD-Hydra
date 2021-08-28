@@ -418,7 +418,7 @@
          ]
       },
       {
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('3',variables('siteNameUnique'),resourceGroup().id)))]",
+         "name":"[concat(variables('automationAccount'),'/Microsoft.Authorization/',Guid(concat('3',variables('automationAccount'),resourceGroup().id)))]",
          "type":"Microsoft.Automation/automationAccounts/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
@@ -468,6 +468,10 @@
                   {
                      "name":"config:AutomationAccount",
                      "value":"[variables('automationAccount')]"
+                  },
+                  {
+                     "name":"config:MarketplaceDeployment",
+                     "value":"1"
                   }
                ]
             }
