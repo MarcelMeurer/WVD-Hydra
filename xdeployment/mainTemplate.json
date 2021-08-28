@@ -418,6 +418,19 @@
             "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
+	  {
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('3',variables('siteNameUnique'),resourceGroup().id)))]",
+         "type":"Microsoft.Automation/automationAccounts/providers/roleAssignments",
+         "apiVersion":"2020-04-01-preview",
+         "properties":{
+            "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+            "principalId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
+            "scope":"[resourceId('Microsoft.Automation/automationAccounts', variables('siteNameUnique'))]"
+         },
+         "dependsOn":[
+            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+         ]
+      },
       {
          "type":"Microsoft.Web/sites",
          "apiVersion":"2019-08-01",
