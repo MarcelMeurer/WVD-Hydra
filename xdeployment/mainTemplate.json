@@ -429,7 +429,7 @@
          },
          "dependsOn":[
             "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]",
-			"[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"s
+			"[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
          ]
       },
       {
