@@ -141,7 +141,7 @@
                         "value": "[resourceGroup().name]"
                     },
                     "webAppName": {
-                        "value": "[variables('site')]"
+                        "value": "[variables('siteNameUnique')]"
                     }
                 }
             },
