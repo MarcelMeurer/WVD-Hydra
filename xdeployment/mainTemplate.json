@@ -84,7 +84,7 @@
  		{
         "type": "Microsoft.Automation/automationAccounts",
         "apiVersion": "2020-01-13-preview",
-        "name": "[parameters('automationAccount')]",
+        "name": "[variables('automationAccount')]",
         "location": "[parameters('location')]",
         "identity": {
           "type": "SystemAssigned"
@@ -101,7 +101,7 @@
             "name": "Update-Hydra",
             "location": "[parameters('location')]",
             "dependsOn": [
-              "[parameters('automationAccount')]"
+              "[variables('automationAccount')]"
             ],
             "properties": {
               "runbookType": "PowerShell",
@@ -376,7 +376,7 @@
                 "enabled": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('siteNameUnique'))]",
 				"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-                "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('automationAccount')),'2019-08-01', 'full').identity.principalId]",
+                "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount')),'2019-08-01', 'full').identity.principalId]",
                 "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
                 "httpsOnly": true,
                 "siteConfig": {
@@ -410,7 +410,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
                 "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]",
-				"[resourceId('Microsoft.Automation/automationAccounts', parameters('automationAccount'))]"
+				"[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
             ]
         }
     ]
