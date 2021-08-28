@@ -52,8 +52,7 @@
         "connectionString": "[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
         "siteNameUnique": "[concat(parameters('siteName'),'')]",
         "storageName": "[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]",
-		"automationAccount": "[concat(parameters('siteName'),'-automation')]",
-		"automationSetupURL": "[uri(parameters('_artifactsLocation'), concat('automation.json', parameters('_artifactsLocationSasToken')))]"
+		"automationAccount": "[concat(parameters('siteName'),'-automation')]"
     },
     "resources": [
         {
@@ -117,34 +116,20 @@
           }
         ]
       },
-	  {
-            "name": "SettingUpAutomation",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
+	          {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2020-01-13-preview",
+            "name": "[concat(variables('automationAccount'), '/resourceGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts',variables('automationAccount'))]"
+            ],
             "properties": {
-                "mode": "Incremental"
-                "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
-                    "automationAccount": {
-                        "value": "[variables('automationAccount')]"
-                    },
-                    "subscriptionId": {
-                        "value": "[subscription().SubscriptionId]"
-                    },
-                    "resourceGroupName": {
-                        "value": "[resourceGroup().name]"
-                    },
-                    "webAppName": {
-                        "value": "[variables('siteNameUnique')]"
-                    }
-                }
-            },
-			"dependsOn": [
-                "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
-            ]
+                "isEncrypted": false,
+                "value": "[resourceGroup().name]",
+                "description": "Resource group"
+            }
         },
+	  
        
         {
             "type": "Microsoft.Storage/storageAccounts",
