@@ -53,7 +53,7 @@
    "variables":{
       "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
       "siteNameUnique":"[concat(parameters('siteName'),'')]",
-      "storageName":"[toLower(concat('wvd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]",
+      "storageName":"[toLower(concat('avd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]",
       "automationAccount":"[concat(parameters('siteName'),'-automation')]"
    },
    "resources":[
@@ -346,7 +346,7 @@
          }
       },
       {
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('1',resourceGroup().id)))]",
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('1',variables('siteNameUnique'),resourceGroup().id)))]",
          "type":"Microsoft.OperationalInsights/workspaces/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
@@ -406,8 +406,8 @@
          ]
       },
 	  {
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('2',resourceGroup().id)))]",
-         "type":"Microsoft.Web/sites/providers/roleAssignments",
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('2',variables('siteNameUnique'),resourceGroup().id)))]",
+         "type":"Microsoft.Web/sites/providers/roleAssignmentsroleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
             "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
