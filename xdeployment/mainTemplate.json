@@ -428,7 +428,8 @@
             "scope":"[resourceId('Microsoft.Automation/automationAccounts', variables('siteNameUnique'))]"
          },
          "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]",
+			"[resourceId('Microsoft.Automation/automationAccounts', variables('siteNameUnique'))]"
          ]
       },
       {
