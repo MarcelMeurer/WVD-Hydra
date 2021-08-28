@@ -94,6 +94,7 @@
             "type":"SystemAssigned"
          },
          "properties":{
+
             "sku":{
                "name":"Basic"
             }
@@ -404,6 +405,19 @@
             "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
+	  {
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(resourceGroup().id))]",
+         "type":"Microsoft.OperationalInsights/workspaces/providers/roleAssignments",
+         "apiVersion":"2020-04-01-preview",
+         "properties":{
+            "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+            "principalId":"[reference(resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount')),'2020-01-13-preview', 'full').identity.principalId]",
+            "scope":"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+         },
+         "dependsOn":[
+            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+         ]
+      },
       {
          "type":"Microsoft.Web/sites",
          "apiVersion":"2019-08-01",
@@ -417,9 +431,6 @@
          "properties":{
             "enabled":true,
             "serverFarmId":"[resourceId('Microsoft.Web/serverfarms',variables('siteNameUnique'))]",
-            "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-            "principalId":"[reference(resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount')),'2020-01-13-preview', 'full').identity.principalId]",
-            "scope":"[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
             "httpsOnly":true,
             "siteConfig":{
                "alwaysOn":true,
