@@ -407,7 +407,7 @@
       },
 	  {
          "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('2',variables('siteNameUnique'),resourceGroup().id)))]",
-         "type":"Microsoft.Web/sites/providers/roleAssignmentsroleAssignments",
+         "type":"Microsoft.Web/sites/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
             "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
