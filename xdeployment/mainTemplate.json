@@ -346,7 +346,7 @@
          }
       },
       {
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(resourceGroup().id))]",
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('1',resourceGroup().id)))]",
          "type":"Microsoft.OperationalInsights/workspaces/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
