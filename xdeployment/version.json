@@ -1,0 +1,4 @@
+{
+	"CurrentVersion" : "1.0.1.1",
+	"UpdateMessage" : "The preview of project Hydra has been updated to a new version. Please upgrade your deployment: App Service -> Deployment Center -> Sync"
+}

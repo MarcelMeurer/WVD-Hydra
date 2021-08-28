@@ -37,6 +37,7 @@ Please make sure to send feedback and update the solution regularly.
     - Schedules
     - Autopilot: Automatically scales up/down/create/remove based on the usage of a host pool
     - Deploy hosts on demand - including ephemeral VMs based on a custom image
+	- Delete and rebuild hosts after logoff
   - VDI
     - Auto deallocate session hosts
 - Session Timeouts

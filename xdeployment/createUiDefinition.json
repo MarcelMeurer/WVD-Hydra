@@ -1,0 +1,185 @@
+{
+   "$schema":"https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+   "handler":"Microsoft.Azure.CreateUIDef",
+   "version":"0.1.2-preview",
+   "parameters":{
+      "config": {
+         "isWizard": true
+      },
+      "resourceTypes":[
+         "Microsoft.OperationalInsights/workspaces",
+         "Microsoft.Sql/servers",
+         "Microsoft.KeyVault/vaults",
+         "Microsoft.Web/serverfarms",
+         "Microsoft.Storage/storageAccounts",
+         "Microsoft.Web/sites"
+      ],
+      "basics":[
+         {
+            "name":"nameApiWeb",
+            "type":"Microsoft.Solutions.ArmApiControl",
+            "request":{
+               "method":"POST",
+               "path":"[concat(subscription().id,'/providers/Microsoft.Web/checkNameAvailability?api-version=2019-08-01')]",
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Web/sites\"}',''))]"
+            }
+         },
+         {
+            "name":"nameApiSql",
+            "type":"Microsoft.Solutions.ArmApiControl",
+            "request":{
+               "method":"POST",
+               "path":"[concat(subscription().id,'/providers/Microsoft.Sql/checkNameAvailability?api-version=2014-04-01')]",
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.Sql/servers\"}',''))]"
+            }
+         },
+         {
+            "name":"nameApiKeyVault",
+            "type":"Microsoft.Solutions.ArmApiControl",
+            "request":{
+               "method":"POST",
+               "path":"[concat(subscription().id,'/providers/Microsoft.KeyVault/checkNameAvailability?api-version=2019-09-01')]",
+               "body":"[parse(concat('{\"name\":\"',basics('siteName'),'\",\"type\":\"Microsoft.KeyVault/vaults\"}',''))]"
+            }
+         },
+         {
+            "name":"siteName",
+            "type":"Microsoft.Common.TextBox",
+            "label":"Name of your deployment",
+            "toolTip":"That is the name of the web portal (e.g.: my-wvd-portal - you can late access this site by using my-wvd-portal.azurewebsites.net).\nThe name should include 4-22 lower-case letters, digits or '-'. The '-' shouldn't be the first symbol.",
+            "constraints":{
+               "required":true,
+               "regex":"^[a-z0-9]{1}[a-z0-9-]{3,21}$",
+               "validationMessage":"The name should include 4-22 letters, digits or '-'. The '-' shouldn't be the first symbol.",
+               "validations":[
+                  {
+                     "isValid":"[or(less(length(basics('siteName')),4),not(equals(basics('nameApiWeb').nameAvailable, false)))]",
+                     "message":"Please use another name. The name is not available for a web site"
+                  },
+                  {
+                     "isValid":"[or(less(length(basics('siteName')),4),not(equals(basics('nameApiSql').available, false)))]",
+                     "message":"Please use another name. The name is not available for a SQL instance"
+                  },
+                  {
+                     "isValid":"[or(less(length(basics('siteName')),4),not(equals(basics('nameApiKeyVault').nameAvailable, false)))]",
+                     "message":"Please use another name. The name is not available for a key vault"
+                  }
+               ]
+            }
+         }
+      ],
+      "steps":[
+         {
+            "name":"ServicePrincipal",
+            "label":"Service Principal",
+            "elements":[
+               {
+                  "name":"textSp",
+                  "type":"Microsoft.Common.TextBlock",
+                  "visible":true,
+                  "options":{
+                     "text":"[concat('A service principal is needed to authenticate to the web app. Please create a service principal based on the documentation and enter the application id and secret. Optionally: Id and secret can be changed on the deployed Key Vault after the deployment. The redirect URI is \"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"')]",
+                     "link":{
+                        "label":"Learn more",
+                        "uri":"[concat('https://github.com/MarcelMeurer/WVD-Hydra/portalHelper/WebApp-ServicePrincipalCode.md?redirectUri=https://',basics('siteName'),'.azurewebsites.net/signin-oidc')]"
+                     }
+                  }
+               },
+               {
+                  "name":"spId",
+                  "type":"Microsoft.Common.TextBox",
+                  "label":"Application Id",
+                  "toolTip":"The application id of the service principal must be in the format '00000000-0000-0000-0000-000000000000'",
+                  "constraints":{
+                     "required":true,
+                     "regex":"^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$",
+                     "validationMessage":"The application id of the service principal must be in the format '00000000-0000-0000-0000-000000000000'"
+                  }
+               },
+               {
+                  "name":"spSecret",
+                  "type":"Microsoft.Common.PasswordBox",
+                  "label":{
+                     "password":"The secret of the service principal",
+                     "confirmPassword":"Confirm secret"
+                  },
+                  "options":{
+                     "hideConfirmation":false
+                  },
+                  "toolTip":"A secret string with a least one character",
+                  "constraints":{
+                     "required":true,
+                     "validationMessage":"A secret string with a least one character"
+                  }
+               },
+               {
+                  "name":"infoBoxSp",
+                  "type":"Microsoft.Common.InfoBox",
+                  "visible":true,
+                  "options":{
+                     "icon":"Info",
+                     "label":" XXX",
+                     "text":"[concat('<b>Create the service principal with powershell in the Cloud Shell</b><br/><br/>Invoke-Command {<br/>$AppName=\"svc-HydraWebAuthentication\"<br/>$ReplyUri=\"https://',basics('siteName'),'.azurewebsites.net/signin-oidc\"<br/>$RequiredGrants = [Microsoft.Open.AzureAD.Model.RequiredResourceAccess]::new(\"00000003-0000-0000-c000-000000000000\",@([Microsoft.Open.AzureAD.Model.ResourceAccess]::new(\"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\"Scope\"),[Microsoft.Open.AzureAD.Model.ResourceAccess]::new(\"b340eb25-3456-403f-be2f-af7a0d370277\",\"Scope\")))<br/><br/>Connect-AzureAD<br/><br/>$App=New-AzureADApplication -DisplayName $AppName -IdentifierUris \"https://$((Get-AzureADDomain | where {$_.IsDefault}).Name)/itprocloud.de/hydra/$((New-Guid).Guid)\" -AvailableToOtherTenants $true -ReplyUrls $ReplyUri -RequiredResourceAccess $RequiredGrants<br/>$AppSecret = New-AzureADApplicationPasswordCredential -ObjectId $App.ObjectId -EndDate ([System.DateTime]::Now.AddYears(2).ToString(\"o\"))<br/>write-host \"--------------------------------------------------------------------------\"<br/>write-host \"Application Id:        $($app.AppId)\"<br/>write-host \"Secret:                $($AppSecret.Value)\"<br/>write-host \"--------------------------------------------------------------------------\"}','')]"
+                  }
+               }
+            ]
+         },
+         {
+            "name":"Administration",
+            "label":"Administration",
+            "elements":[
+               {
+                  "name":"textAdmin",
+                  "type":"Microsoft.Common.TextBlock",
+                  "visible":true,
+                  "options":{
+                     "text":"Enter the UPN of the administrator, who should have unlimited permission in the solution - the user must exist or be invited in this tenant. This UPN can log on after the deployment and configuration. This setting can be changed in the configuration of the deployed web app. It's possible to add more users or groups (object ids of the groups) comma-delimited. E.g: 'admin@contoso.com'",
+                     "link":{
+                        "label":"Learn more",
+                        "uri":"https://github.com/MarcelMeurer/WVD-Hydra"
+                     }
+                  }
+               },
+               {
+                  "name":"admins",
+                  "type":"Microsoft.Common.TextBox",
+                  "label":"Administrator(s) of the solution",
+                  "toolTip":"Comma-delimited list of full admins of the solutions (at least one UPN)",
+                  "constraints":{
+                     "required":true,
+                     "regex":"^[\\W]*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]+[\\W]*,{1}[\\W]*)*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]+)[\\W]*$",
+                     "validationMessage":"At least one UPN mus be entered (admin@contoso.com)"
+                  }
+               }
+            ]
+         },
+         {
+            "name":"tags",
+            "label":"Tags",
+            "elements":[
+               {
+                  "name":"tagsByResource",
+                  "type":"Microsoft.Common.TagsByResource",
+                  "toolTip":"Add tags to the resources for governance reason",
+                  "resources":[
+                     "Microsoft.OperationalInsights/workspaces",
+                     "Microsoft.Sql/servers",
+                     "Microsoft.KeyVault/vaults",
+                     "Microsoft.Web/serverfarms",
+                     "Microsoft.Storage/storageAccounts",
+                     "Microsoft.Web/sites"
+                  ]
+               }
+            ]
+         }
+      ],
+      "outputs":{
+         "spId":"[steps('ServicePrincipal').spId]",
+         "spSecret":"[steps('ServicePrincipal').spSecret]",
+         "location":"[location()]",
+         "siteName":"[basics('siteName')]",
+         "admins":"[steps('Administration').admins]",
+         "tagsByResource":"[steps('tags').tagsByResource]"
+      }
+   }
+}
