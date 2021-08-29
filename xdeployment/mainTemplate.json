@@ -423,7 +423,7 @@
          ]
       },
       {
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('3',variables('siteNameUnique'),resourceGroup().id)))]",
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('4',variables('siteNameUnique'),resourceGroup().id)))]",
          "type":"Microsoft.Web/sites/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
          "properties":{
