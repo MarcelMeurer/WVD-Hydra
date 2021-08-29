@@ -396,15 +396,6 @@
          }
       },
       {
-         "type":"Microsoft.Web/sites/siteextensions",
-         "apiVersion":"2018-11-01",
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
-         "location":"[parameters('location')]",
-         "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-         ]
-      },
-      {
          "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('2',variables('siteNameUnique'),resourceGroup().id)))]",
          "type":"Microsoft.Web/sites/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
@@ -429,6 +420,19 @@
          "dependsOn":[
             "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]",
             "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
+         ]
+      },
+      {
+         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('3',variables('siteNameUnique'),resourceGroup().id)))]",
+         "type":"Microsoft.Web/sites/providers/roleAssignments",
+         "apiVersion":"2020-04-01-preview",
+         "properties":{
+            "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+            "principalId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2020-01-13-preview', 'full').identity.principalId]",
+            "scope":"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+         },
+         "dependsOn":[
+            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
       {
