@@ -374,20 +374,20 @@
                ]
             }
          },
-		"resources": [
-			{
-				"name": "MSDeploy",
-				"type": "extensions",
-				"location": "[parameters('location')]",
-				"apiVersion": "2019-08-01",
-				"dependsOn": [
-					"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-				],
-				"properties": {
-					"packageUri": "[uri(parameters('_artifactsLocation'), concat('starter/HydraStarter.zip', parameters('_artifactsLocationSasToken')))]"
-				}
-			}
-		]
+         "resources":[
+            {
+               "name":"MSDeploy",
+               "type":"extensions",
+               "location":"[parameters('location')]",
+               "apiVersion":"2019-08-01",
+               "dependsOn":[
+                  "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+               ],
+               "properties":{
+                  "packageUri":"[uri(parameters('_artifactsLocation'), concat('starter/HydraStarter.zip', parameters('_artifactsLocationSasToken')))]"
+               }
+            }
+         ],
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
             "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
