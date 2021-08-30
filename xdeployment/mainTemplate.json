@@ -277,7 +277,7 @@
       {
          "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('1',variables('siteNameUnique'),resourceGroup().id)))]",
          "type":"Microsoft.OperationalInsights/workspaces/providers/roleAssignments",
-         "apiVersion":"2020-08-01",
+         "apiVersion":"2020-08-01-preview",
          "properties":{
             "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', '73c42c96-874c-492b-b04d-ab87d138a893')]",
             "principalId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2021-02-01', 'full').identity.principalId]",
@@ -329,7 +329,7 @@
       {
          "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('4',variables('siteNameUnique'),resourceGroup().id)))]",
          "type":"Microsoft.Web/sites/providers/roleAssignments",
-         "apiVersion":"2020-10-01-preview",
+         "apiVersion":"2021-04-01-preview",
          "properties":{
             "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
             "principalId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2021-02-01', 'full').identity.principalId]",
