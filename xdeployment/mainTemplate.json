@@ -53,8 +53,7 @@
    "variables":{
       "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',parameters('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
       "siteNameUnique":"[concat(parameters('siteName'),'')]",
-      "storageName":"[toLower(concat('avd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]",
-      "automationAccount":"[concat(parameters('siteName'),'-automation')]"
+      "storageName":"[toLower(concat('avd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]"
    },
    "resources":[
       {
@@ -84,80 +83,6 @@
             "administratorLoginPassword":"[parameters('SqlPassword')]",
             "version":"12.0"
          }
-      },
-      {
-         "type":"Microsoft.Automation/automationAccounts",
-         "apiVersion":"2020-01-13-preview",
-         "name":"[variables('automationAccount')]",
-         "location":"[parameters('location')]",
-         "identity":{
-            "type":"SystemAssigned"
-         },
-         "properties":{
-            "sku":{
-               "name":"Basic"
-            }
-         },
-         "resources":[
-            {
-               "type":"runbooks",
-               "apiVersion":"2020-01-13-preview",
-               "name":"Update-Hydra",
-               "location":"[parameters('location')]",
-               "dependsOn":[
-                  "[variables('automationAccount')]"
-               ],
-               "properties":{
-                  "runbookType":"PowerShell",
-                  "logProgress":"false",
-                  "logVerbose":"false",
-                  "description":"Update script for Hydra",
-                  "publishContentLink":{
-                     "uri":"[uri(parameters('_artifactsLocation'), concat('scripts/Update-Hydra.ps1', parameters('_artifactsLocationSasToken')))]",
-                     "version":"1.0.0.0"
-                  }
-               }
-            },
-            {
-               "type":"variables",
-               "apiVersion":"2020-01-13-preview",
-               "name":"subscriptionId",
-               "dependsOn":[
-                  "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
-               ],
-               "properties":{
-                  "isEncrypted":false,
-                  "description":"SubscriptionId",
-                  "value":"[concat('\"', subscription().subscriptionId, '\"')]"
-               }
-            },
-            {
-               "type":"variables",
-               "apiVersion":"2020-01-13-preview",
-               "name":"siteName",
-               "dependsOn":[
-                  "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
-               ],
-               "properties":{
-                  "isEncrypted":false,
-                  "description":"Hydra Site",
-                  "value":"[concat('\"', variables('siteNameUnique'), '\"')]"
-               }
-            },
-            {
-               "type":"variables",
-               "apiVersion":"2020-01-13-preview",
-               "name":"resourceGroupName",
-               "dependsOn":[
-                  "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
-               ],
-               "properties":{
-                  "isEncrypted":false,
-                  "description":"ResourceGroupName",
-                  "value":"[concat('\"', resourceGroup().name, '\"')]"
-               }
-            }
-         ]
       },
       {
          "type":"Microsoft.Storage/storageAccounts",
@@ -396,33 +321,6 @@
          }
       },
       {
-         "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('2',variables('siteNameUnique'),resourceGroup().id)))]",
-         "type":"Microsoft.Web/sites/providers/roleAssignments",
-         "apiVersion":"2020-04-01-preview",
-         "properties":{
-            "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-            "principalId":"[reference(resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount')),'2020-01-13-preview', 'full').identity.principalId]",
-            "scope":"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-         },
-         "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
-         ]
-      },
-      {
-         "name":"[concat(variables('automationAccount'),'/Microsoft.Authorization/',Guid(concat('3',variables('automationAccount'),resourceGroup().id)))]",
-         "type":"Microsoft.Automation/automationAccounts/providers/roleAssignments",
-         "apiVersion":"2020-04-01-preview",
-         "properties":{
-            "roleDefinitionId":"[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-            "principalId":"[reference(resourceId('Microsoft.Web/sites', variables('siteNameUnique')),'2019-08-01', 'full').identity.principalId]",
-            "scope":"[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
-         },
-         "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
-         ]
-      },
-      {
          "name":"[concat(variables('siteNameUnique'),'/Microsoft.Authorization/',Guid(concat('4',variables('siteNameUnique'),resourceGroup().id)))]",
          "type":"Microsoft.Web/sites/providers/roleAssignments",
          "apiVersion":"2020-04-01-preview",
@@ -470,20 +368,29 @@
                      "value":"bin"
                   },
                   {
-                     "name":"config:AutomationAccount",
-                     "value":"[variables('automationAccount')]"
-                  },
-                  {
                      "name":"config:MarketplaceDeployment",
                      "value":"1"
                   }
                ]
             }
          },
+		"resources": [
+			{
+				"name": "MSDeploy",
+				"type": "extensions",
+				"location": "[parameters('location')]",
+				"apiVersion": "2019-08-01",
+				"dependsOn": [
+					"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
+				],
+				"properties": {
+					"packageUri": "[uri(parameters('_artifactsLocation'), concat('starter/HydraStarter.zip', parameters('_artifactsLocationSasToken')))]"
+				}
+			}
+		]
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]",
-            "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccount'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('siteNameUnique'))]"
          ]
       }
    ]
