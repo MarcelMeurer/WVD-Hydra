@@ -31,9 +31,13 @@
             
          }
       },
-      "_salt":{
+      "_salt1":{
          "type":"string",
          "defaultValue": "[utcNow('u')]"
+      },
+      "_salt2":{
+         "type":"string",
+         "defaultValue": "[newGuid()]"
       },
       "_artifactsLocation":{
          "type":"string",
@@ -54,7 +58,7 @@
       "connectionString":"[concat('Server=tcp:',concat(parameters('siteName'),''),environment().suffixes.sqlServerHostname,',1433;Initial Catalog=Hydra;Persist Security Info=False;User ID=dbadmin;Password=',variables('SqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
       "siteNameUnique":"[concat(parameters('siteName'),'')]",
       "storageName":"[toLower(concat('avd', uniqueString(resourceGroup().id,subscription().subscriptionId)))]",
-	  "SqlPassword": "[base64(concat(parameters('_salt'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name,newGuid())))]"
+	  "SqlPassword": "[base64(concat(parameters('_salt1'),'fwew##sfkf!3!',guid(resourceGroup().id, deployment().name,parameters('_salt2'))))]"
    },
    "resources":[
       {
