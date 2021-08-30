@@ -261,7 +261,8 @@
                 "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
+				"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
             ]
         },
         {
