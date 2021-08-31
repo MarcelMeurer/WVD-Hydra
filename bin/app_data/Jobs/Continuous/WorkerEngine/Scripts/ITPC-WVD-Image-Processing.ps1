@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 3.6
+# Current Version of this script: 3.7
 
 param(
 
@@ -46,9 +46,7 @@ function ShowPageFiles() {
 		LogWriter("Name: '$($pageFile.Name)', Maximum size: '$($pageFile.MaximumSize)'")
 	}
 }
-
-
-
+                                                        
 # Define static variables
 $LocalConfig="C:\ITPC-WVD-PostCustomizing"
 
@@ -93,11 +91,9 @@ Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig+"\ITPC-WV
 
 if ($mode -eq "Generalize") {
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
-	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Agent Boot Loader"}
-	if ($app -ne $null) {$app.uninstall()}
+	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
-	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Services Infrastructure Agent"}
-	if ($app -ne $null) {$app.uninstall()}
+	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
 
 	LogWriter("Disabling ITPC-LogAnalyticAgent and MySmartScale if exist") 
@@ -215,12 +211,11 @@ if ($mode -eq "Generalize") {
 {
 	# Removing existing agent if exist
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
-	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Agent Boot Loader"}
-	if ($app -ne $null) {$app.uninstall()}
+	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
-	$app=Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -match "Remote Desktop Services Infrastructure Agent"}
-	if ($app -ne $null) {$app.uninstall()}
+	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+
 
 	# Checking for a saved time zone information
 	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime") {

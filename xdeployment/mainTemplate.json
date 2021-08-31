@@ -270,8 +270,7 @@
          },
          "dependsOn":[
             "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
-			"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]",
-			"[resourceId('Microsoft.ManagedIdentity/SystemAssignedIdentities/', variables('siteNameUnique'))]"
+			"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
       {
@@ -322,8 +321,8 @@
             "scope":"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          },
          "dependsOn":[
-            "[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]",
-			"[resourceId('Microsoft.ManagedIdentity/SystemAssignedIdentities/', variables('siteNameUnique'))]"
+            "[resourceId('Microsoft.OperationalInsights/workspaces', variables('siteNameUnique'))]",
+			"[resourceId('Microsoft.Web/sites', variables('siteNameUnique'))]"
          ]
       },
       {
