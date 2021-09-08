@@ -33,7 +33,12 @@ foreach ($user in $users.Split(";")) {
                 $sid=(New-Object System.Security.Principal.SecurityIdentifier([byte[]]($adUser.Properties.objectsid |out-string -Stream),0)).Value
                 LogWriter("User found in Active Directory: $($adUser.Path) with SID $sid")
                 $profilePath=Get-ItemPropertyValue -Path HKLM:\SOFTWARE\FSLogix\Profiles -Name VHDLocations
-                $profilePathUser="$($profilePath)\$($sid)_$($adUser.Properties.samaccountname)"
+                if ((Get-ItemPropertyValue -Path HKLM:\Software\Policies\FSLogix\ODFC -Name FlipFlopProfileDirectoryName -ErrorAction SilentlyContinue) -eq 1) {
+                    $profilePathUser="$($adUser.Properties.samaccountname)_$($profilePath)\$($sid)"
+                    LogWriter("FlipFlopProfileDirectoryName is set to 1")
+                } else  {
+                    $profilePathUser="$($profilePath)\$($sid)_$($adUser.Properties.samaccountname)"
+                }
                 LogWriter("Default FSLogix profile path is: $profilePathUser")
                 if (!(Test-Path -Path "$profilePath" -ErrorAction SilentlyContinue)) {
                     LogWriter("Using service account to authenticate to the file share")
