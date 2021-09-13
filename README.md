@@ -60,6 +60,8 @@ Please make sure to send feedback and update the solution regularly.
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.13	(2021/09/13)
+  - Add: Memory optimization for larger environments
 - 1.0.1.12	(2021/09/04)
   - Add: Watchdog for the worker process, improvement of the deployment of Hydra
 - 1.0.1.11	(2021/08/26)
