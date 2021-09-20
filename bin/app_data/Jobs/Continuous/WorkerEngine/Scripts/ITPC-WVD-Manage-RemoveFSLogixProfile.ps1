@@ -33,7 +33,8 @@ foreach ($user in $users.Split(";")) {
                 $sid=(New-Object System.Security.Principal.SecurityIdentifier([byte[]]($adUser.Properties.objectsid |out-string -Stream),0)).Value
                 LogWriter("User found in Active Directory: $($adUser.Path) with SID $sid")
                 $profilePath=Get-ItemPropertyValue -Path HKLM:\SOFTWARE\FSLogix\Profiles -Name VHDLocations
-                if ((Get-ItemPropertyValue -Path HKLM:\Software\Policies\FSLogix\ODFC -Name FlipFlopProfileDirectoryName -ErrorAction SilentlyContinue) -eq 1) {
+                $regPath="HKLM:\Software\Policies\FSLogix\ODFC"
+                if ((Test-Path $regPath) -and (Get-Item $regPath -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {
                     $profilePathUser="$($profilePath)\$($adUser.Properties.samaccountname)_$($sid)"
                     LogWriter("FlipFlopProfileDirectoryName is set to 1")
                 } else  {
