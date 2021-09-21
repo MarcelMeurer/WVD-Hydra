@@ -6,6 +6,8 @@
 
 [Get it from the Azure Marketplace](https://azuremarketplace.microsoft.com/marketplace/apps/itprocloudgmbh1628775137215.hydra-deploy-d1)
 
+[Get free support for the deployment](mailto:info@itprocloud.com)
+
 
 
 ## Terms
@@ -17,6 +19,12 @@ The project is available as a **free community edition, even for commercial use*
 The owner of this solution is ITProCloud GmbH, [info@itprocloud.com](mailto:info@itprocloud.com).
 
 Please make sure to send feedback and update the solution regularly.
+
+
+
+## Get help
+
+If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
 
 
@@ -142,6 +150,8 @@ After that, click "Create" to install your instance of Project Hydra into your s
 
 
 ## Adding a tenant
+
+***Note:** If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)*
 
 Open your Project Hydra instance in a web browser by entering https://myhydrainstance.azurewebsites.net (myhydrainstance is the name of your deployment from the basic step).
 
