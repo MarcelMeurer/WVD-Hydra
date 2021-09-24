@@ -1,4 +1,4 @@
 {
-	"CurrentVersion" : "1.0.1.12",
-	"UpdateMessage" : "Hydra has been updated to a new version and left the preview phase. Please upgrade your deployment: App Service -> Deployment Center -> Sync"
+	"CurrentVersion" : "1.0.1.15",
+	"UpdateMessage" : "Hydra has been updated to a new version. Please upgrade your deployment: App Service -> Deployment Center -> Sync"
 }
