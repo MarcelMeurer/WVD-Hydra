@@ -68,6 +68,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.16	(2021/09/25)
+  - Add: Assigned users are now visible in the session host list; additional targets for script / collections schedules (single host, named hosts, ...)
 - 1.0.1.15	(2021/09/22)
   - Fix: Optimization to the memory handling for large environments
 - 1.0.1.14	(2021/09/13)
