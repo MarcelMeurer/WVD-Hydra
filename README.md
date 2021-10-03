@@ -68,6 +68,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.17	(2021/10/03)
+  - Add: Showing the current usage of Azure files file shares; Fix: Removing FSLogix profiles will now consider SIDDirNameMatch
 - 1.0.1.16	(2021/09/25)
   - Add: Assigned users are now visible in the session host list; additional targets for script / collections schedules (single host, named hosts, ...)
 - 1.0.1.15	(2021/09/22)
