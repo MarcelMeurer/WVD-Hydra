@@ -60,7 +60,7 @@ If you are not familiar with the first configuration and creating a service prin
   - From version 1.0.0.6: Can be configured on the host pool level
 - [Scripts and Script Collections](#Scripts-and-Script-Collections)
   - Run Powershell scripts on session hosts
-  - Orchestarte hosts with multiple scripts and tasks: Drain mode on -> Logoff users -> Start the VM -> Run a script -> Restart -> Drain mode off
+  - Orchestrate hosts with multiple scripts and tasks: Drain mode on -> Logoff users -> Start the VM -> Run a script -> Restart -> Drain mode off
   - Built-in scripts/collections for Windows Update, Windows 10 optimization, ...
 - ...
 
@@ -68,6 +68,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.18	(2021/10/05)
+  - Add: Logging off users are now awaited. This solve an issue while deleting a FSLogix profile while the logoff process is still running
 - 1.0.1.17	(2021/10/03)
   - Add: Showing the current usage of Azure files file shares; Fix: Removing FSLogix profiles will now consider SIDDirNameMatch
 - 1.0.1.16	(2021/09/25)
