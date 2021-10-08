@@ -68,6 +68,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.20	(2021/10/08)
+  - Add: Shows version in the web GUI and link to the marketplace
 - 1.0.1.19	(2021/10/06)
   - Add: Installs the extensions for AMD/NVIDIA GPU manually or automated during deployment of hosts (configurable on the host pool level -> New Session Host Rollout)
 - 1.0.1.18	(2021/10/05)
