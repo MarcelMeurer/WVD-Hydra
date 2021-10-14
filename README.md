@@ -68,6 +68,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.21	(2021/10/14)
+  - Fix: If a host upgrades the AVD agent for longer than 5 minutes, the host will be ignored (until the agent is updated correctly); Remove leading and trailing white-space from the OU string
 - 1.0.1.20	(2021/10/08)
   - Add: Shows version in the web GUI and link to the marketplace
 - 1.0.1.19	(2021/10/06)
