@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 3.8
+# Current Version of this script: 3.9
 
 param(
 
@@ -7,7 +7,7 @@ param(
 
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader')]
+	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader')]
 	[string] $Mode,
 	[string] $LocalAdminName='localAdmin',				#Currently not used in this script
 	[string] $LocalAdminPassword='',
@@ -322,7 +322,18 @@ if ($mode -eq "Generalize") {
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
 				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -InputObject $task -ErrorAction Ignore
 				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
-				LogWriter("Added new startup task for RDAgentBootloader")
+				LogWriter("Added new startup task to run the RDAgentBootloader")
+					
+				$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
+				$triggerM = $class | New-CimInstance -ClientOnly
+				$triggerM.Enabled = $true
+				$triggerM.Subscription='<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''WVD-Agent'']] and System[(Level=2) and (EventID=3277)]]</Select></Query></QueryList>'
+				$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RestartBootloader`""
+				$settingsM = New-ScheduledTaskSettingsSet
+				$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Restarts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
+				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-1' -InputObject $taskM -ErrorAction Ignore
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-1' -ErrorAction Ignore
+				LogWriter("Added new task to monitor the RDAgentBootloader")
 			}
 		} else {
 			if ((Test-Path "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi") -eq $false) {
@@ -457,6 +468,17 @@ if ($mode -eq "Generalize") {
 		$retryCount++
 		Start-Sleep -Seconds 30
 	}
+	LogWriter("Add new task to monitor the RDAgentBootloader")
+	$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
+	$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
+	$triggerM = $class | New-CimInstance -ClientOnly
+	$triggerM.Enabled = $true
+	$triggerM.Subscription='<QueryList><Query Id="0" Path="RemoteDesktopServices"><Select Path="RemoteDesktopServices">*[System[Provider[@Name=''Microsoft.RDInfra.Messaging.WebSocketTransport'']] and System[(Level=2) and (EventID=0)]]</Select></Query></QueryList>'
+	$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloader`""
+	$settingsM = New-ScheduledTaskSettingsSet
+	$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Starts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
+	Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $taskM -ErrorAction Ignore
+	Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -ErrorAction Ignore
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
@@ -465,4 +487,25 @@ if ($mode -eq "Generalize") {
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
 	}
+}  elseif ($mode -eq "RestartBootloader") {
+    $LogFile=$LogDir+"\AVD.AgentBootloaderErrorHandling.log"
+    LogWriter "Stopping service"
+    Stop-Service -Name "RDAgentBootLoader"
+    LogWriter "Starting service"
+    Start-Service -Name "RDAgentBootLoader"
+}  elseif ($mode -eq "StartBootloader") {
+    $LogFile=$LogDir+"\AVD.AgentBootloaderErrorHandling.log"
+    LogWriter "Start service was triggered by an event"
+    LogWriter "Waiting for 5 seconds"
+    Start-Sleep -Seconds 5
+    LogWriter "Starting service"
+    Start-Service -Name "RDAgentBootLoader"
+    LogWriter "Waiting for 60 seconds"
+    Start-Sleep -Seconds 60
+    LogWriter "Starting service (if not running)"
+    Start-Service -Name "RDAgentBootLoader"
+    LogWriter "Waiting for 60 seconds"
+    Start-Sleep -Seconds 60
+    LogWriter "Starting service (if not running)"
+    Start-Service -Name "RDAgentBootLoader"
 }
