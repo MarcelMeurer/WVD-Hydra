@@ -68,6 +68,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.23	(2021/10/22)
+  - Add: In some cases, Azure cannot provide specific VM sizes because of insufficient resources. This prevents session hosts from starting or deploying. You can configure now on a host pool level -> New session host rollout -> Advanced setting an alternative VM size. This VM size is then used to deploy new hosts for a specific time. Additionally, if a host cannot start with insufficient resources, the VM size will be changed to the alternative configuration. This will not be undone automatically. This function should prevent running into temporary issues. Make sure that the alternative VM size fits the other configuration properties (like disk type). A mapping table to select an alternative VM size in case of an issue automatically is on the roadmap.
 - 1.0.1.22	(2021/10/19)
   - Add: Make the rollout of new hosts more reliable (typical download error of the SXS stack files should be handled with a retry)
 - 1.0.1.21	(2021/10/14)
