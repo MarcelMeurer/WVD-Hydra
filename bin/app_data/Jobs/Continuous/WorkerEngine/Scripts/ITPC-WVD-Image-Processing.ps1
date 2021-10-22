@@ -468,17 +468,17 @@ if ($mode -eq "Generalize") {
 		$retryCount++
 		Start-Sleep -Seconds 30
 	}
-	LogWriter("Add new task to monitor the RDAgentBootloader")
-	$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
-	$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
-	$triggerM = $class | New-CimInstance -ClientOnly
-	$triggerM.Enabled = $true
-	$triggerM.Subscription='<QueryList><Query Id="0" Path="RemoteDesktopServices"><Select Path="RemoteDesktopServices">*[System[Provider[@Name=''Microsoft.RDInfra.Messaging.WebSocketTransport'']] and System[(Level=2) and (EventID=0)]]</Select></Query></QueryList>'
-	$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloader`""
-	$settingsM = New-ScheduledTaskSettingsSet
-	$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Starts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
-	Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $taskM -ErrorAction Ignore
-	Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -ErrorAction Ignore
+	#LogWriter("Add new task to monitor the RDAgentBootloader")
+	#$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
+	#$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
+	#$triggerM = $class | New-CimInstance -ClientOnly
+	#$triggerM.Enabled = $true
+	#$triggerM.Subscription='<QueryList><Query Id="0" Path="RemoteDesktopServices"><Select Path="RemoteDesktopServices">*[System[Provider[@Name=''Microsoft.RDInfra.Messaging.WebSocketTransport'']] and System[(Level=2) and (EventID=0)]]</Select></Query></QueryList>'
+	#$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloader`""
+	#$settingsM = New-ScheduledTaskSettingsSet
+	#$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Starts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
+	#Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $taskM -ErrorAction Ignore
+	#Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -ErrorAction Ignore
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
