@@ -2,9 +2,7 @@
 
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
-
-[Get it from the Azure Marketplace](https://azuremarketplace.microsoft.com/marketplace/apps/itprocloudgmbh1628775137215.hydra-deploy-d1)
+<a href="https://azuremarketplace.microsoft.com/marketplace/apps/itprocloudgmbh1628775137215.hydra-deploy-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
 
 [Get free support for the deployment](mailto:info@itprocloud.com)
 
@@ -32,6 +30,11 @@ If you are not familiar with the first configuration and creating a service prin
 
 - Multi-tenancy
 - Role-based access
+- Image management
+  - Create images from VMs / Golden Masters without destroying the source VM
+  - Copy images to shared image galleries
+  - Delete older images or gallery images
+  - Deploy session hosts based on images
 - Management of user sessions
   - Logoff, messages, shadow user sessions, delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu)
 - Management of session hosts
@@ -45,7 +48,7 @@ If you are not familiar with the first configuration and creating a service prin
     - Schedules
     - Autopilot: Automatically scales up/down/create/remove based on the usage of a host pool
     - Deploy hosts on demand - including ephemeral VMs based on a custom image
-	- Delete and rebuild hosts after logoff
+  - Delete and rebuild hosts after logoff
   - VDI
     - Auto deallocate session hosts
 - Session Timeouts
@@ -68,6 +71,10 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.24	(2021/11/04)
+  - Hydra now has the imaging capabilities from WVDAdmin. You can create images based on existing VMs / Golden Masters without destroying them. The VMs / Golden Masters can be updated in the future and captured again
+  - Hydra has now a Logging menu item to show the latest operations
+  - Concurrent user count is now logged into the log analytics workspace in log Hydra_ConcurrentUserUsage_CL
 - 1.0.1.23	(2021/10/22)
   - Add: In some cases, Azure cannot provide specific VM sizes because of insufficient resources. This prevents session hosts from starting or deploying. You can configure now on a host pool level -> New session host rollout -> Advanced setting an alternative VM size. This VM size is then used to deploy new hosts for a specific time. Additionally, if a host cannot start with insufficient resources, the VM size will be changed to the alternative configuration. This will not be undone automatically right now. This function should prevent running into temporary issues. Make sure that the alternative VM size fits the other configuration properties (like disk type). A mapping table to select an alternative VM size in case of an issue automatically is on the roadmap.
 - 1.0.1.22	(2021/10/19)
@@ -133,9 +140,11 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
 
 ## Installation
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
+<a href="https://azuremarketplace.microsoft.com/marketplace/apps/itprocloudgmbh1628775137215.hydra-deploy-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
 
-Use the "Deploy to Azure" button to roll out your instance of Project Hydra into your subscription.
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank">Deploy from GitHub</a>
+
+Use the "Deploy to Azure" button to roll out your instance of Hydra into your subscription.
 
 <a href="https://youtu.be/GaRrotF0peM" target="_blank">See the installation and basic configuration on YouTube</a>
 
