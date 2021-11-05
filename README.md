@@ -2,7 +2,7 @@
 
 
 
-<a href="https://azuremarketplace.microsoft.com/marketplace/apps/itprocloudgmbh1628775137215.hydra-deploy-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
+<a href="https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-deploy-d1hydra-free-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
 
 [Get free support for the deployment](mailto:info@itprocloud.com)
 
@@ -140,7 +140,7 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
 
 ## Installation
 
-<a href="https://azuremarketplace.microsoft.com/marketplace/apps/itprocloudgmbh1628775137215.hydra-deploy-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
+<a href="https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-deploy-d1hydra-free-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank">Deploy from GitHub</a>
 
