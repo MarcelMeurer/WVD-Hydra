@@ -79,7 +79,7 @@ foreach ($user in $users.Split(";")) {
                     throw "The path $profilePathUser doesn't exist"
                 }
                 LogWriter("Start to remove all files in the path")
-                Get-ChildItem -Path "$profilePathUser\*" | Where { ! $_.PSIsContainer } | Remove-Item -Force -Confirm:$false
+                Get-ChildItem -Path "$profilePathUser\*" -Include *.vhd* | Where { ! $_.PSIsContainer } | Remove-Item -Force -Confirm:$false
                 LogWriter("Done")
 
 

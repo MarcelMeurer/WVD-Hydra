@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 3.9
+# Current Version of this script: 4.0
 
 param(
 
@@ -7,7 +7,7 @@ param(
 
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader')]
+	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','CleanFirstStart')]
 	[string] $Mode,
 	[string] $LocalAdminName='localAdmin',				#Currently not used in this script
 	[string] $LocalAdminPassword='',
@@ -150,6 +150,17 @@ if ($mode -eq "Generalize") {
 		Start-Process -wait -FilePath PowerShell.exe -WorkingDirectory "C:\ProgramData\Optimize" -ArgumentList '-ExecutionPolicy Bypass -File "C:\ProgramData\Optimize\Win10_VirtualDesktop_Optimize.ps1 -AcceptEULA -Optimizations WindowsMediaPlayer,AppxPackages,ScheduledTasks,DefaultUserSettings,Autologgers,Services,NetworkOptimizations"' -RedirectStandardOutput "$($LogDir)\VirtualDesktop_Optimize.Stage1.Out.txt" -RedirectStandardError "$($LogDir)\VirtualDesktop_Optimize.Stage1.Warning.txt"
 	}
 
+	# prepare cleanup task for new deployed VMs - solve an issue with the runcommand api giving older log data
+	LogWriter("Preparing CleanFirstStart task")
+	$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"CleanFirstStart`""
+	$trigger = New-ScheduledTaskTrigger	-AtStartup
+	$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
+	$settingsSet = New-ScheduledTaskSettingsSet
+	$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
+	Register-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper' -InputObject $task -ErrorAction Ignore
+	Enable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper'
+	LogWriter("Added new startup task to run the CleanFirstStart")
+
 	# check if D:-drive not the temporary storage and having three drives 
 	$modifyDrives=$false
 	$disks=Get-WmiObject -Class win32_volume | Where-Object { $_.DriveLetter -ne $null -and $_.DriveType -eq 3 }
@@ -208,7 +219,7 @@ if ($mode -eq "Generalize") {
 	}
 
 } elseif ($mode -eq "JoinDomain")
-{
+{	
 	# Removing existing agent if exist
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
@@ -229,14 +240,29 @@ if ($mode -eq "Generalize") {
 		LogWriter("Joining domain")
 		$psc = New-Object System.Management.Automation.PSCredential($DomainJoinUserName, (ConvertTo-SecureString $DomainJoinUserPassword -AsPlainText -Force))
 
-		if ($DomainJoinOU -eq "")
-		{
-			Add-Computer -DomainName $DomainFqdn -Credential $psc -Force -ErrorAction Stop
-		} 
-		else
-		{
-			Add-Computer -DomainName $DomainFqdn -OUPath $DomainJoinOU -Credential $psc -Force -ErrorAction Stop
-		}
+		$retry=3
+		$ok=$false
+		do{
+			try {
+				if ($DomainJoinOU -eq "")
+				{
+					Add-Computer -DomainName $DomainFqdn -Credential $psc -Force -ErrorAction Stop
+					$ok=$true
+					LogWriter("Domain joined successfully")
+				} 
+				else
+				{
+					Add-Computer -DomainName $DomainFqdn -OUPath $DomainJoinOU -Credential $psc -Force -ErrorAction Stop
+					$ok=$true
+					LogWriter("Domain joined successfully")
+				}
+			} catch {
+				if ($retry -eq 0) {throw $_}
+				$retry--
+				LogWriter("Retry domain join because of an error: $_")
+				Start-Sleep -Seconds 10
+			}
+		} while($ok -ne $true)
 	} else {
 		LogWriter("AAD only is selected. Skipping joining to a native AD, joining AAD")
 		$aadPath=@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows")[@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows").count-1].fullname
@@ -468,21 +494,21 @@ if ($mode -eq "Generalize") {
 		$retryCount++
 		Start-Sleep -Seconds 30
 	}
-	#LogWriter("Add new task to monitor the RDAgentBootloader")
-	#$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
-	#$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
-	#$triggerM = $class | New-CimInstance -ClientOnly
-	#$triggerM.Enabled = $true
-	#$triggerM.Subscription='<QueryList><Query Id="0" Path="RemoteDesktopServices"><Select Path="RemoteDesktopServices">*[System[Provider[@Name=''Microsoft.RDInfra.Messaging.WebSocketTransport'']] and System[(Level=2) and (EventID=0)]]</Select></Query></QueryList>'
-	#$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloader`""
-	#$settingsM = New-ScheduledTaskSettingsSet
-	#$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Starts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
-	#Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $taskM -ErrorAction Ignore
-	#Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -ErrorAction Ignore
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
 		Disable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
+	}
+	catch {
+		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
+	}
+} elseif ($Mode -eq "CleanFirstStart") {
+	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
+	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
+	LogWriter("Disable scheduled task")
+	try {
+		# disable startup scheduled task
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper'
 	}
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
@@ -508,4 +534,4 @@ if ($mode -eq "Generalize") {
     Start-Sleep -Seconds 60
     LogWriter "Starting service (if not running)"
     Start-Service -Name "RDAgentBootLoader"
-}
+} 

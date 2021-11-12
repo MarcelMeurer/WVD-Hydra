@@ -71,6 +71,12 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.25	(2021/11/12)
+  - Improvement of the imaging process to avoid that the Azure Agent shows older logs after the rollout of new VMs
+  - For the rollout configuration: You can now select the source VM (Golden Master) instead of an image. Hydra will care that always the newest image of the source VM is used for the next rollout
+  - Preparation to have unassigned hosts available in a personal host pool  (private preview)
+  - Deleting an FSLogix profile from the GUI will no longer remove all files in the profile folder. Only VHD* files will be removed
+  - Remove a typo in the log analytics data column for host pool statistics
 - 1.0.1.24	(2021/11/04)
   - Hydra now has the imaging capabilities from WVDAdmin. You can create images based on existing VMs / Golden Masters without destroying them. The VMs / Golden Masters can be updated in the future and captured again
   - Hydra has now a Logging menu item to show the latest operations
