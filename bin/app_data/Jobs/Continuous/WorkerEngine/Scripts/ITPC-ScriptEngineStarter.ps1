@@ -41,7 +41,8 @@ function RunScript
        $Name=$([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Name64)))
        OutputWriter("HydraScriptEngine: START $Name")
        $global:Hydra_Script_Name=$Name
-       Invoke-Expression -Command ".\$($id).ps1 $([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Parameters64)))"
+       $parameters=$([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Parameters64)))
+       Invoke-Expression -Command ".\$($id).ps1 $parameters"
        OutputWriter("HydraScriptEngine: END")
        Set-Location $hydraScriptLocation
     } catch {

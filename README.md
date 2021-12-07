@@ -37,6 +37,7 @@ If you are not familiar with the first configuration and creating a service prin
   - Deploy session hosts based on images
 - Management of user sessions
   - Logoff, messages, shadow user sessions, delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu)
+  - In preview: Show user processes, incl. CPU and memory usage; Terminate user processes ([requires an agent](#Install-the-Hydra-Agent))
 - Management of session hosts
   - Start, Stop, Delete, Restart, Automatically change disk types
   - Create new session hosts with a click (with classic disks or ephemeral)
@@ -47,32 +48,38 @@ If you are not familiar with the first configuration and creating a service prin
     - Power-on-connect support
     - Schedules
     - Autopilot: Automatically scales up/down/create/remove based on the usage of a host pool
-    - Deploy hosts on demand - including ephemeral VMs based on a custom image
-  - Delete and rebuild hosts after logoff
+    - Deploy hosts on demand - including ephemeral VMs based on a custom image*
+    - Delete and rebuild hosts after logoff
   - VDI
     - Auto deallocate session hosts
+    - Start spare-host to allow an assign on first connect for new users
+    - Create new VDIs if needed based on a custom image*
 - Session Timeouts
 - Session host definitions for rollouts
   - Per host pool
   - Images and shared images
   - Copy configuration
+- Monitoring
+  - Shows the storage usage (Azure files, FSLogix profile shares)
 - Auto Health
-  - Remove orphan sessions
+  - Remove orphan sessions*
 - Automatic disk change
-  - Disk size is automatically changed on start/deallocation based on the VM tag "WVD.AdvDiskType", e.g., "Premium_LRS" will change the disk type to premium on start and to hdd after deallocation
-  - From version 1.0.0.6: Can be configured on the host pool level
+  - Disk type can automatically be changed on start/deallocation/autoscaling to save storage costs (switch between HDD-Premium-HDD or HDD-SSD-HDD)
 - [Scripts and Script Collections](#Scripts-and-Script-Collections)
   - Run Powershell scripts on session hosts
   - Orchestrate hosts with multiple scripts and tasks: Drain mode on -> Logoff users -> Start the VM -> Run a script -> Restart -> Drain mode off
   - Built-in scripts/collections for Windows Update, Windows 10 optimization, ...
 - ...
 
+[^*]: Currently not available in the US
+
 
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
-- 1.0.1.26	(2021/11/13)
-  - Fix: Getting the image reference id by VM name
+- 1.0.1.27	(2021/12/07)
+  - Preview Feature: Show user processes ([requires an agent](#Install-the-Hydra-Agent))
+  - Add: A fix to handle that sometimes the Azure API returns an empty resource id to the VM for a session host
 - 1.0.1.25	(2021/11/12)
   - Add: Improvement of the imaging process to avoid that the Azure Agent shows older logs after the rollout of new VMs
   - Add: For the rollout configuration: You can now select the source VM (Golden Master) instead of an image. Hydra will care that always the newest image of the source VM is used for the next rollout
@@ -149,8 +156,6 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
 ## Installation
 
 <a href="https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-deploy-d1hydra-free-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
-
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FmainTemplate.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FMarcelMeurer%2FWVD-Hydra%2Fmain%2Fdeployment%2FcreateUiDefinition.json" target="_blank">Deploy from GitHub</a>
 
 Use the "Deploy to Azure" button to roll out your instance of Hydra into your subscription.
 
@@ -474,7 +479,44 @@ Schedules can be used on a host pool level to run a script or collection unatten
 
 This example runs Windows Update on all session hosts Sunday, 1:00 am. Including drain mode, start, update, restart, drain mode off.
 
+### Install the Hydra Agent
 
+The Hydra Agent is currently in preview and is only needed for a small feature set. Today, it's required to show user processes in the user session list and maybe terminate user processes in case of an issue.
 
+#### Prepare the installation of the Hydra Agent
 
+- Create a new collection by copying an existing one
+- Change the name and description to "Install Hydra Agent"
+- Clear the collection and add one step: "VM - Deploy Hydra Agent"
+- Save the new collection
+
+Hint: If your Hydra instance has another external name then myinstance.azurewebsites.net, you can set the external name as a parameter of the step in the collection 
+
+![](media/HydraAgent-01.png)
+
+#### Enable Websockets on the app service
+
+- Open the app service of your Hydra instance in the Azure Portal
+- Go to: Configuration -> General settings -> Set Web sockets to On
+- Click "Save" (your Hydra instance will restart)
+
+![](media/HydraAgent-02.png)
+
+#### Deploy the agent to session hosts
+
+Open a host pool where you want to run the agent. 
+
+- Select the hosts
+- Click in the burger menu "Start a script or collection"
+- Select "Install Hydra Agent" and click "Ok"
+
+Hint: You can run "Install Hydra Agent" with the image creation process on the Golden Master. All deployed session hosts based on this master will have the Agent installed, and you can directly use the advanced features.
+
+![](media/HydraAgent-03.png)
+
+#### Showing user processes
+
+If the Hydra Agent is installed on session hosts, the processes of a single user can be shown in the "User sessions" menu. Click on the icon right to the user to show the processes.
+
+![](media/HydraAgent-04.png)
 
