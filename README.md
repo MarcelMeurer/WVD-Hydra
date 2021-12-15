@@ -71,12 +71,14 @@ If you are not familiar with the first configuration and creating a service prin
   - Built-in scripts/collections for Windows Update, Windows 10 optimization, ...
 - ...
 
-[^*]: Currently not available in the US
+<sup>* Currently not available in the US</sup>
 
 
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.28	(2021/12/15)
+  - Fix: Preview feature "Show process list" doesn't show processes for disconnected users
 - 1.0.1.27	(2021/12/07)
   - Preview Feature: Show user processes ([requires an agent](#Install-the-Hydra-Agent))
   - Add: A fix to handle that sometimes the Azure API returns an empty resource id to the VM for a session host
