@@ -77,6 +77,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.29	(2021/12/16)
+  - Fix: Image reference "Windows 10 EVD - Gen2 - 21h2" corrected; Add: New images for 21h2 + Office
 - 1.0.1.28	(2021/12/15)
   - Fix: Preview feature "Show process list" doesn't show processes for disconnected users
 - 1.0.1.27	(2021/12/07)
