@@ -77,6 +77,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.31	(2022/01/07)
+  - Fix: In some cases the script engine has not started after a hosts shows an error from the AVD backend
 - 1.0.1.30	(2022/01/04)
   - Fix: The process list of a user was sometimes not shown (error message about the JSON data) correctly if the user had a long process list
 - 1.0.1.29	(2021/12/16)
