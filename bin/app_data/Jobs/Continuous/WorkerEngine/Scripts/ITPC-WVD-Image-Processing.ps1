@@ -227,6 +227,11 @@ if ($mode -eq "Generalize") {
 	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
 
+	# Storing AadOnly to registry
+	LogWriter("Storing AadOnly to registry: "+$AadOnly)
+	New-Item -Path "HKLM:\SOFTWARE" -Name "ITProCloud" -ErrorAction Ignore
+	New-Item -Path "HKLM:\SOFTWARE\ITProCloud" -Name "WVD.Runtime" -ErrorAction Ignore
+	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "AadOnly" -Value $AadOnly -force
 
 	# Checking for a saved time zone information
 	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime") {
@@ -270,8 +275,17 @@ if ($mode -eq "Generalize") {
 		if ($JoinMem -eq "1") {
 			LogWriter("Joining Microsoft Endpoint Manamgement is selected. Try to register to MEM")
 			Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/AzureSecureVMJoin /debug /MdmId 0000000a-0000-0000-c000-000000000000" -RedirectStandardOutput "$($LogDir)\Avd.MemJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.MemJoin.Warning.txt"
-
 		}
+		try {
+			if ($AadOnly) {
+				$timeOut=(Get-Date).AddSeconds(5*60)
+				do 
+				{
+					LogWriter("Waiting for the domain join")
+					Start-Sleep -Seconds 3#AzureAdJoined : YES
+				} while ((Get-Date) -le $timeOut -and (Select-String  -InputObject (&dsregcmd /status) -pattern "AzureAdJoined : YES").length -eq 0) 
+			}
+		} catch {}
 	}
 	# check for disk handling
 	$modifyDrives=$false
