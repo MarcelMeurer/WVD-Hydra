@@ -77,6 +77,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.34	(2022/01/20)
+  - Fix: Deployment of new VDI doesn't started under some conditions
 - 1.0.1.33	(2022/01/18)
   - Add: Increase of the time out for an AAD-only deployment (takes much longer to join an AAD instead of an AD)
 - 1.0.1.32	(2022/01/13)
