@@ -77,6 +77,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.35	(2022/01/21)
+  - Add: The last time a connection was seen is now stored on a session host level in the database. This will be used for version 1.0.1.36 to optionally delete session hosts after a specific time of no use
 - 1.0.1.34	(2022/01/20)
   - Fix: Deployment of new VDI doesn't started under some conditions
 - 1.0.1.33	(2022/01/18)
