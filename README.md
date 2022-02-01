@@ -77,6 +77,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.37	(2022/02/01)
+  - Add: Align to the Azure Portal: Don't show error messages with error code != 0 and HealthCheckResult!='HealthCheckSucceeded'
 - 1.0.1.36	(2022/01/28)
   - Add: Optionally delete session hosts after a specific time of no use (personal host pools) - use carefully
 - 1.0.1.35	(2022/01/21)
