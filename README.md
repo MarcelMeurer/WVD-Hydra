@@ -77,6 +77,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.41	(2022/02/15)
+  - Add: User assignment to a VDI session host can be done directly using the the session host view (add, change or delete assignment)
 - 1.0.1.40	(2022/02/15)
   - Change: User and session host list can be downloaded as CSV (showing the content of the displayed table)
 - 1.0.1.39	(2022/02/14)
