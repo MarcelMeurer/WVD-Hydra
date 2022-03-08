@@ -56,8 +56,13 @@ foreach ($user in $users.Split(";")) {
                 $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
 
                 if ($dirName -eq $null -or $dirName -eq "") {
-                    $regPath="HKLM:\Software\Policies\FSLogix\ODFC"
-                    if ((Test-Path $regPath) -and (Get-Item $regPath -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {
+                    $regPath1="HKLM:\Software\FSLogix\Profiles"
+                    $regPath2="HKLM:\Software\Policies\FSLogix\ODFC"
+                    $flipFlop=$false
+                                        
+                    if ((Test-Path $regPath1) -and (Get-Item $regPath1 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
+                    if ((Test-Path $regPath2) -and (Get-Item $regPath2 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
+                    if ($flipFlop) {
                         $profilePathUser="$($profilePath)\$($adUser.Properties.samaccountname)_$($sid)"
                         LogWriter("FlipFlopProfileDirectoryName is set to 1")
                     } else  {
