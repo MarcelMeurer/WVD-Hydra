@@ -77,6 +77,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.44	(2022/03/22)
+  - Fix: if a session host rollout failed due to sufficient capacity in Azure (even for the alternative size), did not delete the failed host
+  - Add: Extended the monitoring of VDI (personal) host pools to store the typical logon time. This will be used in an upcoming release to opt. allow a predicted disk type switching and the start of a host
 - 1.0.1.43	(2022/03/08)
   - Change: Timeout after rolling out a new session hosts (AD-joined) increase to 16 minutes; Fix: Logs are now listed in the local timezone; Fix: FlipFlopProfileDirectoryName for FSLogix corrected
 - 1.0.1.42	(2022/02/24)
