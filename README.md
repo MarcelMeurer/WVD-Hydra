@@ -77,6 +77,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.45	(2022/03/22)
+  - Fix: The copy function to copy a rollout configuration from another host pool was not working
+  - Add: Personal host pools shows the number of hosts and assigned hosts in the detail view
 - 1.0.1.44	(2022/03/22)
   - Fix: if a session host rollout failed due to sufficient capacity in Azure (even for the alternative size), did not delete the failed host
   - Add: Extended the monitoring of VDI (personal) host pools to store the typical logon time. This will be used in an upcoming release to opt. allow a predicted disk type switching and the start of a host
