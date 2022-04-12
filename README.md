@@ -557,9 +557,9 @@ Open a host pool where you want to run the agent.
 - Click in the burger menu "Start a script or collection"
 - Select "Install Hydra Agent" and click "Ok"
 
-Hint: You can run "Install Hydra Agent" with the image creation process on the Golden Master. All deployed session hosts based on this master will have the Agent installed, and you can directly use the advanced features.
-
 ![](media/HydraAgent-03.png)
+
+Hint: You can run "Install Hydra Agent" with the image creation process on the Golden Master. All deployed session hosts based on this master will have the Agent installed, and you can directly use the advanced features.
 
 #### Showing user processes
 If the Hydra Agent is installed on session hosts, the processes of a single user can be shown in the "User sessions" menu. Click on the icon right to the user to show the processes.
