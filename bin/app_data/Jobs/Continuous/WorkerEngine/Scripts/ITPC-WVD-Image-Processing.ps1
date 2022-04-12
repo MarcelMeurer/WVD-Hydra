@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.0
+# Current Version of this script: 4.2
 
 param(
 
@@ -22,7 +22,9 @@ param(
 	[string] $JoinMem='0',
 	[string] $DomainFqdn='',
 	[string] $WvdRegistrationKey='',
-	[string] $LogDir="$env:windir\system32\logfiles"
+	[string] $LogDir="$env:windir\system32\logfiles",
+    [string] $HydraAgentUri='',
+    [string] $HydraAgentSecret=''
 )
 
 function LogWriter($message) {
@@ -45,6 +47,25 @@ function ShowPageFiles() {
 	foreach ($pageFile in $pageFiles) {
 		LogWriter("Name: '$($pageFile.Name)', Maximum size: '$($pageFile.MaximumSize)'")
 	}
+}
+
+function UnzipFile ($zipfile, $outdir)
+{
+    # Based on https://gist.github.com/nachivpn/3e53dd36120877d70aee
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $files = [System.IO.Compression.ZipFile]::OpenRead($zipfile)
+    foreach ($entry in $files.Entries)
+    {
+        $targetPath = [System.IO.Path]::Combine($outdir, $entry.FullName)
+        $directory = [System.IO.Path]::GetDirectoryName($targetPath)
+       
+        if(!(Test-Path $directory )){
+            New-Item -ItemType Directory -Path $directory | Out-Null 
+        }
+        if(!$targetPath.EndsWith("/")){
+            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $targetPath, $true);
+        }
+    }
 }
                                                         
 # Define static variables
@@ -325,6 +346,41 @@ if ($mode -eq "Generalize") {
 				}
 				ShowPageFiles
 			}
+		}
+	}
+
+	# install Hydra Agent
+	if ($HydraAgentUri -ne "") {
+		$uri=$HydraAgentUri
+		$secret=$HydraAgentSecret
+		$DownloadAdress="https://$($uri)/Download/HydraAgent"
+		try {
+			if ((Test-Path ("$env:ProgramFiles\ITProCloud.de")) -eq $false) {
+				new-item "$env:ProgramFiles\ITProCloud.de" -ItemType Directory -ErrorAction Ignore
+			}
+			if ((Test-Path ("$env:ProgramFiles\ITProCloud.de\HydraAgent")) -eq $false) {
+				new-item "$env:ProgramFiles\ITProCloud.de\HydraAgent" -ItemType Directory -ErrorAction Ignore
+			}
+			Remove-Item -Path "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" -Force -ErrorAction Ignore
+
+
+			LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
+			Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
+
+			# Stop a running instance
+			LogWriter("Stop a running instance")
+			Stop-ScheduledTask -TaskName 'ITPC-AVD-Hydra-Helper' -ErrorAction Ignore
+			Stop-Process -Name HydraAgent -Force -ErrorAction Ignore
+			Start-Sleep -Seconds 6
+			UnzipFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" "$env:ProgramFiles\ITProCloud.de\HydraAgent"
+
+			# Configuring the agent
+			LogWriter("Configuring the agent")
+			cd "$env:ProgramFiles\ITProCloud.de\HydraAgent"
+			. "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -i -u "wss://$($uri)/wsx" -s $secret
+		}
+		catch {
+			LogWriter="An error occurred while installing Hydra Agent: $_"
 		}
 	}
 

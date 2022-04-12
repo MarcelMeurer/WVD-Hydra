@@ -61,6 +61,7 @@ If you are not familiar with the first configuration and creating a service prin
   - Copy configuration
 - Monitoring
   - Shows the storage usage (Azure files, FSLogix profile shares)
+  - Realt-time performance of session hosts, including process list via the [Hydra Agent](#The-Hydra-Agent)
 - Auto Health
   - Remove orphan sessions*
 - Automatic disk change
@@ -77,6 +78,12 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.46	(2022/04/11)
+  - Add: The session host list shows the performance (CPU, memory, CPU and disk queue length) of all hosts having the [Hydra Agent](#The-Hydra-Agent) running
+  - Add: Show the processes of a session host by users; terminate single processes using the [Hydra Agent](#The-Hydra-Agent) (needs role Host pool VM and user manager or higher)
+  - Add: New checkbox in 'New session host rollout': Install [Hydra Agent](#The-Hydra-Agent) to install the agent while rolling out a new session host
+  - Add: In the user view: processes can be sorted by name, resources usage, etc.
+
 - 1.0.1.45	(2022/03/22)
   - Fix: The copy function to copy a rollout configuration from another host pool was not working
   - Add: Personal host pools shows the number of hosts and assigned hosts in the detail view
@@ -116,7 +123,7 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
 - 1.0.1.28	(2021/12/15)
   - Fix: Preview feature "Show process list" doesn't show processes for disconnected users
 - 1.0.1.27	(2021/12/07)
-  - Preview Feature: Show user processes ([requires an agent](#Install-the-Hydra-Agent))
+  - Preview Feature: Show user processes ([requires an agent](#The-Hydra-Agent))
   - Add: A fix to handle that sometimes the Azure API returns an empty resource id to the VM for a session host
 - 1.0.1.25	(2021/11/12)
   - Add: Improvement of the imaging process to avoid that the Azure Agent shows older logs after the rollout of new VMs
@@ -517,13 +524,25 @@ Schedules can be used on a host pool level to run a script or collection unatten
 
 This example runs Windows Update on all session hosts Sunday, 1:00 am. Including drain mode, start, update, restart, drain mode off.
 
-### Install the Hydra Agent
+### The Hydra Agent
 
-The Hydra Agent is currently in preview and is only needed for a small feature set. Today, it's required to show user processes in the user session list and maybe terminate user processes in case of an issue.
+The Hydra Agent is currently in preview and is needed for an optional feature set. Today, it's required to show user processes in the user session or in the session host list and maybe to terminate processes in case of an issue. Additionally, the agent is needed to show CPU, memory, CPU and disk queue length in the session host list.
 
-#### Prepare the installation of the Hydra Agent
+How does it work: The Hydra Agent connects to the Hydra app service via secure WebSocket and a secret to allow real-time communication. The communication flow is from the Hydra instance to the agent: The Hydra instance asks for information (e.g., process list), and the agent responds with the requested data. The agent cannot trigger a function on the Hydra instance.
 
-- Create a new collection by copying an existing one
+##### Precondition
+WebSocket needs to be enabled on the Hydra app service in the Azure Portal as well: App Services -> Hydra Instance -> Configuration -> General Settings -> Web Sockets
+- Open the app service of your Hydra instance in the Azure Portal
+- Go to: Configuration -> General settings -> Set Web sockets to On
+- Click "Save" (your Hydra instance will restart)
+
+![](media/HydraAgent-02.png)
+
+#### Installing the Hydra Agent on new hosts
+Check the box 'Install Hydra Agent' in the 'New session host rollout' tab of the host pool configuration for new session hosts.
+
+#### Deploy the agent to existing session hosts
+- Create a new script collection by copying an existing one
 - Change the name and description to "Install Hydra Agent"
 - Clear the collection and add one step: "VM - Deploy Hydra Agent"
 - Save the new collection
@@ -531,16 +550,6 @@ The Hydra Agent is currently in preview and is only needed for a small feature s
 Hint: If your Hydra instance has another external name then myinstance.azurewebsites.net, you can set the external name as a parameter of the step in the collection 
 
 ![](media/HydraAgent-01.png)
-
-#### Enable Websockets on the app service
-
-- Open the app service of your Hydra instance in the Azure Portal
-- Go to: Configuration -> General settings -> Set Web sockets to On
-- Click "Save" (your Hydra instance will restart)
-
-![](media/HydraAgent-02.png)
-
-#### Deploy the agent to session hosts
 
 Open a host pool where you want to run the agent. 
 
@@ -553,7 +562,6 @@ Hint: You can run "Install Hydra Agent" with the image creation process on the G
 ![](media/HydraAgent-03.png)
 
 #### Showing user processes
-
 If the Hydra Agent is installed on session hosts, the processes of a single user can be shown in the "User sessions" menu. Click on the icon right to the user to show the processes.
 
 ![](media/HydraAgent-04.png)
