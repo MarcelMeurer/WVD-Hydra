@@ -305,52 +305,115 @@
           "lib/netstandard2.0/AutoMapper.dll": {}
         }
       },
-      "Azure.Core/1.6.0": {
+      "Azure.Core/1.24.0": {
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "1.0.0",
-          "System.Buffers": "4.5.0",
+          "Microsoft.Bcl.AsyncInterfaces": "1.1.1",
           "System.Diagnostics.DiagnosticSource": "5.0.1",
-          "System.Memory": "4.5.4",
+          "System.Memory.Data": "1.0.2",
           "System.Numerics.Vectors": "4.5.0",
+          "System.Text.Encodings.Web": "4.7.2",
           "System.Text.Json": "5.0.0",
-          "System.Threading.Tasks.Extensions": "4.5.2"
+          "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
-          "lib/netstandard2.0/Azure.Core.dll": {
-            "assemblyVersion": "1.6.0.0",
-            "fileVersion": "1.600.20.52802"
+          "lib/netcoreapp2.1/Azure.Core.dll": {
+            "assemblyVersion": "1.24.0.0",
+            "fileVersion": "1.2400.22.20404"
           }
         },
         "compile": {
-          "lib/netstandard2.0/Azure.Core.dll": {}
+          "lib/netcoreapp2.1/Azure.Core.dll": {}
         }
       },
-      "Azure.Identity/1.3.0": {
+      "Azure.Identity/1.6.0": {
         "dependencies": {
-          "Azure.Core": "1.6.0",
-          "Microsoft.Identity.Client": "4.31.0",
-          "Microsoft.Identity.Client.Extensions.Msal": "2.16.5",
+          "Azure.Core": "1.24.0",
+          "Microsoft.Identity.Client": "4.39.0",
+          "Microsoft.Identity.Client.Extensions.Msal": "2.19.3",
           "System.Memory": "4.5.4",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
           "System.Text.Json": "5.0.0",
-          "System.Threading.Tasks.Extensions": "4.5.2"
+          "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Identity.dll": {
-            "assemblyVersion": "1.3.0.0",
-            "fileVersion": "1.300.20.56202"
+            "assemblyVersion": "1.6.0.0",
+            "fileVersion": "1.600.22.20503"
           }
         },
         "compile": {
           "lib/netstandard2.0/Azure.Identity.dll": {}
         }
       },
+      "Azure.ResourceManager/1.0.0": {
+        "dependencies": {
+          "Azure.Core": "1.24.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.22.20703"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.ResourceManager.dll": {}
+        }
+      },
+      "Azure.ResourceManager.Compute/1.0.0-beta.7": {
+        "dependencies": {
+          "Azure.Core": "1.24.0",
+          "Azure.ResourceManager": "1.0.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.Compute.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.22.18103"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.ResourceManager.Compute.dll": {}
+        }
+      },
+      "Azure.ResourceManager.Network/1.0.0-beta.7": {
+        "dependencies": {
+          "Azure.Core": "1.24.0",
+          "Azure.ResourceManager": "1.0.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.Network.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.22.20802"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.ResourceManager.Network.dll": {}
+        }
+      },
+      "Azure.ResourceManager.Storage/1.0.0-beta.7": {
+        "dependencies": {
+          "Azure.Core": "1.24.0",
+          "Azure.ResourceManager": "1.0.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.Storage.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.22.18104"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.ResourceManager.Storage.dll": {}
+        }
+      },
       "Azure.Security.KeyVault.Certificates/4.1.0": {
         "dependencies": {
-          "Azure.Core": "1.6.0",
+          "Azure.Core": "1.24.0",
           "System.Memory": "4.5.4",
           "System.Text.Json": "5.0.0",
-          "System.Threading.Tasks.Extensions": "4.5.2"
+          "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Security.KeyVault.Certificates.dll": {
@@ -364,10 +427,10 @@
       },
       "Azure.Security.KeyVault.Secrets/4.1.0": {
         "dependencies": {
-          "Azure.Core": "1.6.0",
+          "Azure.Core": "1.24.0",
           "System.Memory": "4.5.4",
           "System.Text.Json": "5.0.0",
-          "System.Threading.Tasks.Extensions": "4.5.2"
+          "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Security.KeyVault.Secrets.dll": {
@@ -1092,11 +1155,11 @@
           "lib/netstandard2.0/Microsoft.Azure.Services.AppAuthentication.dll": {}
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/1.0.0": {
+      "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
         "runtime": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "4.700.19.46214"
+            "fileVersion": "4.700.20.21406"
           }
         },
         "compile": {
@@ -1107,7 +1170,7 @@
       "Microsoft.Data.SqlClient/2.1.2": {
         "dependencies": {
           "Microsoft.Data.SqlClient.SNI.runtime": "2.1.1",
-          "Microsoft.Identity.Client": "4.31.0",
+          "Microsoft.Identity.Client": "4.39.0",
           "Microsoft.IdentityModel.JsonWebTokens": "6.8.0",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.8.0",
           "Microsoft.Win32.Registry": "5.0.0",
@@ -1805,26 +1868,26 @@
           "lib/netstandard1.1/Microsoft.Graph.Core.dll": {}
         }
       },
-      "Microsoft.Identity.Client/4.31.0": {
+      "Microsoft.Identity.Client/4.39.0": {
         "runtime": {
           "lib/netcoreapp2.1/Microsoft.Identity.Client.dll": {
-            "assemblyVersion": "4.31.0.0",
-            "fileVersion": "4.31.0.0"
+            "assemblyVersion": "4.39.0.0",
+            "fileVersion": "4.39.0.0"
           }
         },
         "compile": {
           "lib/netcoreapp2.1/Microsoft.Identity.Client.dll": {}
         }
       },
-      "Microsoft.Identity.Client.Extensions.Msal/2.16.5": {
+      "Microsoft.Identity.Client.Extensions.Msal/2.19.3": {
         "dependencies": {
-          "Microsoft.Identity.Client": "4.31.0",
+          "Microsoft.Identity.Client": "4.39.0",
           "System.Security.Cryptography.ProtectedData": "6.0.0"
         },
         "runtime": {
           "lib/netcoreapp2.1/Microsoft.Identity.Client.Extensions.Msal.dll": {
-            "assemblyVersion": "2.16.5.0",
-            "fileVersion": "2.16.5.0"
+            "assemblyVersion": "2.19.3.0",
+            "fileVersion": "2.19.3.0"
           }
         },
         "compile": {
@@ -1833,12 +1896,12 @@
       },
       "Microsoft.Identity.Web/1.12.0": {
         "dependencies": {
-          "Azure.Identity": "1.3.0",
+          "Azure.Identity": "1.6.0",
           "Azure.Security.KeyVault.Certificates": "4.1.0",
           "Azure.Security.KeyVault.Secrets": "4.1.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "3.1.8",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "3.1.14",
-          "Microsoft.Identity.Client": "4.31.0",
+          "Microsoft.Identity.Client": "4.39.0",
           "System.Text.Encodings.Web": "4.7.2"
         },
         "runtime": {
@@ -2837,6 +2900,21 @@
         }
       },
       "System.Memory/4.5.4": {},
+      "System.Memory.Data/1.0.2": {
+        "dependencies": {
+          "System.Text.Encodings.Web": "4.7.2",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.Memory.Data.dll": {
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.221.20802"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/System.Memory.Data.dll": {}
+        }
+      },
       "System.Net.Http/4.3.4": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "5.0.0",
@@ -3375,7 +3453,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.Threading.Tasks.Extensions/4.5.2": {},
+      "System.Threading.Tasks.Extensions/4.5.4": {},
       "System.Threading.Thread/4.3.0": {
         "dependencies": {
           "System.Runtime": "4.3.0"
@@ -3439,7 +3517,7 @@
           "System.Text.Encoding.Extensions": "4.3.0",
           "System.Text.RegularExpressions": "4.3.0",
           "System.Threading.Tasks": "4.3.0",
-          "System.Threading.Tasks.Extensions": "4.5.2"
+          "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
       "System.Xml.XDocument/4.3.0": {
@@ -3569,7 +3647,10 @@
         "dependencies": {
           "Agent for Project Hydra": "1.0.0",
           "AutoMapper": "10.1.1",
-          "Azure.Identity": "1.3.0",
+          "Azure.Identity": "1.6.0",
+          "Azure.ResourceManager.Compute": "1.0.0-beta.7",
+          "Azure.ResourceManager.Network": "1.0.0-beta.7",
+          "Azure.ResourceManager.Storage": "1.0.0-beta.7",
           "Azure.Security.KeyVault.Secrets": "4.1.0",
           "EFCore.BulkExtensions": "3.6.4",
           "Microsoft.Azure.Management.Fluent": "1.36.1",
@@ -5062,19 +5143,47 @@
       "path": "automapper/10.1.1",
       "hashPath": "automapper.10.1.1.nupkg.sha512"
     },
-    "Azure.Core/1.6.0": {
+    "Azure.Core/1.24.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kI4m2NsODPOrxo0OoKjk6B3ADbdovhDQIEmI4039upjjZKRaewVLx/Uz4DfRa/NtnIRZQPUALe1yvdHWAoRt4w==",
-      "path": "azure.core/1.6.0",
-      "hashPath": "azure.core.1.6.0.nupkg.sha512"
+      "sha512": "sha512-+/qI1j2oU1S4/nvxb2k/wDsol00iGf1AyJX5g3epV7eOpQEP/2xcgh/cxgKMeFgn3U2fmgSiBnQZdkV+l5y0Uw==",
+      "path": "azure.core/1.24.0",
+      "hashPath": "azure.core.1.24.0.nupkg.sha512"
     },
-    "Azure.Identity/1.3.0": {
+    "Azure.Identity/1.6.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-l1SYfZKOFBuUFG7C2SWHmJcrQQaiXgBdVCycx4vcZQkC6efDVt7mzZ5pfJAFEJDBUq7mjRQ0RPq9ZDGdSswqMg==",
-      "path": "azure.identity/1.3.0",
-      "hashPath": "azure.identity.1.3.0.nupkg.sha512"
+      "sha512": "sha512-EycyMsb6rD2PK9P0SyibFfEhvWWttdrYhyPF4f41uzdB/44yQlV+2Wehxyg489Rj6gbPvSPgbKq0xsHJBhipZA==",
+      "path": "azure.identity/1.6.0",
+      "hashPath": "azure.identity.1.6.0.nupkg.sha512"
+    },
+    "Azure.ResourceManager/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UGaoiPcJ8a9Et030+F3zc2KhTssPAgPm7uXm4E9kyNI4jYYenUe6zj2J1bTimaTfcOZnn5scSjSYxKtZCzftcA==",
+      "path": "azure.resourcemanager/1.0.0",
+      "hashPath": "azure.resourcemanager.1.0.0.nupkg.sha512"
+    },
+    "Azure.ResourceManager.Compute/1.0.0-beta.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZKblB51Q6ds0rwTaxROGHlQk1I6aisk5qyQnw5rcy7IVtGZaBGYsvFX8E14Ezq69G//JH3Vxs/BxnaSJKk1tHw==",
+      "path": "azure.resourcemanager.compute/1.0.0-beta.7",
+      "hashPath": "azure.resourcemanager.compute.1.0.0-beta.7.nupkg.sha512"
+    },
+    "Azure.ResourceManager.Network/1.0.0-beta.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ih8tb6OwxEEEEXATVzgX6oHJzVr9p4X6GfOfBnNAI3aIt9+G8blyQLltaCcJAGJ+dO1sBT/Nalgj/HinO+cBlw==",
+      "path": "azure.resourcemanager.network/1.0.0-beta.7",
+      "hashPath": "azure.resourcemanager.network.1.0.0-beta.7.nupkg.sha512"
+    },
+    "Azure.ResourceManager.Storage/1.0.0-beta.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-snWAcTIPWZ6x9XADAYXlTVrn7ToiEfaRAKTjOYdBA8Bqt91MQiEN0Hqh7Tu2SZR7+93uFhOcEIO5pv4EQ891Zw==",
+      "path": "azure.resourcemanager.storage/1.0.0-beta.7",
+      "hashPath": "azure.resourcemanager.storage.1.0.0-beta.7.nupkg.sha512"
     },
     "Azure.Security.KeyVault.Certificates/4.1.0": {
       "type": "package",
@@ -5391,12 +5500,12 @@
       "path": "microsoft.azure.services.appauthentication/1.6.2",
       "hashPath": "microsoft.azure.services.appauthentication.1.6.2.nupkg.sha512"
     },
-    "Microsoft.Bcl.AsyncInterfaces/1.0.0": {
+    "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-K63Y4hORbBcKLWH5wnKgzyn7TOfYzevIEwIedQHBIkmkEBA9SCqgvom+XTuE+fAFGvINGkhFItaZ2dvMGdT5iw==",
-      "path": "microsoft.bcl.asyncinterfaces/1.0.0",
-      "hashPath": "microsoft.bcl.asyncinterfaces.1.0.0.nupkg.sha512"
+      "sha512": "sha512-yuvf07qFWFqtK3P/MRkEKLhn5r2UbSpVueRziSqj0yJQIKFwG1pq9mOayK3zE5qZCTs0CbrwL9M6R8VwqyGy2w==",
+      "path": "microsoft.bcl.asyncinterfaces/1.1.1",
+      "hashPath": "microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512"
     },
     "Microsoft.CSharp/4.7.0": {
       "type": "package",
@@ -5720,19 +5829,19 @@
       "path": "microsoft.graph.core/1.25.1",
       "hashPath": "microsoft.graph.core.1.25.1.nupkg.sha512"
     },
-    "Microsoft.Identity.Client/4.31.0": {
+    "Microsoft.Identity.Client/4.39.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-lbfSuH+WTFOv3zEnIuJO/PK8sDvrzcFgm4JklQ46wIif6CFePUxi+BvvUUqDRIqynOy2+ydbeqLmWVmxswokxQ==",
-      "path": "microsoft.identity.client/4.31.0",
-      "hashPath": "microsoft.identity.client.4.31.0.nupkg.sha512"
+      "sha512": "sha512-+/y4ELXYqnAbiqhEgFAl3riBbkMeCw8+6+Y8r367bUf6zWhlNUjhm360VsTMBgqbPyfJld5X+cJkDhDCrudezA==",
+      "path": "microsoft.identity.client/4.39.0",
+      "hashPath": "microsoft.identity.client.4.39.0.nupkg.sha512"
     },
-    "Microsoft.Identity.Client.Extensions.Msal/2.16.5": {
+    "Microsoft.Identity.Client.Extensions.Msal/2.19.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-VlGUZEpF8KP/GCfFI59sdE0WA0o9quqwM1YQY0dSp6jpGy5EOBkureaybLfpwCuYUUjQbLkN2p7neUIcQCfbzA==",
-      "path": "microsoft.identity.client.extensions.msal/2.16.5",
-      "hashPath": "microsoft.identity.client.extensions.msal.2.16.5.nupkg.sha512"
+      "sha512": "sha512-zVVZjn8aW7W79rC1crioDgdOwaFTQorsSO6RgVlDDjc7MvbEGz071wSNrjVhzR0CdQn6Sefx7Abf1o7vasmrLg==",
+      "path": "microsoft.identity.client.extensions.msal/2.19.3",
+      "hashPath": "microsoft.identity.client.extensions.msal.2.19.3.nupkg.sha512"
     },
     "Microsoft.Identity.Web/1.12.0": {
       "type": "package",
@@ -6315,6 +6424,13 @@
       "path": "system.memory/4.5.4",
       "hashPath": "system.memory.4.5.4.nupkg.sha512"
     },
+    "System.Memory.Data/1.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-JGkzeqgBsiZwKJZ1IxPNsDFZDhUvuEdX8L8BDC8N3KOj+6zMcNU28CNN59TpZE/VJYy9cP+5M+sbxtWJx3/xtw==",
+      "path": "system.memory.data/1.0.2",
+      "hashPath": "system.memory.data.1.0.2.nupkg.sha512"
+    },
     "System.Net.Http/4.3.4": {
       "type": "package",
       "serviceable": true,
@@ -6644,12 +6760,12 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "System.Threading.Tasks.Extensions/4.5.2": {
+    "System.Threading.Tasks.Extensions/4.5.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-BG/TNxDFv0svAzx8OiMXDlsHfGw623BZ8tCXw4YLhDFDvDhNUEV58jKYMGRnkbJNm7c3JNNJDiN7JBMzxRBR2w==",
-      "path": "system.threading.tasks.extensions/4.5.2",
-      "hashPath": "system.threading.tasks.extensions.4.5.2.nupkg.sha512"
+      "sha512": "sha512-zteT+G8xuGu6mS+mzDzYXbzS7rd3K6Fjb9RiZlYlJPam2/hU7JCBZBVEcywNuR+oZ1ncTvc/cq0faRr3P01OVg==",
+      "path": "system.threading.tasks.extensions/4.5.4",
+      "hashPath": "system.threading.tasks.extensions.4.5.4.nupkg.sha512"
     },
     "System.Threading.Thread/4.3.0": {
       "type": "package",

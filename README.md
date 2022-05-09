@@ -78,6 +78,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.48	(2022/05/09)
+  - Change: Timeout for a host to become available increased to 24 minutes
+  - Fix: A drained host with disconnected sessions counted negitvly to the session load of the pool
 - 1.0.1.46	(2022/04/11)
   - Add: The session host list shows the performance (CPU, memory, CPU and disk queue length) of all hosts having the [Hydra Agent](#The-Hydra-Agent) running
   - Add: Show the processes of a session host by users; terminate single processes using the [Hydra Agent](#The-Hydra-Agent) (needs role Host pool VM and user manager or higher)

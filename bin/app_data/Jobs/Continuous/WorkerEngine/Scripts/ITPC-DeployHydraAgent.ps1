@@ -74,6 +74,8 @@ try {
     LogWriter("Configuring the agent")
     cd "$env:ProgramFiles\ITProCloud.de\HydraAgent"
     . "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -i -u "wss://$($uri)/wsx" -s $secret
+    Start-Sleep -Seconds 3
+    Start-ScheduledTask -TaskName 'ITPC-AVD-Hydra-Helper' -ErrorAction Ignore
 }
 catch {
     $global:Hydra_Output="An error occurred: $_"
