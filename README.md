@@ -75,7 +75,6 @@ If you are not familiar with the first configuration and creating a service prin
 <sup>* Currently not available in the US</sup>
 
 
-
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
 - 1.0.1.48	(2022/05/09)
@@ -86,7 +85,6 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
   - Add: Show the processes of a session host by users; terminate single processes using the [Hydra Agent](#The-Hydra-Agent) (needs role Host pool VM and user manager or higher)
   - Add: New checkbox in 'New session host rollout': Install [Hydra Agent](#The-Hydra-Agent) to install the agent while rolling out a new session host
   - Add: In the user view: processes can be sorted by name, resources usage, etc.
-
 - 1.0.1.45	(2022/03/22)
   - Fix: The copy function to copy a rollout configuration from another host pool was not working
   - Add: Personal host pools shows the number of hosts and assigned hosts in the detail view
