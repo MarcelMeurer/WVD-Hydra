@@ -78,6 +78,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.49	(2022/05/18)
+  - Fix: Additional rollouts could start while rolling out new hosts from a schedule and directly applying scripts.
+  - Add: You can create hosts with secure boot from a custom image from an Azure Compute Gallery (shared image gallery). First, create an image definition with Secure Boot enabled and let Hydra capture an image from a golden master and copy it to the image definition in the gallery.
 - 1.0.1.48	(2022/05/09)
   - Change: Timeout for a host to become available increased to 24 minutes
   - Fix: A drained host with disconnected sessions counted negitvly to the session load of the pool

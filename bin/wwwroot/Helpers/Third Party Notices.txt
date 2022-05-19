@@ -1,0 +1,107 @@
+Third Party Legal Notice
+-----------------------------------------------------------------
+
+AutoMapper 10.1.1, Jimmy Bogard
+https://www.nuget.org/packages/AutoMapper/10.1.1/ReportAbuse
+
+Azure.Identity, Microsoft
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.Compute, Microsoft
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.Network, Microsoft
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.Storage, Microsoft
+https://licenses.nuget.org/MIT
+
+Azure.Security.KeyVault.Secrets, Microsoft
+https://licenses.nuget.org/MIT
+
+CommandLineParser, gsscoder,nemec,ericnewton76,moh-hassan
+https://www.nuget.org/packages/CommandLineParser/2.8.0/license
+
+EFCore.BulkExtensions, borisdj
+https://licenses.nuget.org/MIT
+
+Microsoft.AspNetCore.Authentication.OpenIdConnect, Microsoft
+https://licenses.nuget.org/Apache-2.0
+
+Microsoft.AspNetCore.Http, Microsoft
+https://raw.githubusercontent.com/aspnet/AspNetCore/2.0.0/LICENSE.txt
+
+Microsoft.AspNetCore.Http.Extensions, Microsoft
+https://raw.githubusercontent.com/aspnet/AspNetCore/2.0.0/LICENSE.txt
+
+Microsoft.AspNetCore.StaticFiles, Microsoft
+https://raw.githubusercontent.com/aspnet/AspNetCore/2.0.0/LICENSE.txt
+
+Microsoft.Azure.Management.Fluent, Microsoft
+https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE
+
+Microsoft.Azure.Management.ResourceManager.Fluent, Microsoft
+https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE
+
+Microsoft.Azure.Services.AppAuthentication, Microsoft
+https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE
+
+Microsoft.EntityFrameworkCore, Microsoft
+https://licenses.nuget.org/Apache-2.0
+
+Microsoft.EntityFrameworkCore.SqlServer, Microsoft
+https://licenses.nuget.org/Apache-2.0
+
+Microsoft.EntityFrameworkCore.Tools, Microsoft
+https://licenses.nuget.org/Apache-2.0
+
+Microsoft.Extensions.Configuration.AzureKeyVault, Microsoft
+https://licenses.nuget.org/Apache-2.0
+
+Microsoft.Extensions.Configuration.Binder, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Extensions.Configuration.UserSecrets, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Extensions.DependencyInjection, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Extensions.Hosting, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Extensions.Http, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Extensions.Logging.AzureAppServices, Microsoft
+https://licenses.nuget.org/Apache-2.0
+
+Microsoft.Graph, Microsoft
+https://www.nuget.org/packages/Microsoft.Graph/3.33.0/license
+
+Microsoft.Identity.Web.MicrosoftGraph, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Identity.Web.UI, Microsoft
+https://licenses.nuget.org/MIT
+
+Microsoft.Win32.Registry, Microsoft
+https://licenses.nuget.org/MIT
+
+Newtonsoft.Json, James Newton-King
+https://licenses.nuget.org/MIT
+
+System.Diagnostics.PerformanceCounter, Microsoft
+https://licenses.nuget.org/MIT
+
+System.Management, Microsoft
+https://licenses.nuget.org/MIT
+
+System.Security.Cryptography.ProtectedData, Microsoft
+https://licenses.nuget.org/MIT
+
+TaskScheduler, David Hall
+https://licenses.nuget.org/MIT
+
+
+
