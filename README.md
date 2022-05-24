@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.52	(2022/05/24)
+  - Fix: In some cases, a rollout failed if the log file could not be written
 - 1.0.1.51	(2022/05/21)
   - Fix: In some cases, the rollout configuration didn't show images and some other resources (if no rollout configuration for the host pool exists)
 - 1.0.1.50	(2022/05/20)

@@ -29,7 +29,7 @@ param(
 function LogWriter($message) {
 	$message="$(Get-Date ([datetime]::UtcNow) -Format "o") $message"
 	write-host($message)
-	if ([System.IO.Directory]::Exists($LogDir)) {write-output($message) | Out-File $LogFile -Append}
+	if ([System.IO.Directory]::Exists($LogDir)) {try {write-output($message) | Out-File $LogFile -Append} catch {}}
 }
 function ShowDrives() {
 	$drives = Get-WmiObject -Class win32_volume -Filter "DriveType = 3"	
