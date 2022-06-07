@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.53	(2022/06/07)
+  - Fix: Group membership of users were limited to the first 100 groups
 - 1.0.1.52	(2022/05/24)
   - Fix: In some cases, a rollout failed if the log file could not be written
 - 1.0.1.51	(2022/05/21)
