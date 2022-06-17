@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.55	(2022/06/17)
+  - Add: Session host and user list are now using paging to view larger lists
 - 1.0.1.54	(2022/06/15)
   - Add: A script collection can now be used to replace an existing session host. A new host is rolled out, and the old host is deleted afterward. All further tasks of the collection are applied to the new host (technically, it combines the 'add a host' and 'delete a host') in one step. The new host has another name than the existing host.
   - Add: A notification is shown if a service principal is outdated over time.
