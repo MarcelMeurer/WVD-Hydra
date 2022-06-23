@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.4
+# Current Version of this script: 4.5
 
 param(
 	[Parameter(Mandatory)]
@@ -402,7 +402,7 @@ if ($mode -eq "Generalize") {
 
 
 			LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
-			Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
+			Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" -UseBasicParsing
 
 			# Stop a running instance
 			LogWriter("Stop a running instance")
