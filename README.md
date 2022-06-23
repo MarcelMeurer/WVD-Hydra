@@ -78,6 +78,13 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.56	(2022/06/23)
+  - Add: Wizard to replace up to all hosts in a pool with new hosts based on a new image/configuration
+  - Add: Change the VM size directly in the session hosts view
+  - Add: A task for script collections to wait for a specific time (Others - Wait)
+  - Add: Replace  host after logoff is also available in the advanced settings of the deployment configuration
+  - Add: Navigation: Click on the session host load shows the connections
+  - Add: Optimization to query data via the resource graph (it's now faster)
 - 1.0.1.55	(2022/06/17)
   - Add: Session host and user list are now using paging to view larger lists
   - Fix: Running a script on a session host in another subscription, then other hosts could fail ( ... does not have authorization to perform action ...) 
