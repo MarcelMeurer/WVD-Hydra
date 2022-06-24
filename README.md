@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.58	(2022/06/24)
+  - Fix: Deleting a host during the replacement wizard run cause in re-re-replacing the host (tried multiple times)
 - 1.0.1.57	(2022/06/24)
   - Fix: Search operator !failed showed unavailable hosts as well
 - 1.0.1.56	(2022/06/23)
