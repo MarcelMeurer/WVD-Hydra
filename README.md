@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.60	(2022/06/28)
+  - Fix: Minor fixes in the GUI
 - 1.0.1.59	(2022/06/24)
   - Add: Filter for the session host list: !drainon, !drainoff, filter by agent version
   - Add: Rolloutconfiguration -> Advanced settings -> Download the newest AVD agent during the rollout (instead of using the agent in the image (custom images))
