@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.62	(2022/06/30)
+  - Fix: Limit the number of connections from the Hydra agents to one
 - 1.0.1.61	(2022/06/29)
   - Add: Session host and user list: Select items on the current page
   - Add: Rollout new session hosts in groups (max. n hosts at the same time)
