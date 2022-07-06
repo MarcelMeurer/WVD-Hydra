@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.63	(2022/07/06)
+  - Add: In the session host list, you can now enable/disable the extend mode to show more data about the hosts int the table (like image resource id)
 - 1.0.1.62	(2022/06/30)
   - Fix: Limit the number of connections from the Hydra agents to one
 - 1.0.1.61	(2022/06/29)
