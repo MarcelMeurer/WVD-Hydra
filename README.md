@@ -78,6 +78,13 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.64	(2022/07/20)
+  - Add: Image links to Windows 10 with Microsoft 365 (Gallery)
+  - Add: Rollout configuration: Encryption at host, and custom encryption set to use customer-managed keys
+  - Add: Concept of one managed snapshot per host: A script collection can create or update a snapshot - or restore a snapshot (keep in mind to maybe deactivate the password rotation for the computer objects to avoid untrusted relationship to the domain)
+  - Add: Rollout configuration: Optionally, a managed snapshot can be used instead of replacing a host after logoff of all users from a host 
+  - Fix: The logs showed an older date in the finished column, even if the task was not finished (1/1/01) 
+  - Change: If a host runs into a timeout during the deployment, the host/VM will be deleted (before: deallocated)
 - 1.0.1.63	(2022/07/06)
   - Add: In the session host list, you can now enable/disable the extend mode to show more data about the hosts int the table (like image resource id)
 - 1.0.1.62	(2022/06/30)
