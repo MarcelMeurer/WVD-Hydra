@@ -78,6 +78,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.66	(2022/08/01)
+  - Add: New role "Reader"
+  - Add: Reminder to remember FullAdmins to check that the secrets of the service principals are not expiring 
 - 1.0.1.65	(2022/07/21)
   - Add: Optionally, the naming schema for new hosts can be configured to only count up (and don't fill up unused numbers)
   - Fix: In some few cases, the value for Capacity soon was higher at the end of a rollout of new hosts (during the time while the host was available and the deployment was not finished)
