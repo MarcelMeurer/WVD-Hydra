@@ -78,6 +78,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.67	(2022/08/17)
+  - Add: Schedules for autoscaling and script schedules can now have a start and/or end date (click on "Show advanced time and date settings"). An empty value disables the start/end date.
 - 1.0.1.66	(2022/08/01)
   - Add: New role "Reader"
   - Add: Reminder to remember FullAdmins to check that the secrets of the service principals are not expiring 
