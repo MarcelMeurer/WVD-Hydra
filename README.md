@@ -78,6 +78,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.68	(2022/08/19)
+  - Add: Logs are now showing an overview (running, waiting, failed)
+  - Add: Running a task on more than 50 selected hosts is now processed as a batch. That prevents the web GUI from slowing down.
 - 1.0.1.67	(2022/08/17)
   - Add: Schedules for autoscaling and script schedules can now have a start and/or end date (click on "Show advanced time and date settings"). An empty value disables the start/end date.
 - 1.0.1.66	(2022/08/01)
