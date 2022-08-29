@@ -37,7 +37,7 @@ If you are not familiar with the first configuration and creating a service prin
   - Deploy session hosts based on images
 - Management of user sessions
   - Logoff, messages, shadow user sessions, delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu)
-  - In preview: Show user processes, incl. CPU and memory usage; Terminate user processes ([requires an agent](#Install-the-Hydra-Agent))
+  - In preview: Show user processes, incl. CPU and memory usage; Terminate user processes ([requires an agent](#The-Hydra-Agent))
 - Management of session hosts
   - Start, Stop, Delete, Restart, Automatically change disk types
   - Create new session hosts with a click (with classic disks or ephemeral)
@@ -78,6 +78,10 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.69	(2022/08/28)
+  - Add: Adding a feature from WVDAdmin: Rolling out a new host can now be done with [Azure Disk Encryption](#ADE) (ADE)
+  - Add: Accessing the database with managed service identity (optional)
+  - Add: The following extensions can be selected for a roll out: Antimaleware extension, Dependency extension
 - 1.0.1.68	(2022/08/19)
   - Add: Logs are now showing an overview (running, waiting, failed)
   - Add: Running a task on more than 50 selected hosts is now processed as a batch. That prevents the web GUI from slowing down.
@@ -626,3 +630,43 @@ If the Hydra Agent is installed on session hosts, the processes of a single user
 
 ![](media/HydraAgent-04.png)
 
+#### Database and Managed Service Identity
+Hydra connects to the database with a SQL user defined in the connection string stored in the Key Vault. Alternatively, Hydra can connect using its Azure AD identity.
+
+Do the following changes in the maintenance windows:
+Open the SQL server resource in the Azure Portal -> Azure Active Directory  -> Set the managed identity of Hydra's web service as an administrator and check "Support only Azure Active Directory authentication for this server"
+
+![](media/SQLMSI-01.png)
+
+Change the connection string in the Key Vault. Open the Key Vault and give yourself permission (Access Policy) to change secrets. In secrets, copy the existing connection string from Hydra-DbConnectionString and modify it to match the following string:
+
+Server=tcp:hydra-validation.database.windows.net,1433;Initial Catalog=Hydra;Persist Security Info=False;Encrypt=True;Connection Timeout=90;
+
+Remove the other parts of the string (like user id, ...). Add the new connection string as a new version. Optionally, remove your permission from the Key Vault.
+Restart the app service and verify that the engine runs with the new configuration
+
+#### ADE
+
+Azure Disk Encryption (ADE) encrypts the OS and data disks of Azure virtual machines (VMs) inside your VMs by using BitLocker. ADE cannot be combined with a disk encryption set.
+
+To roll out session hosts with ADE, some resources must be prepared to work: Azure Key Vault with an encryption key, and Azure Key Vault to store the secrets of the disks (can be the same vault)
+
+- First, create a Key Vault in the Azure Portal
+- Give the service principal (from the tenant configuration) contributor permission to the vault (access and control)
+- In Access Policies, give the service principal the following permissions:
+-- Key permissions: Get, Encrypt, Wrap Key
+-- Secret permissions: Set
+- Check the boxes: Azure Virtual Machines for deployment and Azure Disk Encryption for volume encryption
+- Give yourself permissions: Key and secret management
+- Go to Keys and click on Generate. Type a name and select RSA and 2048
+- Click on the generate key and on the current version. Copy the Key identifier (must include the version). E.g., https://avd-disks.vault.azure.net/keys/ADE-Encryption/bf270e977a574813a87bb637d57a6675
+
+In Hydra, configure "New Session Host Rollout":
+In "Advanced settings" select the Key Vault  in ADE Key Vault
+Copy the Key Identifier to ADE Encryption Key Url
+
+![](media/ADE-01.png)
+
+Do a deployment to verify that the disk is ADE encrypted:
+
+![](media/ADE-02.png)

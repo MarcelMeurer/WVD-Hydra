@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.5
+# Current Version of this script: 4.6
 
 param(
 	[Parameter(Mandatory)]
@@ -215,6 +215,7 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\Sysprep" -Name "SysprepCorrupt" -ErrorAction Ignore
 	New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "State" -Value 2 -force
 	New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "GeneralizationState" -Value 7 -force
+	New-Item -Path "HKLM:\Software\Microsoft\DesiredStateConfiguration" -ErrorAction Ignore
 	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\DesiredStateConfiguration" -Name "AgentId" -Value "" -force  -ErrorAction Ignore
 
 	LogWriter("Saving time zone info for re-deploy")
