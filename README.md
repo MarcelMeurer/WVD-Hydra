@@ -82,6 +82,7 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
   - Add: ADE can generate a new key and secret per host (left the ADE Encryption Key Url empty)
   - Add: It's now configurable to mark a session host as "ready" after a rollout, even if the host is upgrading the AVD agent
   - Add: Imaging script: Set the following reg key on the master to HKLM:\SOFTWARE\ITProCloud\WVD.Force to use DISM during the imaging process (takes longer)
+  - Fix: An image based on an AAD-joined golden master can now be rollout as a session host
   - Fix: Rolloutconfiguration install Azure monitor only with workspace id and shared key
 - 1.0.1.69	(2022/08/28)
   - Add: Adding a feature from WVDAdmin: Rolling out a new host can now be done with [Azure Disk Encryption](#ADE) (ADE)
