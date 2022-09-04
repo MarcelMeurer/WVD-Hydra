@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.6
+# Current Version of this script: 4.7
 
 param(
 	[Parameter(Mandatory)]
@@ -181,6 +181,27 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "DirtyShutdownTime" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "LastAliveStamp" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
+
+	# Triggering dotnet to execute queued items
+	$dotnetRoot="$env:windir\Microsoft.NET\Framework"
+	Get-ChildItem -Path $dotnetRoot -Directory | foreach {
+		if (Test-Path "$($_.FullName)\ngen.exe") {
+			LogWriter("Triggering dotnet to execute queued items in: $($_.FullName)")
+			Start-Process -FilePath "$($_.FullName)\ngen.exe" -Wait -ArgumentList "ExecuteQueuedItems" -ErrorAction SilentlyContinue
+		}
+	}
+
+	# Read property from registry (force imaging, like dism)
+	$force=$false
+	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Force") {
+		$force=$true
+	}
+
+	# DISM cleanup
+	if ($force -and (Test-Path "$env:windir\system32\Dism.exe")) {
+		LogWriter("DISM cleanup")
+		Start-Process -FilePath "$env:windir\system32\Dism.exe" -Wait -ArgumentList "/online /cleanup-image /startcomponentcleanup /resetbase" -ErrorAction SilentlyContinue
+	}
 	
 	LogWriter("Modifying sysprep to avoid issues with AppXPackages - Start")
 	$sysPrepActionPath="$env:windir\System32\Sysprep\ActionFiles"
@@ -318,6 +339,11 @@ if ($mode -eq "Generalize") {
 	}
 	
 	# AD / AAD handling
+	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Force -ErrorAction Ignore
+	if (Test-Path -Path "$($env:WinDir)\system32\Dsregcmd.exe") {
+		Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/leave" -ErrorAction SilentlyContinue
+	}	
 	if ($DomainJoinUserName -ne "" -and $AadOnly -ne "1") {
 		LogWriter("Joining AD domain")
 		$psc = New-Object System.Management.Automation.PSCredential($DomainJoinUserName, (ConvertTo-SecureString $DomainJoinUserPassword -AsPlainText -Force))
