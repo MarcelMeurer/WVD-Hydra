@@ -78,10 +78,11 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.72	(2022/09/07)
+  - Add: Secure boot enabled hosts are now supporting 'Guest Attestation' (automatically installed)
 - 1.0.1.71	(2022/09/07)
   - Add: Session host table: Added value 20 to the paging list
   - Add: New role "Users", users are seeing only their sessions and assigned hosts
-  - Add: Secure boot enabled hosts are now supporting 'Guest Attestation' (automatically installed)
 - 1.0.1.70	(2022/09/04)
   - Add: ADE can generate a new key and secret per host (left the ADE Encryption Key Url empty)
   - Add: It's now configurable to mark a session host as "ready" after a rollout, even if the host is upgrading the AVD agent

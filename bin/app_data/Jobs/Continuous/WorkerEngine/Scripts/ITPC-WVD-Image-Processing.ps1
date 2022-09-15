@@ -6,6 +6,7 @@ param(
 	[ValidateNotNullOrEmpty()]
 	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','CleanFirstStart', 'RenameComputer')]
 	[string] $Mode,
+	[string] $StrongGeneralize='0',
 	[string] $ComputerNewname='',						#Only for SecureBoot process (workaround, normaly not used)
 	[string] $LocalAdminName='localAdmin',				#Only for SecureBoot process (workaround, normaly not used)
 	[string] $LocalAdminPassword='',
@@ -163,7 +164,7 @@ try {
 catch {}
 
 
-# Start script by §mode
+# Start script by mode
 if ($mode -eq "Generalize") {
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
@@ -192,7 +193,7 @@ if ($mode -eq "Generalize") {
 	}
 
 	# Read property from registry (force imaging, like dism)
-	$force=$false
+	$force=$StrongGeneralize -eq "1"
 	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Force") {
 		$force=$true
 	}
@@ -343,7 +344,7 @@ if ($mode -eq "Generalize") {
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Force -ErrorAction Ignore
 	if (Test-Path -Path "$($env:WinDir)\system32\Dsregcmd.exe") {
 		Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/leave" -ErrorAction SilentlyContinue
-	}	
+	}
 	if ($DomainJoinUserName -ne "" -and $AadOnly -ne "1") {
 		LogWriter("Joining AD domain")
 		$psc = New-Object System.Management.Automation.PSCredential($DomainJoinUserName, (ConvertTo-SecureString $DomainJoinUserPassword -AsPlainText -Force))
