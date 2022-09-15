@@ -76,6 +76,7 @@ If you are not familiar with the first configuration and creating a service prin
 
 
 
+
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
 - 1.0.1.72	(2022/09/07)
