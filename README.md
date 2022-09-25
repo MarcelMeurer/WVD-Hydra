@@ -79,6 +79,11 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.73	(2022/09/19)
+  - Add: Support for certificate based authentication (use a path to a certificate as the secret (https://myKeyVault.vault.azure.net/certificates/Hydra-Service-Cert)); the app service (MSI) of Hydra needs "Get" permission for certificates on the used key vault
+  - Add: Download engine logfile (full admin permission only)
+  - Add: Restart the full engine (full admin permission only)
+  - Fix: Wait up to 3 minutes in the clean-up of a failed VM before trying to delete the NIC (a new and strange Azure behavior)
 - 1.0.1.72	(2022/09/07)
   - Add: Secure boot enabled hosts are now supporting 'Guest Attestation' (automatically installed)
 - 1.0.1.71	(2022/09/07)
