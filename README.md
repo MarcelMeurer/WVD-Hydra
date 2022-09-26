@@ -79,7 +79,7 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
-- 1.0.1.73	(2022/09/19)
+- 1.0.1.73	(2022/09/25)
   - Add: Support for certificate based authentication (use a path to a certificate as the secret (https://myKeyVault.vault.azure.net/certificates/Hydra-Service-Cert)); the app service (MSI) of Hydra needs "Get" permission for certificates on the used key vault
   - Add: Download engine logfile (full admin permission only)
   - Add: Restart the full engine (full admin permission only)
