@@ -14,7 +14,7 @@
 
 The project is available as a **free community edition, even for commercial use** (up to 6 session hosts per host pool and a single tenant) and as a supported licensable product ($2 per concurrent user/month). Hydra will generally work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or license your Hydra instance through the Azure Subscription ([Billing subscription to Hydra](https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-pay-c1/preview)).
 
-The owner of this solution is ITProCloud GmbH, [info@itprocloud.com](mailto:info@itprocloud.com).
+The owner of this solution is [ITProCloud GmbH](https://www.itprocloud.com/), [info@itprocloud.com](mailto:info@itprocloud.com).
 
 Please make sure to send feedback and update the solution regularly.
 
@@ -79,6 +79,10 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.74	(2022/10/15)
+  - Add: Certificate caching
+  - Add: Improvement of the imaging script
+  - Fix: Icon for a host in shutdown state was not shown in the session host list
 - 1.0.1.73	(2022/09/25)
   - Add: Support for certificate based authentication (use a path to a certificate as the secret (https://myKeyVault.vault.azure.net/certificates/Hydra-Service-Cert)); the app service (MSI) of Hydra needs "Get" permission for certificates on the used key vault
   - Add: Download engine logfile (full admin permission only)

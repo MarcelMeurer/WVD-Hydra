@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.7
+# Current Version of this script: 4.8
 
 param(
 	[Parameter(Mandatory)]
@@ -183,6 +183,9 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "LastAliveStamp" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
 
+	LogWriter("Cleaning up some blocking sysprep apps")
+	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection" -Name "senseGuid" -ErrorAction Ignore
+
 	# Triggering dotnet to execute queued items
 	$dotnetRoot="$env:windir\Microsoft.NET\Framework"
 	Get-ChildItem -Path $dotnetRoot -Directory | foreach {
@@ -198,10 +201,18 @@ if ($mode -eq "Generalize") {
 		$force=$true
 	}
 
-	# DISM cleanup
+	# DISM cleanup (only if forced)
 	if ($force -and (Test-Path "$env:windir\system32\Dism.exe")) {
 		LogWriter("DISM cleanup")
 		Start-Process -FilePath "$env:windir\system32\Dism.exe" -Wait -ArgumentList "/online /cleanup-image /startcomponentcleanup /resetbase" -ErrorAction SilentlyContinue
+	}
+
+	# Disable reserved storage (only if forced)
+	if ($force -and (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager")) {
+		LogWriter("Disabling reserved storage")
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "MiscPolicyInfo" -Value 2 -force  -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "PassedPolicy" -Value 0 -force  -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ShippedWithReserves" -Value 0 -force  -ErrorAction Ignore
 	}
 	
 	LogWriter("Modifying sysprep to avoid issues with AppXPackages - Start")
