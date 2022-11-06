@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.8
+# Current Version of this script: 4.9
 
 param(
 	[Parameter(Mandatory)]
@@ -163,6 +163,16 @@ try {
 }
 catch {}
 
+# try to get windows full version to do some workarounds
+$is1122H2=$false
+try {
+    $ci=Get-ComputerInfo
+    if ($ci.OsName -match "Windows 11" -and $ci.OSDisplayVersion -match "22h2") {
+		$is1122H2=$true
+		LogWriter("Windows 11 22H2 detected")
+	}
+}
+catch {}
 
 # Start script by mode
 if ($mode -eq "Generalize") {
@@ -215,9 +225,9 @@ if ($mode -eq "Generalize") {
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ShippedWithReserves" -Value 0 -force  -ErrorAction Ignore
 	}
 	
-	LogWriter("Modifying sysprep to avoid issues with AppXPackages - Start")
+	# Get access to sysprep action files
 	$sysPrepActionPath="$env:windir\System32\Sysprep\ActionFiles"
-	$sysPrepActionFile="Generalize.xml"
+									
 	$sysPrepActionPathItem = Get-Item $sysPrepActionPath.Replace("C:\","\\localhost\\c$\") -ErrorAction Ignore
 	$acl = $sysPrepActionPathItem.GetAccessControl()
 	$acl.SetOwner((New-Object System.Security.Principal.NTAccount("SYSTEM")))
@@ -225,16 +235,35 @@ if ($mode -eq "Generalize") {
 	$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("SYSTEM","FullControl","Allow")
 	$acl.AddAccessRule($aclSystemFull)
 	$sysPrepActionPathItem.SetAccessControl($acl)
+	
+	# Patch Generalize.xml
+	$sysPrepActionFile="Generalize.xml"
 	[xml]$xml = Get-Content -Path "$sysPrepActionPath\$sysPrepActionFile"
-	$xmlNode=$xml.sysprepInformation.imaging | where {$_.sysprepModule.moduleName -match "AppxSysprep.dll"}
-	if ($xmlNode -ne $null) {
-		$xmlNode.ParentNode.RemoveChild($xmlNode)
-		$xml.sysprepInformation.imaging.Count
+	$xml.SelectNodes("//sysprepModule") | ForEach-Object{
+		if($_.moduleName -match "AppxSysprep.dll") {$_.ParentNode.ParentNode.RemoveChild($_.ParentNode) | Out-Null}
+	}
+	$xml.Save("$sysPrepActionPath\$sysPrepActionFile.new")
+	Remove-Item "$sysPrepActionPath\$sysPrepActionFile.old.*" -Force -ErrorAction Ignore
+	Move-Item "$sysPrepActionPath\$sysPrepActionFile" "$sysPrepActionPath\$sysPrepActionFile.old.$((Get-Date).ToString("yyyy-MM-dd_HH-mm-ss"))"
+	Move-Item "$sysPrepActionPath\$sysPrepActionFile.new" "$sysPrepActionPath\$sysPrepActionFile"
+	LogWriter("Modifying sysprep Generalize - Done")
+	
+	# Patch Specialize.xml for Windows 11 22H2 as workaround
+	if ($is1122H2) {
+		LogWriter("Modifying sysprep Specialize to avoid issues with Windows 11 22H2")
+		$sysPrepActionFile="Specialize.xml"
+		[xml]$xml = Get-Content -Path "$sysPrepActionPath\$sysPrepActionFile"
+		$xml.SelectNodes("//sysprepModule") | ForEach-Object{
+			if($_.methodName -eq "CryptoSysPrep_Specialize") {$_.ParentNode.ParentNode.RemoveChild($_.ParentNode) | Out-Null}
+		}
+		$xml.SelectNodes("//sysprepModule") | ForEach-Object{
+			if($_.methodName -eq "CryptoSysPrep_Specialize") {$_.ParentNode.ParentNode.RemoveChild($_.ParentNode) | Out-Null}
+		}
 		$xml.Save("$sysPrepActionPath\$sysPrepActionFile.new")
-		Remove-Item "$sysPrepActionPath\$sysPrepActionFile.old" -Force -ErrorAction Ignore
-		Move-Item "$sysPrepActionPath\$sysPrepActionFile" "$sysPrepActionPath\$sysPrepActionFile.old"
+		Remove-Item "$sysPrepActionPath\$sysPrepActionFile.old.*" -Force -ErrorAction Ignore
+		Move-Item "$sysPrepActionPath\$sysPrepActionFile" "$sysPrepActionPath\$sysPrepActionFile.old.$((Get-Date).ToString("yyyy-MM-dd_HH-mm-ss"))"
 		Move-Item "$sysPrepActionPath\$sysPrepActionFile.new" "$sysPrepActionPath\$sysPrepActionFile"
-		LogWriter("Modifying sysprep to avoid issues with AppXPackages - Done")
+		LogWriter("Modifying sysprep Specialize - Done")
 	}
 
 	# Preparation for the snapshot workaround
@@ -349,11 +378,20 @@ if ($mode -eq "Generalize") {
 			Set-TimeZone -Id $timeZone
 		}
 	}
+
+    # Handling workaround for Windows 11 22H2
+	if ($is1122H2) {
+		LogWriter("Handling workaround for Windows 11 22H2")
+        # Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Cryptography" -Name "MachineGuid" -ErrorAction Ignore
+		LogWriter("Running spnet.dll,Sysprep_Generalize_Net")
+        Start-Process -FilePath "$($env:windir)\System32\rundll32.exe" -Wait -ArgumentList "spnet.dll,Sysprep_Generalize_Net" 
+	}
 	
 	# AD / AAD handling
 	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Force -ErrorAction Ignore
 	if (Test-Path -Path "$($env:WinDir)\system32\Dsregcmd.exe") {
+		LogWriter("Leaving old AAD")
 		Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/leave" -ErrorAction SilentlyContinue
 	}
 	if ($DomainJoinUserName -ne "" -and $AadOnly -ne "1") {
