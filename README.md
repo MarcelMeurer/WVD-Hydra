@@ -79,6 +79,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.77	(2022/11/08)
+  - Change: Longer timeout to wait for the AVD Agent update
 - 1.0.1.76	(2022/11/06)
   - Add: Workaround to image Windows 11 22H2 (there is a bug in the sysprep process)
   - Change: Timeout handling after creating a new VM. I a new host is created, the update of the AVD agent will not go into the "Upgrading Timeout" state. Background: There were cases when the AVD Agent update took 30 minutes to complete.
