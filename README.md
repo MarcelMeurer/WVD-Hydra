@@ -25,7 +25,7 @@ Please make sure to send feedback and update the solution regularly.
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
 
-## Important
+## Important !
 **Rollout issues: AVD Agent 1.0.5555.1008 and newer are causing high timeouts for upgrading themselves. That can cause rollout issues with Hydra. [Read more to fix this issue](avd-agent-timeouts.md)**
 
 
