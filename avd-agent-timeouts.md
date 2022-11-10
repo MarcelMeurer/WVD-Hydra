@@ -5,6 +5,8 @@ Due to the new AVD agent from Microsoft, two actions are recommended not to show
 ## 1) Update Hydra for Azure Virtual Desktop.
 The update is simple via the App Service -> Deployment Center -> Sync. Please only do this when no active tasks (deployments) are running.
 
+![](media/UpdateHydra.png)
+
 ## 2) Configuration: Mark, a session host as ready even if the AVD agent is updating.
 Optional: This will directly consider the rollout of new session hosts as complete, even if the AVD agent is still updating. The Global Config can be accessed: Avatar image next to the name in the upper right corner -> Global Settings.
 
