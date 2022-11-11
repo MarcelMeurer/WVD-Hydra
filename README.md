@@ -82,6 +82,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.79	(2022/11/11)
+  - Fix: Deployment of Hydra agent from a script collection sometimes failed
 - 1.0.1.78	(2022/11/09)
   - Change: Longer timeout (60 minutes) to wait for the AVD Agent update
 - 1.0.1.77	(2022/11/08)

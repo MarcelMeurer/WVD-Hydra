@@ -44,7 +44,25 @@ function UnzipFile ($zipfile, $outdir)
         }
     }
 }
-
+function DownloadFile ( $url, $outFile)
+{
+    $i=3
+    $ok=$false;
+    do {
+        try {
+            LogWriter("Try to download file")
+            Invoke-WebRequest -Uri $url -OutFile $outFile -UseBasicParsing
+            $ok=$true
+        } catch {
+            $i--;
+            if ($i -le 0) {
+                throw 
+            }
+            LogWriter("Re-trying download after 10 seconds")
+            Start-Sleep -Seconds 10
+		}
+    } while (!$ok)
+}
 
 $DownloadAdress="https://$($uri)/Download/HydraAgent"
 
@@ -61,7 +79,8 @@ try {
 
 
     LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
-    Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
+    DownloadFile $DownloadAdress "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
+    #Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
 
     # Stop a running instance
     LogWriter("Stop a running instance")
