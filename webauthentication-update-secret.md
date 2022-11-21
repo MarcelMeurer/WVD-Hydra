@@ -21,7 +21,7 @@ Key Vault -> Secrets -> AzureAd--ClientSecret ->New Version -> Paste the newly c
 
 To verify that the newly created secret is used, please restart the app service running the Hydra portal. It could take a few minutes before the new secret is used.
 
-**Hint:** It is recommended to set a reminder for the expiration of the secret.**
+**Hint:** It is recommended to set a reminder for the expiration of the secret.
 
 
 
