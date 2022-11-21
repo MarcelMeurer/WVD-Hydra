@@ -318,7 +318,7 @@ During the deployment, you have to enter the following information:
   - Region
   - Name of your deployment: That name becomes the hostname of the hydra-portal e.g., "myhydrainstance.azurewebsites.net". The name must be unique for some resource types. Press "Tab" to let Azure check the availability of the name
 
-- Service Principal
+- Service Principal for the web authentication
 
   - A (web) service principal is needed to let users log in to the hydra-portal website. Create the service principal with the PowerShell script in the Cloud Shell. Copy the following data into the fields: 
   - Application Id
@@ -334,6 +334,7 @@ During the deployment, you have to enter the following information:
 
 After that, click "Create" to install your instance of Project Hydra into your subscription. The deployment will take some minutes.
 
+**Hint:** The service principal for the web authentication expires after two years and must be updated. Check out this post if you got the error message [AADSTS7000222:  InvalidClientSecretExpiredKeysProvided](webauthentication-update-secret.md)
 
 
 ## Adding a tenant
