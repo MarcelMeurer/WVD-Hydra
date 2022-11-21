@@ -8,15 +8,11 @@ Service principal/app registration secrets have a limited validity period (up to
 
 The issue can easily be solved by creating a new secret. The error message also contains the client id (the id of the service principal/app registration). Copy the id to the clipboard and open Azure AD from the Azure portal. Go:
 
-Azure AD -> App registrations -> All applications -> Paste the id into the search field
-
-Select the service principal/app registration -> Certificates & secrets -> New client secret -> Chose a proper value for "Expires" -> Click "Add"
-
-Copy the value of the newly generated secret to the clipboard. Optionally, delete the old expired secret.
-
-Open the key vault of your Hydra deployment. It's in the same resource group and has the same name as the hostname of the Hydra portal.
-
-Key Vault -> Secrets -> AzureAd--ClientSecret ->New Version -> Paste the newly created secret into the field "Secret value" -> Create
+- Azure AD -> App registrations -> All applications -> Paste the id into the search field
+- Select the service principal/app registration -> Certificates & secrets -> New client secret -> Chose a proper value for "Expires" -> Click "Add"
+- Copy the value of the newly generated secret to the clipboard. Optionally, delete the old expired secret.
+- Open the key vault of your Hydra deployment. It's in the same resource group and has the same name as the hostname of the Hydra portal.
+- Key Vault -> Secrets -> AzureAd--ClientSecret ->New Version -> Paste the newly created secret into the field "Secret value" -> Create
 ![](media/UpdateWebSecret.png)
 
 To verify that the newly created secret is used, please restart the app service running the Hydra portal. It could take a few minutes before the new secret is used.
