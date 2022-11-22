@@ -82,6 +82,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.82	(2022/11/22)
+  - Add: A new task for a script collection: Host - Reinstall AVD Agent (experimental) - remove the host from the pool and reinstall the agent to re-join the pool. It is intended for maintenance.
 - 1.0.1.81	(2022/11/22)
   - Add: A new variable in scripts: $global:Hydra_SessionHost_AssignedUser #UPN of the assigned user of a VDI (otherwise empty string)
   - Add: Additionally, search for an assigned user in the session host list
