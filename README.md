@@ -82,7 +82,7 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
-- 1.0.1.83	(2022/12/13)
+- 1.0.1.83	(2022/12/09)
   - Add: The replacement wizard will show if a Microsoft native scaling plan is active (recommendation: disable the native scaling plan during rollout)
   - Add: After deploying an NVDIA base VM, the rollout will wait a while to give the NVIDIA driver time to reboot the VM (unexpected behavior)
   - Add: New configuration for autoscaling (multi-session), called [Reserve a number of existing hosts](#Reserve a number of existing hosts)* for power-on-connect.
