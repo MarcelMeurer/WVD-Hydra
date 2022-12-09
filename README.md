@@ -82,6 +82,11 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.83	(2022/12/13)
+  - Add: The replacement wizard will show if a Microsoft native scaling plan is active (recommendation: disable the native scaling plan during rollout)
+  - Add: After deploying an NVDIA base VM, the rollout will wait a while to give the NVIDIA driver time to reboot the VM (unexpected behavior)
+  - Add: New configuration for autoscaling (multi-session), called [Reserve a number of existing hosts](#Reserve a number of existing hosts)* for power-on-connect.
+  - Add: Some GUI optimizations
 - 1.0.1.82	(2022/11/22)
   - Add: A new task for a script collection: Host - Reinstall AVD Agent (experimental) - remove the host from the pool and reinstall the agent to re-join the pool. It is intended for maintenance.
 - 1.0.1.81	(2022/11/22)
@@ -343,6 +348,14 @@ After that, click "Create" to install your instance of Project Hydra into your s
 **Hint:** The service principal for the web authentication expires after two years and must be updated. Check out this post if you got the error message [AADSTS7000222:  InvalidClientSecretExpiredKeysProvided](webauthentication-update-secret.md)
 
 
+## Cost saving for a small environment
+
+If you are using Hydra in a small environment (a few pools with few hosts), you can reduce the cost of the app service running Hydra.
+- Change the app service plan deployed with Hydra from S1 to B1
+  - Scale up (App Sevice plan)
+  - Dev Test -> B1
+
+
 ## Adding a tenant
 
 ***Note:** If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)*
@@ -447,7 +460,6 @@ Add a new schedule and configure:
 - Note: Configure the time zone of the host pool in the "Base" tab
 
 
-
 **Pro-Tip:**
 
 - Create a default rollout profile in the "New session host rollout" tab and test it 
@@ -455,7 +467,6 @@ Add a new schedule and configure:
 - Have several session hosts deployed permanently to (with Hydra or WVDAdmin). These hosts are proposed to start them if new hosts are needed (starting is faster than creating)
 - Use a schedule to provide temporarily created hosts in the rush hour (typically in the morning). These hosts will be deleted if no longer needed (and that saves the costs for the non-existing disks as well)
 - Configure "Session Timeouts" to log off disconnected sessions
-
 
 
 **Pro-Pro-Tip:** 
@@ -467,6 +478,9 @@ Add a new schedule and configure:
 **Example:**
 
 ![](media/Scale-Pooled-01.png)
+
+#### Reserve a number of existing hosts
+Reserve several existing hosts and prefer a rollout of temporary hosts if possible. The reserved hosts can be used by power-on-connect to start a host if the rollout is not fast enough. In this case, the users get the message that a new host is started (not an error message). The reserved hosts are also used if the limits for hosts in the pool are reached. Remember that disk-switching will not work for those hosts and that power-on-connect must be enabled on the host pool. Default: 0. Can be configured in Advanced Settings -> Details.
 
 
 

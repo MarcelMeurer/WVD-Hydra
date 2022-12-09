@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 4.9
+# Current Version of this script: 5.0
 
 param(
 	[Parameter(Mandatory)]
@@ -94,17 +94,20 @@ function DownloadFile ( $url, $outFile)
     do {
         try {
             LogWriter("Try to download file")
-            Invoke-WebRequest -Uri $url -OutFile $outFile -UseBasicParsing
+			(New-Object System.Net.WebClient).DownloadFile($url,$outFile)
+            #Invoke-WebRequest -Uri $url -OutFile $outFile -UseBasicParsing
             $ok=$true
         } catch {
             $i--;
             if ($i -le 0) {
+				LogWriter("Download failed: $_")
                 throw 
             }
             LogWriter("Re-trying download after 10 seconds")
             Start-Sleep -Seconds 10
 		}
     } while (!$ok)
+	LogWriter("Download done")
 }
 
 # Define static variables
@@ -140,14 +143,12 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot+"\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDAgent")
 			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig+"\Microsoft.RDInfra.RDAgent.msi")
-			#Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile ($LocalConfig+"\Microsoft.RDInfra.RDAgent.msi")
 		} else {Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig+"\")}
 	}
 	if ((Test-Path ($LocalConfig+"\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot+"\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDBootloader")
 			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig+"\Microsoft.RDInfra.RDAgentBootLoader.msi")
-			#Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" -OutFile ($LocalConfig+"\Microsoft.RDInfra.RDAgentBootLoader.msi")
 		} else {Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig+"\")}
 	}
 }
@@ -501,7 +502,6 @@ if ($mode -eq "Generalize") {
 
 			LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
 			DownloadFile $DownloadAdress "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
-			#Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" -UseBasicParsing
 
 			# Stop a running instance
 			LogWriter("Stop a running instance")
@@ -570,12 +570,10 @@ if ($mode -eq "Generalize") {
 			if ((Test-Path "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi") -eq $false) {
 				LogWriter("Downloading Microsoft.RDInfra.WVDAgent.msi")
 				DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE3JZCm" "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi"
-				#Invoke-WebRequest -Uri 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE3JZCm' -OutFile "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi" -UseBasicParsing
 			}
 			if ((Test-Path "${LocalConfig}\Microsoft.RDInfra.WVDAgentManager.msi") -eq $false) {
 				LogWriter("Downloading Microsoft.RDInfra.WVDAgentManager.msi")
 				DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE3K2e3" "${LocalConfig}\Microsoft.RDInfra.WVDAgentManager.msi"
-				#nvoke-WebRequest -Uri 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE3K2e3' -OutFile "${LocalConfig}\Microsoft.RDInfra.WVDAgentManager.msi" -UseBasicParsing
 			}
 			LogWriter("Installing AVDAgent")
 			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.WVDAgent.msi" -ArgumentList "/q RegistrationToken=${WvdRegistrationKey}"
