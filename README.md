@@ -410,9 +410,10 @@ Go back to the configuration and give your new tenant configuration a display na
 ## Deployment, special operations
 
 ### Spot instances
-[Spot instances](https://azure.microsoft.com/products/virtual-machines/spot) VMs are unused compute power in Azure available for a lower price. If Microsoft Azure needs the resources, it will deallocate the VM without a visible warning to the users. So, using spot instances in production is not recommended. It's good for testing and demonstrations.
-If a session host is deployed with the option "Use Spot instance, if possible", the host is marked and will be created as a spot instance. If that fails, the host is created as a standard VM. The same happens for starting such a marked host: If possible, a spot instance is deployed or a normal VM as failback.
 
+[Spot instances](https://azure.microsoft.com/products/virtual-machines/spot) VMs are unused compute power in Azure available for a lower price. If Microsoft Azure needs the resources, it will deallocate the VM without a visible warning to the users. So, using spot instances in production is not recommended. It's good for testing and demonstrations.
+
+If a session host is deployed with the option "Use Spot instance, if possible", the host is marked and will be created as a spot instance. If that fails, the host is created as a standard VM. The same happens for starting such a marked host: If possible, the host is started as a spot instance, and if it fails, as a normal VM. That ensures that even autoscaling tries to use the spot instance first, even if Azure revokes the resources before. Session hosts show the marking with an icon in the host list. The maker can be changed with a script collection task.
 
 
 ## Scaling
