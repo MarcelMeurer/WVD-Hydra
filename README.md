@@ -82,6 +82,11 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.84	(2022/12/15)
+  - Add: Showing the number of selected users in the user list
+  - Add: Showing the number of selected hosts in the session host list
+  - Add: Having a "back button" in the host pool configuration
+  - Add: Adding a checkbox "Use Spot instance, if possible" to the rollout configuration; comparable to the VM rollout in the Azure Portal (not recommended for [production](#Spot instances))
 - 1.0.1.83	(2022/12/09)
   - Add: The replacement wizard will show if a Microsoft native scaling plan is active (recommendation: disable the native scaling plan during rollout)
   - Add: After deploying an NVDIA base VM, the rollout will wait a while to give the NVIDIA driver time to reboot the VM (unexpected behavior)
@@ -399,6 +404,14 @@ Before you complete the configuration in Project Hydra, go to your Azure subscri
 
 
 Go back to the configuration and give your new tenant configuration a display name and check "Enabled". You can test the service principal by clicking "Test primary". After that, click "Save". Please reload the website after a few minutes to see your environment in Project Hydra.
+
+
+
+## Deployment, special operations
+
+### Spot instances
+[Spot instances](https://azure.microsoft.com/products/virtual-machines/spot) VMs are unused compute power in Azure available for a lower price. If Microsoft Azure needs the resources, it will deallocate the VM without a visible warning to the users. So, using spot instances in production is not recommended. It's good for testing and demonstrations.
+If a session host is deployed with the option "Use Spot instance, if possible", the host is marked and will be created as a spot instance. If that fails, the host is created as a standard VM. The same happens for starting such a marked host: If possible, a spot instance is deployed or a normal VM as failback.
 
 
 
