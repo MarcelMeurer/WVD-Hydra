@@ -86,11 +86,11 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
   - Add: Showing the number of selected users in the user list
   - Add: Showing the number of selected hosts in the session host list
   - Add: Having a "back button" in the host pool configuration
-  - Add: Adding a checkbox "Use Spot instance, if possible" to the rollout configuration; comparable to the VM rollout in the Azure Portal; not recommended for [production](#Spot instances) 
+  - Add: Adding a checkbox "Use Spot instance, if possible" to the rollout configuration; comparable to the VM rollout in the Azure Portal; not recommended for [production](#Spot-instances) 
 - 1.0.1.83	(2022/12/09)
   - Add: The replacement wizard will show if a Microsoft native scaling plan is active (recommendation: disable the native scaling plan during rollout)
   - Add: After deploying an NVDIA base VM, the rollout will wait a while to give the NVIDIA driver time to reboot the VM (unexpected behavior)
-  - Add: New configuration for autoscaling (multi-session), called [Reserve a number of existing hosts](#Reserve a number of existing hosts)* for power-on-connect.
+  - Add: New configuration for autoscaling (multi-session), called [Reserve a number of existing hosts](#Reserve-a-number-of-existing hosts)* for power-on-connect.
   - Add: Some GUI optimizations
 - 1.0.1.82	(2022/11/22)
   - Add: A new task for a script collection: Host - Reinstall AVD Agent (experimental) - remove the host from the pool and reinstall the agent to re-join the pool. It is intended for maintenance.
