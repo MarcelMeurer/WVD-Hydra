@@ -1,10 +1,10 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 5.0
+# Current Version of this script: 5.1
 
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','CleanFirstStart', 'RenameComputer')]
+	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','CleanFirstStart', 'RenameComputer','RepairMonitoringAgent')]
 	[string] $Mode,
 	[string] $StrongGeneralize='0',
 	[string] $ComputerNewname='',						#Only for SecureBoot process (workaround, normaly not used)
@@ -95,7 +95,6 @@ function DownloadFile ( $url, $outFile)
         try {
             LogWriter("Try to download file")
 			(New-Object System.Net.WebClient).DownloadFile($url,$outFile)
-            #Invoke-WebRequest -Uri $url -OutFile $outFile -UseBasicParsing
             $ok=$true
         } catch {
             $i--;
@@ -701,6 +700,17 @@ if ($mode -eq "Generalize") {
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
 	}
+    LogWriter "Creating task to monitor the AVDAgent Monitoring"
+    $principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
+    $class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
+    $triggerM = $class | New-CimInstance -ClientOnly
+    $triggerM.Enabled = $true
+    $triggerM.Subscription='<QueryList><Query Id="0" Path="RemoteDesktopServices"><Select Path="RemoteDesktopServices">*[System[Provider[@Name=''Microsoft.RDInfra.RDAgent.Service.MonitoringAgentCheck'']] and System[(Level=3) and (Task=0) and (EventID=0)]]</Select></Query></QueryList>'
+    $actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RepairMonitoringAgent`""
+    $settingsM = New-ScheduledTaskSettingsSet
+    $taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Repairs the Azure Monitoring Agent in case of an issue"
+    Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -InputObject $taskM #-ErrorAction Ignore
+    Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -ErrorAction Ignore
 } elseif ($Mode -eq "CleanFirstStart") {
 	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
 	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
@@ -718,6 +728,16 @@ if ($mode -eq "Generalize") {
 	Stop-Service -Name "RDAgentBootLoader"
 	LogWriter "Starting service"
 	Start-Service -Name "RDAgentBootLoader"
+}  elseif ($mode -eq "RepairMonitoringAgent") {
+	$LogFile=$LogDir+"\AVD.MonitorReinstall.log"
+    $files=@(Get-ChildItem -Path "$($env:ProgramFiles)\Microsoft RDInfra\Microsoft.RDInfra.Geneva.Installer*.msi")
+    if ($files.Length -eq 0) {
+        LogWriter "Couldn't find binaries"
+    } else {
+        $file=$files[$files.Length-1]
+        LogWriter "Installing Monitoring Agent $file"
+        Start-Process -wait -FilePath "$file" -ArgumentList "/quiet /qn /norestart /passive /l*v `"$($env:windir)\system32\logfiles\AVD-MonitoringAgentMsi.log`""
+    }
 }  elseif ($mode -eq "StartBootloader") {
 	$LogFile=$LogDir+"\AVD.AgentBootloaderErrorHandling.log"
 	LogWriter "Start service was triggered by an event"

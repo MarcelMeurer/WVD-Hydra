@@ -82,6 +82,9 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.85	(2023/01/10)
+  - Fix: If a host is deleted, existing sessions are logged off first (prevent from having an orphan host if the host is deleted manually)
+  - Add: Option to show a notification on the portal in case of an event (triggered by the vendor)
 - 1.0.1.85	(2022/12/19)
   - Add: An optional workaround to ignore if the session host goes one time into the drain mode caused by the upgrading AVD agent. The workaround can be enabled in the global settings: Ignore singe drain-mode event
 - 1.0.1.84	(2022/12/15)

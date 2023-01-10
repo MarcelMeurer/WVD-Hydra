@@ -80,7 +80,6 @@ try {
 
     LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
     DownloadFile $DownloadAdress "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
-    #Invoke-WebRequest -Uri $DownloadAdress -OutFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
 
     # Stop a running instance
     LogWriter("Stop a running instance")
