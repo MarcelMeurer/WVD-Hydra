@@ -9,28 +9,19 @@
 
 
 ## Terms
-
 "Hydra" is a solution to manage Azure Virtual Desktop (Azure Virtual Desktop) for one or more tenants. It's a working solution and can be installed in any subscription. The solution can be used at your own risk and without the right of indemnity. However, I am trying to publish the preview releases in high quality.
 
-The project is available as a **free community edition, even for commercial use** (up to 6 session hosts per host pool and a single tenant) and as a supported licensable product ($2 per concurrent user/month). Hydra will generally work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or license your Hydra instance through the Azure Subscription ([Billing subscription to Hydra](https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-pay-c1/preview)).
+The project is available as a **free community edition, even for commercial use** (up to 6 session hosts per host pool and a single tenant) and as a supported licensable product ($2 or €2 per concurrent user/month). Hydra will generally work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or license your Hydra instance through the Azure Subscription ([Billing subscription to Hydra](https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-pay-c1/preview)).
 
 The owner of this solution is [ITProCloud GmbH](https://www.itprocloud.com/), [info@itprocloud.com](mailto:info@itprocloud.com).
 
 Please make sure to send feedback and update the solution regularly.
 
 
-
-## Important !
-**Rollout issues: AVD Agent 1.0.5555.1008 and newer are causing high timeouts for upgrading themselves. That can cause rollout issues with Hydra. [Read more to fix this issue](avd-agent-timeouts.md)**
-
-
-
 ## Get help
-
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
 ## Features
-
 - Multi-tenancy
 - Role-based access
 - Image management
