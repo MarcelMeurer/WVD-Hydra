@@ -222,8 +222,24 @@ if ($mode -eq "Generalize") {
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "MiscPolicyInfo" -Value 2 -force  -ErrorAction Ignore
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "PassedPolicy" -Value 0 -force  -ErrorAction Ignore
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ShippedWithReserves" -Value 0 -force  -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ActiveScenario" -Value 0 -force  -ErrorAction Ignore
 	}
 	
+	# Removing the state of an olde AAD Join
+	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension"  -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin"  -Recurse -Force -ErrorAction Ignore
+	$AadCert=Get-ChildItem Cert:\LocalMachine\My | Where-Object {$_.Issuer -match "CN=MS-Organization-P2P-Access*"}
+	if ($AadCert -ne $null) {
+		$cn=$AadCert.Subject.Split(",")[0]
+
+		LogWriter("Found probaly a AAD certificate with name: $cn")
+		Get-ChildItem Cert:\LocalMachine\My | Where-Object {$_.Subject -match "$($cn)*"} | ForEach-Object {
+			LogWriter("Deleting certificate from image with subject: $($_.Subject)")
+			Remove-Item -Path $_.PSPath
+		}
+	}
+
 	# Get access to sysprep action files
 	$sysPrepActionPath="$env:windir\System32\Sysprep\ActionFiles"
 									
@@ -387,12 +403,6 @@ if ($mode -eq "Generalize") {
 	}
 	
 	# AD / AAD handling
-	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
-	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Force -ErrorAction Ignore
-	if (Test-Path -Path "$($env:WinDir)\system32\Dsregcmd.exe") {
-		LogWriter("Leaving old AAD")
-		Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/leave" -ErrorAction SilentlyContinue
-	}
 	if ($DomainJoinUserName -ne "" -and $AadOnly -ne "1") {
 		LogWriter("Joining AD domain")
 		$psc = New-Object System.Management.Automation.PSCredential($DomainJoinUserName, (ConvertTo-SecureString $DomainJoinUserPassword -AsPlainText -Force))
@@ -421,22 +431,42 @@ if ($mode -eq "Generalize") {
 		} while($ok -ne $true)
 	} else {
 		LogWriter("AAD only is selected. Skipping joining to a native AD, joining AAD")
-		$aadPath=@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows")[@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows").count-1].fullname
-		Start-Process -wait -FilePath "$aadPath\AADLoginForWindowsHandler.exe" -WorkingDirectory $aadPath -ArgumentList 'enable' -RedirectStandardOutput "$($LogDir)\Avd.AadJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.AadJoin.Warning.txt"
+		$aadJoinSuccessful=$false
+        # check if already joined		
+        $aadLoginLogfile=@(Get-ChildItem "C:\WindowsAzure\Logs\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows\?.?.?.?\AADLoginForWindowsExtension*.*" -ErrorAction Ignore)[@(Get-ChildItem -Directory  "C:\WindowsAzure\Logs\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows\?.?.?.?\AADLoginForWindowsExtension*.*" -ErrorAction Ignore).count-1].fullname
+        if ($aadLoginLogfile -ne $null) {
+            LogWriter("AAD-Logfile of aad join exist in folder: $aadLoginLogfile")
+        	$aadJoinMessage=(Select-String  -Path "$aadLoginLogfile" -pattern "BadRequest")
+        		if ($aadJoinMessage -ne $null) {
+                    $aadJoinMessage="{"+$aadJoinMessage.ToString().split("{")[1..99]
+        			# AAD join failed
+        			LogWriter("AAD join failed with message: $($aadJoinMessage)")
+        			throw "AAD join failed with message: `n$($aadJoinMessage)"
+        		}
+        	$aadJoinMessage=(Select-String  -Path "$aadLoginLogfile" -pattern "Successfully joined|Device is already secure joined")
+
+        		if ($aadJoinMessage -ne $null) {
+                    $aadJoinMessage="{"+$aadJoinMessage.ToString().split("{")[1..99]
+        			# AAD join sucessful
+					LogWriter("Hosts is successfully joined to AAD (reported by logfile)")
+        			$aadJoinSuccessful=$true
+        		}
+        }
+        if ($aadJoinSuccessful -eq $false) {
+			LogWriter("Cleaning up previous AADLoginExtension / AAD join")
+			Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Force -ErrorAction Ignore
+			if (Test-Path -Path "$($env:WinDir)\system32\Dsregcmd.exe") {
+				LogWriter("Leaving old AAD")
+				Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/leave" -ErrorAction SilentlyContinue
+			}
+    		LogWriter("Running AADLoginForWindows")
+    		$aadPath=@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows")[@(Get-ChildItem -Directory  "C:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows").count-1].fullname
+    		Start-Process -wait -LoadUserProfile -FilePath "$aadPath\AADLoginForWindowsHandler.exe" -WorkingDirectory "$aadPath" -ArgumentList 'enable' -RedirectStandardOutput "$($LogDir)\Avd.AadJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.AadJoin.Warning.txt"
+        }
 		if ($JoinMem -eq "1") {
 			LogWriter("Joining Microsoft Endpoint Manamgement is selected. Try to register to MEM")
 			Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/AzureSecureVMJoin /debug /MdmId 0000000a-0000-0000-c000-000000000000" -RedirectStandardOutput "$($LogDir)\Avd.MemJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.MemJoin.Warning.txt"
 		}
-		try {
-			if ($AadOnly) {
-				$timeOut=(Get-Date).AddSeconds(5*60)
-				do 
-				{
-					LogWriter("Waiting for the domain join")
-					Start-Sleep -Seconds 3#AzureAdJoined : YES
-				} while ((Get-Date) -le $timeOut -and (Select-String  -InputObject (&dsregcmd /status) -pattern "AzureAdJoined : YES").length -eq 0) 
-			}
-		} catch {}
 	}
 	# check for disk handling
 	$modifyDrives=$false
@@ -700,6 +730,7 @@ if ($mode -eq "Generalize") {
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
 	}
+	Start-Sleep -Seconds 60
     LogWriter "Creating task to monitor the AVDAgent Monitoring"
     $principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
     $class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler

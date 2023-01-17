@@ -82,6 +82,10 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.86	(2023/01/17)
+  - Add: Better handling for [AAD only joined VM](#AAD-Only---Join-and-re-join-hosts)
+  - Add: In the rollout configuration: Azure Active Directory: Try to delete old device - If the service principal is in the group "Cloud Device Administrator" the sp can remove the device from AAD before deploying a new host
+  - Add: In base settings: A script or collection can be triggered before a host and VM is deleted. It can be used to unjoin AAD with the collection ''BuiltIn: Remove device from Azure Active Directory before deleting host" or for other tasks
 - 1.0.1.85	(2023/01/10)
   - Fix: If a host is deleted, existing sessions are logged off first (prevent from having an orphan host if the host is deleted manually)
   - Add: Option to show a notification on the portal in case of an event (triggered by the vendor)
@@ -95,7 +99,7 @@ Hydra can be easily updated from GitHub. Open the deployed app service -> Deploy
 - 1.0.1.83	(2022/12/09)
   - Add: The replacement wizard will show if a Microsoft native scaling plan is active (recommendation: disable the native scaling plan during rollout)
   - Add: After deploying an NVDIA base VM, the rollout will wait a while to give the NVIDIA driver time to reboot the VM (unexpected behavior)
-  - Add: New configuration for autoscaling (multi-session), called [Reserve a number of existing hosts](#Reserve-a-number-of-existing hosts)* for power-on-connect.
+  - Add: New configuration for autoscaling (multi-session), called [Reserve a number of existing hosts](#Reserve-a-number-of-existing-hosts)* for power-on-connect.
   - Add: Some GUI optimizations
 - 1.0.1.82	(2022/11/22)
   - Add: A new task for a script collection: Host - Reinstall AVD Agent (experimental) - remove the host from the pool and reinstall the agent to re-join the pool. It is intended for maintenance.
@@ -703,12 +707,28 @@ Open a host pool where you want to run the agent.
 
 Hint: You can run "Install Hydra Agent" with the image creation process on the Golden Master. All deployed session hosts based on this master will have the Agent installed, and you can directly use the advanced features.
 
-#### Showing user processes
+### AAD Only - Join and re-join hosts
+Azure AD-only joined are getting more common in Azure Virtual Desktop. There are some challenges running AVD hosts as AAD-only. One challenge is that you can roll out a new session host in AAD only if a device with the same name doesn't exist. In the past, that was possible, but that may be changed over the last few months.
+
+If you roll out a new session host with AAD-only integration and a device with the same exist, you get an error message:
+
+*Another object with the same value for property hostnames already exists.*
+
+So, if you roll out session hosts after an update of the image again and you try to reuse the names, you have to remove the older - no longer existing devices - from AAD first.
+
+To make this a bit easier, I added two options to do this with Hydra for Azure Virtual Desktop in an automated way:
+
+1) If you added the service principal Hydra used to the role *"Cloud Device Administrator"* and ticked the box "Azure Active Directory: Try to delete old device" in the rollout configuration, Hydra will delete existing devices with the same name from Azure AD. Note: "Cloud Device Administrator" is a highly privileged role. Alternatively, the 2nd option doesn't need this role.
+2) Run a script shortly before deleting a session host to remove the device. Running dsregcmd.exe locally on a device will remove the device from AAD. To automate this, a script collection can be selected in the base settings of the host pool configuration: Run script or collection on specific events -> On-Delete -> Select the collection "BuiltIn: Remove device from Azure Active Directory before deleting host". The collection moves the host into the drain mode and runs the script shortly before the host is deleted. (Note: If the script collection is not visible, update the build-in scripts by clicking on the update button in the upper right corner of the script menu). The on-delete option can also be used for other aspects.
+
+![](media/AAD-On-Delete.png)
+
+### Showing user processes
 If the Hydra Agent is installed on session hosts, the processes of a single user can be shown in the "User sessions" menu. Click on the icon right to the user to show the processes.
 
 ![](media/HydraAgent-04.png)
 
-#### Database and Managed Service Identity
+### Database and Managed Service Identity
 Hydra connects to the database with a SQL user defined in the connection string stored in the Key Vault. Alternatively, Hydra can connect using its Azure AD identity.
 
 Do the following changes in the maintenance windows:
@@ -723,7 +743,7 @@ Server=tcp:<my-database-server>.database.windows.net,1433;Initial Catalog=Hydra;
 Remove the other parts of the string (like user id, ...). Add the new connection string as a new version. Optionally, remove your permission from the Key Vault.
 Restart the app service and verify that the engine runs with the new configuration
 
-#### ADE
+### ADE
 
 Azure Disk Encryption (ADE) encrypts the OS and data disks of Azure virtual machines (VMs) inside your VMs by using BitLocker. ADE cannot be combined with a disk encryption set.
 

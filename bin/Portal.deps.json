@@ -3661,7 +3661,8 @@
           "Microsoft.Extensions.Configuration.Binder": "5.0.0",
           "Microsoft.Extensions.Configuration.UserSecrets": "5.0.0",
           "Microsoft.Extensions.Hosting": "5.0.0",
-          "Microsoft.Extensions.Http": "5.0.0"
+          "Microsoft.Extensions.Http": "5.0.0",
+          "Microsoft.Graph": "3.33.0"
         },
         "runtime": {
           "HydraShared.dll": {}
