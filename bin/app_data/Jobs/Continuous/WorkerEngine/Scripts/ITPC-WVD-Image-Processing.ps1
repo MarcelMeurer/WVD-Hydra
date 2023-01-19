@@ -240,6 +240,12 @@ if ($mode -eq "Generalize") {
 		}
 	}
 
+	# Removing an old intune configuration to avoid an uninstall of installed applications
+	LogWriter("Removing intune configuration")
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement" -Recurse -Force -ErrorAction Ignore
+	Uninstall-Package -Name "Microsoft Intune Management Extension" -AllVersions -Force -ErrorAction SilentlyContinue 
+
 	# Get access to sysprep action files
 	$sysPrepActionPath="$env:windir\System32\Sysprep\ActionFiles"
 									
@@ -506,6 +512,20 @@ if ($mode -eq "Generalize") {
 				}
 				ShowPageFiles
 			}
+		}
+	}
+	
+	# resize C: partition to fill up the disk
+	if ($modifyDrives -eq $false)
+	{
+		try {
+			$supportedSize = (Get-PartitionSupportedSize -DriveLetter "c")
+			if ((Get-Partition -DriveLetter "c").Size -lt $supportedSize.SizeMax) {
+				LogWriter("Resize C: partition to fill up the disk")
+				Resize-Partition -DriveLetter "c" -Size $supportedSize.SizeMax
+			}
+		} catch {
+			LogWriter("Resize C: partition failed: $_")
 		}
 	}
 

@@ -73,6 +73,10 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.87	(2023/01/17)
+  - Add: Gallery images for Windows 10 22H2
+  - Add: Imaging will now remove an existing intune client from the Golden Master
+  - Add: If a larger disk size is used as the image: the last partition will be automatically extend
 - 1.0.1.86	(2023/01/17)
   - Add: Better handling for [AAD only joined VM](#AAD-Only---Join-and-re-join-hosts)
   - Add: In the rollout configuration: Azure Active Directory: Try to delete old device - If the service principal is in the group "Cloud Device Administrator" the sp can remove the device from AAD before deploying a new host
@@ -703,7 +707,7 @@ Azure AD-only joined are getting more common in Azure Virtual Desktop. There are
 
 If you roll out a new session host with AAD-only integration and a device with the same exist, you get an error message:
 
-*Another object with the same value for property hostnames already exists.*
+***Another object with the same value for property hostnames already exists.***
 
 So, if you roll out session hosts after an update of the image again and you try to reuse the names, you have to remove the older - no longer existing devices - from AAD first.
 
