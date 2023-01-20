@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 5.1
+# Current Version of this script: 5.2
 
 param(
 	[Parameter(Mandatory)]
@@ -519,7 +519,7 @@ if ($mode -eq "Generalize") {
 	if ($modifyDrives -eq $false)
 	{
 		try {
-			$supportedSize = (Get-PartitionSupportedSize -DriveLetter "c")
+			$supportedSize = (Get-PartitionSupportedSize -DriveLetter "c" -ErrorAction Stop)
 			if ((Get-Partition -DriveLetter "c").Size -lt $supportedSize.SizeMax) {
 				LogWriter("Resize C: partition to fill up the disk")
 				Resize-Partition -DriveLetter "c" -Size $supportedSize.SizeMax
