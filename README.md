@@ -73,7 +73,7 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
-- 1.0.1.87	(2023/01/17)
+- 1.0.1.87	(2023/01/19)
   - Add: Gallery images for Windows 10 22H2
   - Add: Imaging will now remove an existing intune client from the Golden Master
   - Add: If a larger disk size is used as the image: the last partition will be automatically extend
