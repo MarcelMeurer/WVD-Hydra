@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 5.2
+# Current Version of this script: 5.3
 
 param(
 	[Parameter(Mandatory)]
@@ -20,6 +20,7 @@ param(
 	[string] $AadOnly='0',
 	[string] $JoinMem='0',
 	[string] $MovePagefileToC='0',
+	[string] $ExpandPartition='0',
 	[string] $DomainFqdn='',
 	[string] $WvdRegistrationKey='',
 	[string] $LogDir="$env:windir\system32\logfiles",
@@ -515,8 +516,8 @@ if ($mode -eq "Generalize") {
 		}
 	}
 	
-	# resize C: partition to fill up the disk
-	if ($modifyDrives -eq $false)
+	# resize C: partition to fill up the disk if ExpandPartition!="0""
+	if ($ExpandPartition -ne "0" -and $modifyDrives -eq $false)
 	{
 		try {
 			$defragSvc=Get-Service -Name defragsvc -ErrorAction SilentlyContinue
