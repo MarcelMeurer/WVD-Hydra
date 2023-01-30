@@ -2,14 +2,18 @@
 param(
     [string]$paramLogFileName="AVD.DeleteFSLogixProfile.log",
    	[string]$users="",
-    [string]$serviceDomainUser="",
-    [string]$serviceDomainPw=""
+    [string]$serviceDomainUser64="",
+    [string]$serviceDomainPw64=""
 );
 
 # Define logfile and dir
 $LogDir="$env:windir\system32\logfiles"
 $LogFile="$LogDir\$paramLogFileName"
 $ErrorActionPreference="stop"
+
+# set serviceDomainCredentials
+$serviceDomainUser=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($serviceDomainUser64))
+$serviceDomainPw=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($serviceDomainPw64))
 
 $global:messages=""
 function LogWriter($message)

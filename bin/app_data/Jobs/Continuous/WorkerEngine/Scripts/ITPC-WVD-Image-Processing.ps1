@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 5.3
+# Current Version of this script: 5.4
 
 param(
 	[Parameter(Mandatory)]
@@ -481,7 +481,7 @@ if ($mode -eq "Generalize") {
 		if ((Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime").ChangeDrives -eq 1) {
 			$disks=Get-WmiObject -Class win32_volume | Where-Object { $_.DriveLetter -ne $null -and $_.DriveType -eq 3 }
 			foreach ($disk in $disks) {if ($disk.Name -eq 'D:\' -and $disk.Label -eq 'Temporary Storage') {$modifyDrives=$true}}
-				if ($modifyDrives -and $disks.Count -eq 3) {
+			if ($modifyDrives -and $disks.Count -eq 3) {
 				# change drive letters of temp and data drive for VMs with 3 drives
 				LogWriter("VM with 3 drives so delete old pagefile and install runonce key")
 
@@ -512,13 +512,14 @@ if ($mode -eq "Generalize") {
 					}
 				}
 				ShowPageFiles
-			}
+			} else {$modifyDrives=$false}
 		}
 	}
 	
 	# resize C: partition to fill up the disk if ExpandPartition!="0""
 	if ($ExpandPartition -ne "0" -and $modifyDrives -eq $false)
 	{
+		LogWriter("Check C: partition for resizing")
 		try {
 			$defragSvc=Get-Service -Name defragsvc -ErrorAction SilentlyContinue
 			Set-Service -Name defragsvc -StartupType Manual -ErrorAction SilentlyContinue
