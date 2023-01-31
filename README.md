@@ -73,6 +73,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.89	(2023/01/31)
+  - Change: Dependency Agent is no longer automatically installed with the Azure Monitoring Agent
 - 1.0.1.88	(2023/01/30)
   - Add: New option in the global settings: Debug: Write session host data to log analytics (contains sensitive data)
   - Fix: If the service account password contains some special characters (like "), the FSLogix delete operation failed
