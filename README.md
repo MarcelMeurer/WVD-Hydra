@@ -73,6 +73,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.90	(2023/02/08)
+  - Fix: Some typos
 - 1.0.1.89	(2023/01/31)
   - Change: Dependency Agent is no longer automatically installed with the Azure Monitoring Agent
 - 1.0.1.88	(2023/01/30)
