@@ -73,6 +73,12 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.91	(2023/02/19)
+  - Add: Send a message to all users on selected session hosts (in the session host list)
+  - Add: Two new tasks in scripts and collections: SetTag, RemoveTag to set or remove a tag on the virtual machine objects
+  - Add: New option in the global settings: Debug: If a start of a host failed by a timeout (AVD agent not responding), flag the host as critically failed - the host is also excluded from autoscaling
+  - Add: New autoscaling option for pooled hosts: Advanced -> Scale Down -> Allow scale down, even if hosts are starting or in creation (prevents that scale down stocks if a host is starting and never get online)
+  - Fix: On the start of the engine, all start/stop/create/delete states are reset 
 - 1.0.1.90	(2023/02/08)
   - Fix: Some typos
 - 1.0.1.89	(2023/01/31)
