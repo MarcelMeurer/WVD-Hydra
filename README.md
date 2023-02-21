@@ -73,6 +73,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.92	(2023/02/21)
+  - Fix: In very seldom constellations in multi-tenancy, the resource credentials couldn't be read (was null), and a retry getting the credentials happened unnecessarily (only in 1.0.1.91).
 - 1.0.1.91	(2023/02/19)
   - Add: Send a message to all users on selected session hosts (in the session host list)
   - Add: Two new tasks in scripts and collections: SetTag, RemoveTag to set or remove a tag on the virtual machine objects
