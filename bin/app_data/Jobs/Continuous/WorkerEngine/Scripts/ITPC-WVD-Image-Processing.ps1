@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 5.4
+# Current Version of this script: 6.0
 
 param(
 	[Parameter(Mandatory)]
@@ -70,7 +70,7 @@ function RedirectPageFileToC() {
 			LogWriter("New pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
 		}
 }
-function UnzipFile ($zipfile, $outdir)
+function UnzipFile($zipfile, $outdir)
 {
     # Based on https://gist.github.com/nachivpn/3e53dd36120877d70aee
     Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -88,7 +88,7 @@ function UnzipFile ($zipfile, $outdir)
         }
     }
 }
-function DownloadFile ( $url, $outFile)
+function DownloadFile($url, $outFile)
 {
     $i=3
     $ok=$false;
@@ -108,6 +108,119 @@ function DownloadFile ( $url, $outFile)
 		}
     } while (!$ok)
 	LogWriter("Download done")
+}
+
+function SysprepPreClean()
+{
+	# DISM cleanup (only if forced)
+	if (Test-Path "$env:windir\system32\Dism.exe") {
+		LogWriter("DISM cleanup")
+		Start-Process -FilePath "$env:windir\system32\Dism.exe" -Wait -ArgumentList "/online /cleanup-image /startcomponentcleanup /resetbase" -ErrorAction SilentlyContinue
+	}
+
+	# Disable reserved storage (only if forced)
+	if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager") {
+		LogWriter("Disabling reserved storage")
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "MiscPolicyInfo" -Value 2 -force  -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "PassedPolicy" -Value 0 -force  -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ShippedWithReserves" -Value 0 -force  -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ActiveScenario" -Value 0 -force  -ErrorAction Ignore
+	}
+}
+
+function RunSysprep($parameter)
+{
+	$sysprepErrorLogFile="$env:windir\System32\Sysprep\Panther\setuperr.log"
+
+	# Get access to the log files
+	$sysPrepLogPath="$env:windir\System32\Sysprep\Panther"
+	$sysPrepLogPathItem = Get-Item $sysPrepLogPath.Replace("C:\","\\localhost\\c$\") -ErrorAction Ignore
+	$acl = $sysPrepLogPathItem.GetAccessControl()
+	$acl.SetOwner((New-Object System.Security.Principal.NTAccount("System")))
+	$sysPrepLogPathItem.SetAccessControl($acl)
+	$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("System","FullControl","Allow")
+	$acl.AddAccessRule($aclSystemFull)
+	$sysPrepLogPathItem.SetAccessControl($acl)
+
+	$errorReason=""
+	$restrartSysprepOnce=2
+	do {
+		Remove-Item -Path $sysprepErrorLogFile -Force -ErrorAction Ignore
+		LogWriter("Resetting sysprep")
+		Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\Sysprep" -Name "SysprepCorrupt" -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "State" -Value 2 -force
+		New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "GeneralizationState" -Value 7 -force
+		New-Item -Path "HKLM:\Software\Microsoft\DesiredStateConfiguration" -ErrorAction Ignore
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\DesiredStateConfiguration" -Name "AgentId" -Value "" -force  -ErrorAction Ignore
+
+		if ($errorReason -ne "") {
+			LogWriter("Patch Generalize.xml to workaround $errorReason")
+			# Patch Generalize.xml
+			$sysPrepActionFile="Generalize.xml"
+			$sysPrepActionPath="$env:windir\System32\Sysprep\ActionFiles"
+			[xml]$xml = Get-Content -Path "$sysPrepActionPath\$sysPrepActionFile"
+			$xml.SelectNodes("//assemblyIdentity") | ForEach-Object{
+				if($_.name -match $errorReason) {$_.ParentNode.ParentNode.RemoveChild($_.ParentNode) | Out-Null}
+			}
+			$xml.Save("$sysPrepActionPath\$sysPrepActionFile.new")
+			Remove-Item "$sysPrepActionPath\$sysPrepActionFile.old.*" -Force -ErrorAction Ignore
+			Move-Item "$sysPrepActionPath\$sysPrepActionFile" "$sysPrepActionPath\$sysPrepActionFile.old.$((Get-Date).ToString("yyyy-MM-dd_HH-mm-ss"))"
+			Move-Item "$sysPrepActionPath\$sysPrepActionFile.new" "$sysPrepActionPath\$sysPrepActionFile"
+			LogWriter("Modifying sysprep Generalize - Done")
+		}
+
+		LogWriter("Starting sysprep")
+		$proc=Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList $parameter -PassThru
+
+		$restrartSysprepOnce--
+
+		# Wait for sysprep shutdown and monitor logfile
+		$again=$true
+		do {
+			LogWriter("Waiting for sysprep")
+			Start-Sleep -Seconds 5
+			if ((Get-Process -Id $proc.Id -ErrorAction SilentlyContinue) -eq $null) {
+				LogWriter("Sysprep finished")
+				$again=$false
+				$restrartSysprepOnce=0
+			}
+			$sysprepErrorLog=Get-Content -Path $sysprepErrorLogFile -ErrorAction SilentlyContinue
+			if ($sysprepErrorLog) {
+				$hasError=$false
+				$errorReason=""
+				$errorReasonFull=""
+				$sysprepErrorLog | foreach {
+					# check for error
+					if ($_ -like "*, Error *") {
+						if ($_ -like "*ExecuteInternal*") {
+							$pattern = "(?<=Error in executing action for\s)(.*?)(?=;)"
+							$errorReason=Select-String -InputObject $_ -Pattern $pattern -AllMatches | Foreach-Object { $_.Matches.Value }
+							if ($restrartSysprepOnce -eq 0) {
+								LogWriter("Sysprep failed: $_")
+								throw "Sysprep failed: $_"
+							}
+						}
+						if ($_.IndexOf(", Error      [") -gt -1) {
+							$again=$false
+							$hasError=$true
+						}
+					}
+				}
+				if ($hasError -and $restrartSysprepOnce -gt 0) {
+					# Do one time a force clean-up for sysprep
+					LogWriter("Forcing sysprep")
+					Start-Sleep -Seconds 5
+					try {Stop-Process -Id $proc.Id -ErrorAction SilentlyContinue} catch {}
+					SysprepPreClean
+				} 
+				# elseif ($hasError -and $restrartSysprepOnce -le 0) {
+				# 	LogWriter("Sysprep failed. Check the logfile on the temporary VM in: $sysprepErrorLogFile")
+				# 	throw("Sysprep failed. Check the logfile on the temporary VM in: $sysprepErrorLogFile")
+				# }
+			}
+		} while ($again)
+	} while ($restrartSysprepOnce -gt 0)
+	LogWriter("Finishing RunSysprep")
 }
 
 # Define static variables
@@ -211,19 +324,9 @@ if ($mode -eq "Generalize") {
 		$force=$true
 	}
 
-	# DISM cleanup (only if forced)
-	if ($force -and (Test-Path "$env:windir\system32\Dism.exe")) {
-		LogWriter("DISM cleanup")
-		Start-Process -FilePath "$env:windir\system32\Dism.exe" -Wait -ArgumentList "/online /cleanup-image /startcomponentcleanup /resetbase" -ErrorAction SilentlyContinue
-	}
-
-	# Disable reserved storage (only if forced)
-	if ($force -and (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager")) {
-		LogWriter("Disabling reserved storage")
-		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "MiscPolicyInfo" -Value 2 -force  -ErrorAction Ignore
-		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "PassedPolicy" -Value 0 -force  -ErrorAction Ignore
-		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ShippedWithReserves" -Value 0 -force  -ErrorAction Ignore
-		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ActiveScenario" -Value 0 -force  -ErrorAction Ignore
+	# SysprepPreClean: DSIM and reserved storage
+	if ($force) {
+		SysprepPreClean	
 	}
 	
 	# Removing the state of an olde AAD Join
@@ -249,12 +352,11 @@ if ($mode -eq "Generalize") {
 
 	# Get access to sysprep action files
 	$sysPrepActionPath="$env:windir\System32\Sysprep\ActionFiles"
-									
 	$sysPrepActionPathItem = Get-Item $sysPrepActionPath.Replace("C:\","\\localhost\\c$\") -ErrorAction Ignore
 	$acl = $sysPrepActionPathItem.GetAccessControl()
-	$acl.SetOwner((New-Object System.Security.Principal.NTAccount("SYSTEM")))
+	$acl.SetOwner((New-Object System.Security.Principal.NTAccount("System")))
 	$sysPrepActionPathItem.SetAccessControl($acl)
-	$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("SYSTEM","FullControl","Allow")
+	$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("System","FullControl","Allow")
 	$acl.AddAccessRule($aclSystemFull)
 	$sysPrepActionPathItem.SetAccessControl($acl)
 	
@@ -360,15 +462,18 @@ if ($mode -eq "Generalize") {
 		New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft" -Name "Windows NT" -ErrorAction Ignore
 		New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT" -Name "Terminal Services" -ErrorAction Ignore
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Name "fServerEnableRDP8" -Value 1 -force
-		Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown"
+		RunSysprep "/generalize /oobe /shutdown"
+		#Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown"
 	} else {
 		if ($isSecureBoot) {
 			LogWriter("Secure boot is enabled")
 			write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($unattend))) | Out-File "$LocalConfig\unattend.xml" -Encoding ASCII
 			write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($unattend))) | Out-File "$env:windir\panther\unattend.xml" -Encoding ASCII
-			Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown /mode:vm /unattend:$LocalConfig\unattend.xml"
+			RunSysprep 	"/generalize /oobe /shutdown /mode:vm /unattend:$LocalConfig\unattend.xml"
+			#Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown /mode:vm /unattend:$LocalConfig\unattend.xml"
 		} else {
-			Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown /mode:vm"
+			RunSysprep "/generalize /oobe /shutdown /mode:vm"
+			#Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown /mode:vm"
 		}
 	}
 

@@ -88,6 +88,9 @@ https://licenses.nuget.org/MIT
 Microsoft.Win32.Registry, Microsoft
 https://licenses.nuget.org/MIT
 
+System.Data.SQLite
+https://www.sqlite.org/copyright.html
+
 Newtonsoft.Json, James Newton-King
 https://licenses.nuget.org/MIT
 
