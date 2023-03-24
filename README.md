@@ -75,7 +75,6 @@ If you are not familiar with the first configuration and creating a service prin
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
 - 1.0.1.93	(2023/03/24)
   - Add: Windows Package Manager / Winget integration (see Script Collections: PM - ...) to install applications and to update all applications on a session host and on Golden Masters
-  - Add: Update the imaging script to be even more resilient to sysprep issues. Sysprep is now monitored, and some workarounds for sysprep are triggered automatically in case of a sysprep error
   - Add: Running scripts and collections on a golden master now supports all VM-focused operations like running on session hosts
 - 1.0.1.92	(2023/02/21)
   - Fix: In very seldom constellations in multi-tenancy, the resource credentials couldn't be read (was null), and a retry getting the credentials happened unnecessarily (only in 1.0.1.91).
