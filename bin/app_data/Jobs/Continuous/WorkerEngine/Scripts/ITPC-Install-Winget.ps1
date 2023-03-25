@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 1.0
+# Current Version of this script: 2.0
 
 param(
 	[Parameter(Mandatory)]

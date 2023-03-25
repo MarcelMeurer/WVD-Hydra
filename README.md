@@ -73,6 +73,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.94  (2023/03/25)
+  - Add: Update the imaging script to be even more resilient to sysprep issues. Sysprep is now monitored, and some workarounds for sysprep are triggered automatically in case of a sysprep error
 - 1.0.1.93	(2023/03/24)
   - Add: Windows Package Manager / Winget integration (see Script Collections: PM - ...) to install applications and to update all applications on a session host and on Golden Masters
   - Add: Running scripts and collections on a golden master now supports all VM-focused operations like running on session hosts
