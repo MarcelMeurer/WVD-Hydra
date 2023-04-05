@@ -73,6 +73,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.95  (2023/04/05)
+  - Fix: The log of a script running on a a host, didn't disappear after 60 seconds
 - 1.0.1.94  (2023/03/25)
   - Add: Update the imaging script to be even more resilient to sysprep issues. Sysprep is now monitored, and some workarounds for sysprep are triggered automatically in case of a sysprep error
 - 1.0.1.93	(2023/03/24)
