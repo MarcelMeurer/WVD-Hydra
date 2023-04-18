@@ -73,6 +73,8 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.1.98  (2023/04/17)
+  - Add: Option to assign the NSG / ASGs after the rollout completed (ASGs and NSGs are regularly applied during the rollout of new session hosts)
 - 1.0.1.97  (2023/04/07)
   - Add: All host pool configurations (like schedules, base settings, ...) can be copied from an existing configured host pool (use the list box in the upper right corner)
 - 1.0.1.96  (2023/04/05)
