@@ -73,6 +73,10 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Updates and releases
 Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+- 1.0.2.02  (2023/05/03)
+  - Fix: In a few cases, an invalid value reported by the Hydra agent about the host's load cause the list of hosts in a pool failed
+- 1.0.2.01  (2023/04/27)
+  - Fix: Is some cases an Azure AD specific german OU prevents the engine from enumerating other subscriptions
 - 1.0.2.00  (2023/04/26)
   - Add: Option to update Hydra directly from the avatar menu (right upper corner in the roboter menu)
   - Change: Reduce data transfered to the front-end (remove redundant health messages)
