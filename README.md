@@ -72,7 +72,13 @@ If you are not familiar with the first configuration and creating a service prin
 
 
 ## Updates and releases
-Hydra can be easily updated from GitHub. Open the deployed app service -> Deployment Center -> click on "Sync"
+Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine"
+
+If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
+
+
+- 1.0.2.06  (2023/05/18)
+  - Add: The following extensions can be selected for a roll out: Antimaleware extension, Dependency extension, Guest (new)
 - 1.0.2.04  (2023/05/08)
   - Add: For new session host rollouts, a "Proximity placement group" can be configured in the advanced settings of the rollout configuration
 - 1.0.2.02  (2023/05/03)

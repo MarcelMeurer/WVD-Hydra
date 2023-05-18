@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "HydraAgent/1.0.0": {
+      "HydraAgent/2.0.0": {
         "dependencies": {
           "CommandLineParser": "2.8.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
@@ -419,7 +419,7 @@
     }
   },
   "libraries": {
-    "HydraAgent/1.0.0": {
+    "HydraAgent/2.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

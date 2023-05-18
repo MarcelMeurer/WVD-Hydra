@@ -3706,7 +3706,7 @@
           "lib/netstandard1.3/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "Agent for Project Hydra/1.0.0": {
+      "Agent for Project Hydra/2.0.0": {
         "dependencies": {
           "CommandLineParser": "2.8.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
@@ -3726,7 +3726,7 @@
       },
       "HydraShared/1.0.0": {
         "dependencies": {
-          "Agent for Project Hydra": "1.0.0",
+          "Agent for Project Hydra": "2.0.0",
           "AutoMapper": "10.1.1",
           "Azure.Identity": "1.6.0",
           "Azure.ResourceManager.Compute": "1.0.0-beta.7",
@@ -6962,7 +6962,7 @@
       "path": "windowsazure.storage/9.3.3",
       "hashPath": "windowsazure.storage.9.3.3.nupkg.sha512"
     },
-    "Agent for Project Hydra/1.0.0": {
+    "Agent for Project Hydra/2.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
