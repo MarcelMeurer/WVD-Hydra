@@ -76,7 +76,9 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-
+- 1.0.2.07  (2023/06/1)
+  - Add: Preview feature "Endpoints" available and can be enabled global settings => Enable Endpoint Management
+  - Add: Modification to keep settings through Intune in the template
 - 1.0.2.06  (2023/05/18)
   - Add: The following extensions can be selected for a roll out: Antimaleware extension, Dependency extension, Guest (new)
 - 1.0.2.04  (2023/05/08)

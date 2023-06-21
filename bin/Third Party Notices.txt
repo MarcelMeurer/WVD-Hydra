@@ -97,6 +97,9 @@ https://licenses.nuget.org/MIT
 System.Diagnostics.PerformanceCounter, Microsoft
 https://licenses.nuget.org/MIT
 
+System.IO.FileSystem, Microsoft
+https://licenses.nuget.org/MIT
+
 System.Management, Microsoft
 https://licenses.nuget.org/MIT
 

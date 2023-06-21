@@ -2922,6 +2922,29 @@
           "System.Threading.Tasks": "4.3.0"
         }
       },
+      "System.IO.FileSystem.AccessControl/5.0.0": {
+        "dependencies": {
+          "System.Security.AccessControl": "6.0.0",
+          "System.Security.Principal.Windows": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.IO.FileSystem.AccessControl.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/netstandard2.0/System.IO.FileSystem.AccessControl.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
+          }
+        },
+        "compile": {
+          "ref/netstandard2.0/System.IO.FileSystem.AccessControl.dll": {}
+        }
+      },
       "System.IO.FileSystem.Primitives/4.3.0": {
         "dependencies": {
           "System.Runtime": "4.3.0"
@@ -3706,13 +3729,15 @@
           "lib/netstandard1.3/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "Agent for Project Hydra/2.0.0": {
+      "Agent for Project Hydra/2.0.8": {
         "dependencies": {
           "CommandLineParser": "2.8.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.Win32.Registry": "5.0.0",
           "Newtonsoft.Json": "13.0.1",
           "System.Diagnostics.PerformanceCounter": "6.0.0",
+          "System.IO.FileSystem": "4.3.0",
+          "System.IO.FileSystem.AccessControl": "5.0.0",
           "System.Management": "6.0.0",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
           "TaskScheduler": "2.9.2"
@@ -3726,7 +3751,7 @@
       },
       "HydraShared/1.0.0": {
         "dependencies": {
-          "Agent for Project Hydra": "2.0.0",
+          "Agent for Project Hydra": "2.0.8",
           "AutoMapper": "10.1.1",
           "Azure.Identity": "1.6.0",
           "Azure.ResourceManager.Compute": "1.0.0-beta.7",
@@ -6507,6 +6532,13 @@
       "path": "system.io.filesystem/4.3.0",
       "hashPath": "system.io.filesystem.4.3.0.nupkg.sha512"
     },
+    "System.IO.FileSystem.AccessControl/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-SxHB3nuNrpptVk+vZ/F+7OHEpoHUIKKMl02bUmYHQr1r+glbZQxs7pRtsf4ENO29TVm2TH3AEeep2fJcy92oYw==",
+      "path": "system.io.filesystem.accesscontrol/5.0.0",
+      "hashPath": "system.io.filesystem.accesscontrol.5.0.0.nupkg.sha512"
+    },
     "System.IO.FileSystem.Primitives/4.3.0": {
       "type": "package",
       "serviceable": true,
@@ -6962,7 +6994,7 @@
       "path": "windowsazure.storage/9.3.3",
       "hashPath": "windowsazure.storage.9.3.3.nupkg.sha512"
     },
-    "Agent for Project Hydra/2.0.0": {
+    "Agent for Project Hydra/2.0.8": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
