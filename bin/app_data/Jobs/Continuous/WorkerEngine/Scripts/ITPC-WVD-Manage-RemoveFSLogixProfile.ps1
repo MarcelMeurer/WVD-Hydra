@@ -78,11 +78,11 @@ foreach ($user in $users.Split(";")) {
                     $profilePathUser="$($profilePath)\$dirName"
                 }
 
-                LogWriter("Default FSLogix profile path is: $profilePathUser")
-                if (!(Test-Path -Path "$profilePath" -ErrorAction SilentlyContinue)) {
+                LogWriter("Default FSLogix profile path is: $profilePathUser in $profilePath")
+                if (!(Test-Path -Path "$profilePathUser" -ErrorAction SilentlyContinue)) {
                     LogWriter("Using service account to authenticate to the file share")
                     $psc = New-Object System.Management.Automation.PSCredential("$serviceDomainUser", (ConvertTo-SecureString "$serviceDomainPw" -AsPlainText -Force))
-                    New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePath" -Credential $psc
+                    New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePathUser" -Credential $psc
                 }
                 if (-not (Test-Path $profilePathUser)) {
                     throw "The path $profilePathUser doesn't exist"
