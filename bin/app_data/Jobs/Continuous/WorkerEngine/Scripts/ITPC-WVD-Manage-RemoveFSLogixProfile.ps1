@@ -44,6 +44,14 @@ function ResolveEnvVariable($stringValue)
 
 LogWriter("Remove FSLogix profile script starts. Parameter: $($users)")
 
+try {
+    LogWriter("Pre-authentication: Using service account to authenticate to the file share silently")
+    $psc = New-Object System.Management.Automation.PSCredential("$serviceDomainUser", (ConvertTo-SecureString "$serviceDomainPw" -AsPlainText -Force))
+    New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePath" -Credential $psc -ErrorAction Stop   
+} catch {
+    LogWriter("Pre-authentication failed or was not nessessary. Return message: $_")
+}
+
 foreach ($user in $users.Split(";")) {
     if ($user -ne "") {
         try {
@@ -78,24 +86,26 @@ foreach ($user in $users.Split(";")) {
                     $profilePathUser="$($profilePath)\$dirName"
                 }
 
-                LogWriter("Default FSLogix profile path is: $profilePathUser in $profilePath")
-                if (!(Test-Path -Path "$profilePathUser" -ErrorAction SilentlyContinue)) {
+                LogWriter("Default FSLogix profile path is: $profilePathUser")
+                if (!(Test-Path -Path "$profilePath" -ErrorAction SilentlyContinue)) {
                     LogWriter("Using service account to authenticate to the file share")
                     $psc = New-Object System.Management.Automation.PSCredential("$serviceDomainUser", (ConvertTo-SecureString "$serviceDomainPw" -AsPlainText -Force))
-                    New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePathUser" -Credential $psc
+                    New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePath" -Credential $psc -ErrorAction SilentlyContinue
                 }
                 if (-not (Test-Path $profilePathUser)) {
                     throw "The path $profilePathUser doesn't exist"
                 }
                 LogWriter("Start to remove all files in the path")
-                Get-ChildItem -Path "$profilePathUser\*" -Include *.vhd* | Where { ! $_.PSIsContainer } | Remove-Item -Force -Confirm:$false
+                $files=Get-ChildItem -Path "$profilePathUser\*" -Include *.vhd* -Force | Where { ! $_.PSIsContainer }
+                LogWriter("Found $($files.count) file(s) in directory")
+                if  ($files.count -eq 0) {
+                    LogWriter("ERROR: No files found in $profilePathUser")
+                }
+                $files | Remove-Item -Force -Confirm:$false
                 LogWriter("Done")
-
-
             } else {
                 LogWriter("WARNING: User $user couldn't be found in Active Directory")
             }
-
         } catch {
             LogWriter("ERROR: An exception occurs: $_.Message")
         }
