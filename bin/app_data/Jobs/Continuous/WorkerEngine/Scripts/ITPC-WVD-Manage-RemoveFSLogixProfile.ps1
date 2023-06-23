@@ -44,6 +44,11 @@ function ResolveEnvVariable($stringValue)
 
 LogWriter("Remove FSLogix profile script starts. Parameter: $($users)")
 
+$profilePath=Get-ItemPropertyValue -Path HKLM:\SOFTWARE\FSLogix\Profiles -Name VHDLocations
+if ($profilePath -eq $null) {
+    throw "VHDLocations is not set on the host (FSLogix configuration)"
+}
+
 try {
     LogWriter("Pre-authentication: Using service account to authenticate to the file share silently")
     $psc = New-Object System.Management.Automation.PSCredential("$serviceDomainUser", (ConvertTo-SecureString "$serviceDomainPw" -AsPlainText -Force))
@@ -62,7 +67,6 @@ foreach ($user in $users.Split(";")) {
             if ($adUser) {
                 $sid=(New-Object System.Security.Principal.SecurityIdentifier([byte[]]($adUser.Properties.objectsid |out-string -Stream),0)).Value
                 LogWriter("User found in Active Directory: $($adUser.Path) with SID $sid")
-                $profilePath=Get-ItemPropertyValue -Path HKLM:\SOFTWARE\FSLogix\Profiles -Name VHDLocations
 
                 # Test for custom naming
                 $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
