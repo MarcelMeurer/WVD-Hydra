@@ -1,10 +1,10 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 6.1
+# Current Version of this script: 6.2
 
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','CleanFirstStart', 'RenameComputer','RepairMonitoringAgent','RunSysprep')]
+	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','StartBootloaderIfNotRunning','CleanFirstStart', 'RenameComputer','RepairMonitoringAgent','RunSysprep')]
 	[string] $Mode,
 	[string] $StrongGeneralize='0',
 	[string] $ComputerNewname='',						#Only for SecureBoot process (workaround, normaly not used)
@@ -724,6 +724,13 @@ if ($mode -eq "Generalize") {
 				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -InputObject $task -ErrorAction Ignore
 				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
 				LogWriter("Added new startup task to run the RDAgentBootloader")
+
+				$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloaderIfNotRunning`""
+				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
+				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $task -ErrorAction Ignore
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2'
+				LogWriter("Added new startup task to monitor the RDAgentBootloader")
+
 					
 				$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
 				$triggerM = $class | New-CimInstance -ClientOnly
@@ -927,4 +934,20 @@ if ($mode -eq "Generalize") {
 	Start-Sleep -Seconds 60
 	LogWriter "Starting service (if not running)"
 	Start-Service -Name "RDAgentBootLoader"
-} 
+}  elseif ($mode -eq "StartBootloaderIfNotRunning") {
+	$interval=30
+	$run=$true
+	$counter=0
+	$serviceName="RDAgentBootLoader"
+	do {
+		Start-Sleep -Seconds $interval
+		$service=Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+		if ($service -ne $null -and $service.Status -ne [System.ServiceProcess.ServiceControllerStatus](4)) {
+			LogWriter "Starting service: $serviceName"
+			Start-Service -Name $serviceName -ErrorAction SilentlyContinue
+		}
+		$counter++
+		if ($counter -gt 10) {$interval=90}
+		if ($counter -gt 20) {$run=$false}
+	} while ($run)
+}

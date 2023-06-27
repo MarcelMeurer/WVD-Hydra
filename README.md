@@ -77,6 +77,10 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
 - 1.0.2.07  (2023/06/1)
+  - Add: Support for creating images from a secure-boot-enabled VM directly into an Azure compute gallery
+  - Add: New deployed hosts: In the first minutes, the correct start of the BootloaderAgent is monitored (if the service is not running, the service will be started)
+  - Add: Option in the global settings to hide the footer of the Hydra portal (for white-labeling)
+- 1.0.2.07  (2023/06/1)
   - Add: Preview feature "Endpoints" available and can be enabled global settings => Enable Endpoint Management
   - Add: Modification to keep settings through Intune in the template
 - 1.0.2.06  (2023/05/18)
