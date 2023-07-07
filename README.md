@@ -76,6 +76,9 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.00  (2023/07/07)
+  - Add: New task types in script colletions: "Pool - Increase host count" and "Pool - Decrease host count" - creates or deletes standard hosts in a pool to the given target count (set it in parameter). Use carefully
+  - Add: Gallery images for Windows 11 Enterprise 22H2
 - 1.0.2.09  (2023/06/30)
   - Fix: If a API request to get a list of host pools failed during the rollout, a successful rollout was not detected (the deployment timed out and the hosts were deleted)
 - 1.0.2.08  (2023/06/27)
