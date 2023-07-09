@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.01  (2023/07/09)
+  - Fix: Update of the installation script to install WinGet/Microsoft Package Manager applications
 - 1.0.3.00  (2023/07/07)
   - Add: New task types in script colletions: "Pool - Increase host count" and "Pool - Decrease host count" - creates or deletes standard hosts in a pool to the given target count (set it in parameter). Use carefully
   - Add: Gallery images for Windows 11 Enterprise 22H2
