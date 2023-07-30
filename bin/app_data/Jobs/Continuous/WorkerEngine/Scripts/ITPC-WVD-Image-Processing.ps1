@@ -1,10 +1,10 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 6.2
+# Current Version of this script: 6.4
 
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','StartBootloaderIfNotRunning','CleanFirstStart', 'RenameComputer','RepairMonitoringAgent','RunSysprep')]
+	[ValidateSet('Generalize','JoinDomain','DataPartition','RDAgentBootloader','RestartBootloader','StartBootloader','StartBootloaderIfNotRunning','CleanFirstStart', 'RenameComputer','RepairMonitoringAgent','RunSysprep','JoinMEMFromHybrid')]
 	[string] $Mode,
 	[string] $StrongGeneralize='0',
 	[string] $ComputerNewname='',						#Only for SecureBoot process (workaround, normaly not used)
@@ -71,8 +71,7 @@ function RedirectPageFileToC() {
 			LogWriter("New pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
 		}
 }
-function UnzipFile($zipfile, $outdir)
-{
+function UnzipFile($zipfile, $outdir) {
     # Based on https://gist.github.com/nachivpn/3e53dd36120877d70aee
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $files = [System.IO.Compression.ZipFile]::OpenRead($zipfile)
@@ -89,8 +88,7 @@ function UnzipFile($zipfile, $outdir)
         }
     }
 }
-function DownloadFile($url, $outFile)
-{
+function DownloadFile($url, $outFile) {
     $i=3
     $ok=$false;
     do {
@@ -111,8 +109,7 @@ function DownloadFile($url, $outFile)
 	LogWriter("Download done")
 }
 
-function SysprepPreClean()
-{
+function SysprepPreClean() {
 	# DISM cleanup (only if forced)
 	if (Test-Path "$env:windir\system32\Dism.exe") {
 		LogWriter("DISM cleanup")
@@ -129,13 +126,11 @@ function SysprepPreClean()
 	}
 }
 
-function RunSysprep($parameters)
-{	
+function RunSysprep($parameters) {	
 	# Run sysprep in another task to let the runcommand call end and monitor the sysprep log file in parallel
 	Start-Process -FilePath PowerShell.exe -WorkingDirectory $LocalConfig -ArgumentList "-ExecutionPolicy Bypass -File `"$($LocalConfig)\ITPC-WVD-Image-Processing.ps1`" -Mode RunSysprep -parameters `"$($parameters)`""
 }
-function RunSysprepInternal($parameters)
-{
+function RunSysprepInternal($parameters) {
 	LogWriter("Starting sysprep to generalize session host")
 	$sysprepErrorLogFile="$env:windir\System32\Sysprep\Panther\setuperr.log"
 
@@ -238,7 +233,7 @@ $unattend="PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnPz48dW5hdHRlbmQgeG1sb
 $LogFile=$LogDir+"\AVD.Customizing.log"
 
 # Main
-LogWriter("Starting ITPC-WVD-Image-Processing in mode ${Mode}")
+LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
 
 # Generating variables from Base64-coding
 if ($LocalAdminName64) {$LocalAdminName=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminName64))}
@@ -552,6 +547,18 @@ if ($mode -eq "Generalize") {
 				Start-Sleep -Seconds 10
 			}
 		} while($ok -ne $true)
+		if ($JoinMem -eq "1") {
+			LogWriter("Joining Microsoft Endpoint Management is selected. Create a scheduled task to enroll in Intune after completing the hybrid join")
+			$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"JoinMEMFromHybrid`""
+			$trigger = @(
+				$(New-ScheduledTaskTrigger -AtStartup),
+				$(New-ScheduledTaskTrigger -At (Get-Date).AddMinutes(2) -Once -RepetitionInterval (New-TimeSpan -Minutes 1))
+			)
+			$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
+			$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+			$task = New-ScheduledTask -Action $action -Trigger $trigger -Settings $settings -Principal $principal
+			Register-ScheduledTask -TaskName "ITPC-AVD-Enroll-To-Intune" -InputObject $task -Force
+		}
 	} else {
 		LogWriter("AAD only is selected. Skipping joining to a native AD, joining AAD")
 		$aadJoinSuccessful=$false
@@ -587,7 +594,7 @@ if ($mode -eq "Generalize") {
     		Start-Process -wait -LoadUserProfile -FilePath "$aadPath\AADLoginForWindowsHandler.exe" -WorkingDirectory "$aadPath" -ArgumentList 'enable' -RedirectStandardOutput "$($LogDir)\Avd.AadJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.AadJoin.Warning.txt"
         }
 		if ($JoinMem -eq "1") {
-			LogWriter("Joining Microsoft Endpoint Manamgement is selected. Try to register to MEM")
+			LogWriter("Joining Microsoft Endpoint Management is selected. Try to register to MEM")
 			Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/AzureSecureVMJoin /debug /MdmId 0000000a-0000-0000-c000-000000000000" -RedirectStandardOutput "$($LogDir)\Avd.MemJoin.Out.txt" -RedirectStandardError "$($LogDir)\Avd.MemJoin.Warning.txt"
 		}
 	}
@@ -892,6 +899,25 @@ if ($mode -eq "Generalize") {
     $taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Repairs the Azure Monitoring Agent in case of an issue"
     Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -InputObject $taskM #-ErrorAction Ignore
     Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -ErrorAction Ignore
+	LogWriter "Monitoring the agent state on the first start to handle the SXS-Stack issue"
+	$run=$true
+	$counter=0
+	do {
+		$avdAgentStateJson=(Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -ErrorAction Ignore)."AgentHealthCheckReport"
+		if ($avdAgentStateJson -ne $null) {
+			LogWriter "Got an AVD agent state"
+			if ($avdAgentStateJson -like "*SxsStack listener is not ready*") {
+				LogWriter "SxsStack listener is not ready / restarting bootloader" 
+				Stop-Service -Name "RDAgentBootLoader"
+				Start-Service -Name "RDAgentBootLoader"
+				Start-Sleep -Seconds 60
+				$counter=$counter+10
+			}
+		}
+		$counter++
+		if ($counter -gt 60) {$run=$false}
+		Start-Sleep -Seconds 10
+	} while ($run)
 } elseif ($Mode -eq "CleanFirstStart") {
 	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
 	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
@@ -950,4 +976,20 @@ if ($mode -eq "Generalize") {
 		if ($counter -gt 10) {$interval=90}
 		if ($counter -gt 20) {$run=$false}
 	} while ($run)
+}  elseif ($mode -eq "JoinMEMFromHybrid") {
+    # Check, if registry key exist
+    if ($null -ne (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*" -ErrorAction SilentlyContinue)) {
+        LogWriter("Device is AAD joined")
+        if (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement") {
+            LogWriter("Device is Intune managed")
+            LogWriter("Removing schedule task")
+            Unregister-ScheduledTask -TaskName "ITPC-$($appTitle)" -Confirm:$false
+        } else {
+            LogWriter("Device is not Intune managed - starting registration")
+            Start-Process -FilePath "$($env:windir)\System32\deviceenroller.exe" -ArgumentList "/c /AutoEnrollMDMUsingAADDeviceCredential" -Wait -NoNewWindow
+        }
+       } else {
+        LogWriter("Device is not AAD joined")
+        exit
+	}
 }

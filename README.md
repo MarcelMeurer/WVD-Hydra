@@ -76,6 +76,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.02  (2023/07/30)
+  - Add: Checkbox on the rollout configuration to join a host to intune for hybrid-joined hosts (before: only for AAD-only)
+  - Add: New advanced option for schedules in the autoscaling configuration: Active only (the schedule is only enabled if at least one session is in the pool)
+  - Add: New option in the global settings: "Show host pool friendly names"
+  - Add: Improvement to monitor the AVD agent on startup and handle some issues (SXS stack error)
 - 1.0.3.01  (2023/07/09)
   - Fix: Update of the installation script to install WinGet/Microsoft Package Manager applications
 - 1.0.3.00  (2023/07/07)
