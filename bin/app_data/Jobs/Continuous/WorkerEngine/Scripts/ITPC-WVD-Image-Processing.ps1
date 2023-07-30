@@ -988,8 +988,11 @@ if ($mode -eq "Generalize") {
             LogWriter("Device is not Intune managed - starting registration")
             Start-Process -FilePath "$($env:windir)\System32\deviceenroller.exe" -ArgumentList "/c /AutoEnrollMDMUsingAADDeviceCredential" -Wait -NoNewWindow
         }
-       } else {
+    } else {
         LogWriter("Device is not AAD joined")
-        exit
+		if (Test-Path -Path "$($env:WinDir)\system32\Dsregcmd.exe") {
+				LogWriter("Triggering AAD join")
+				Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/join" -ErrorAction SilentlyContinue
+		}
 	}
 }
