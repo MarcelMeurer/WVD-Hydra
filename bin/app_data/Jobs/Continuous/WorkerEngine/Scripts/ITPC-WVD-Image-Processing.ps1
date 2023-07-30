@@ -983,7 +983,7 @@ if ($mode -eq "Generalize") {
         if (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement") {
             LogWriter("Device is Intune managed")
             LogWriter("Removing schedule task")
-            Unregister-ScheduledTask -TaskName "ITPC-$($appTitle)" -Confirm:$false
+            Unregister-ScheduledTask -TaskName "ITPC-AVD-Enroll-To-Intune" -Confirm:$false
         } else {
             LogWriter("Device is not Intune managed - starting registration")
             Start-Process -FilePath "$($env:windir)\System32\deviceenroller.exe" -ArgumentList "/c /AutoEnrollMDMUsingAADDeviceCredential" -Wait -NoNewWindow
