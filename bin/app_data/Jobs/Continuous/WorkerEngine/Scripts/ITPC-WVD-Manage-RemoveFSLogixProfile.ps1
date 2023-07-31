@@ -38,8 +38,9 @@ function ResolveEnvVariable($stringValue)
                 $newValue+=$text
             }
         }
+        return $newValue    
     }
-    return $newValue
+    return $stringValue
 }
 
 LogWriter("Remove FSLogix profile script starts. Parameter: $($users)")
@@ -70,6 +71,8 @@ foreach ($user in $users.Split(";")) {
 
                 # Test for custom naming
                 $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
+                $noProfileContainingFolder=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("NoProfileContainingFolder")
+                if ($noProfileContainingFolder -ne $null -and $noProfileContainingFolder -eq "1") {$dirName=""}
 
                 if ($dirName -eq $null -or $dirName -eq "") {
                     $regPath1="HKLM:\Software\FSLogix\Profiles"
@@ -83,12 +86,13 @@ foreach ($user in $users.Split(";")) {
                         LogWriter("FlipFlopProfileDirectoryName is set to 1")
                     } else  {
                         $profilePathUser="$($profilePath)\$($sid)_$($adUser.Properties.samaccountname)"
+                        LogWriter("FlipFlopProfileDirectoryName is set to 0")
                     }
                 } else {
-                    $env:userName=$adUser.Properties.samaccountname
-                    $dirName=ResolveEnvVariable($dirName)
                     $profilePathUser="$($profilePath)\$dirName"
                 }
+                $env:userName=$adUser.Properties.samaccountname
+                $profilePathUser=ResolveEnvVariable($profilePathUser)
 
                 LogWriter("Default FSLogix profile path is: $profilePathUser")
                 if (!(Test-Path -Path "$profilePath" -ErrorAction SilentlyContinue)) {
