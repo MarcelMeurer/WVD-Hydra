@@ -335,7 +335,6 @@ if ($mode -eq "Generalize") {
 	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension"  -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin"  -Recurse -Force -ErrorAction Ignore
-	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement"  -Recurse -Force -ErrorAction Ignore
 	$AadCert=Get-ChildItem Cert:\LocalMachine\My | Where-Object {$_.Issuer -match "CN=MS-Organization-P2P-Access*"}
 	if ($AadCert -ne $null) {
 		$cn=$AadCert.Subject.Split(",")[0]
@@ -497,6 +496,9 @@ if ($mode -eq "Generalize") {
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
 	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+
+	# Removing Intune dependency
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement" -Recurse -Force -ErrorAction Ignore
 
 	# Storing AadOnly to registry
 	LogWriter("Storing AadOnly to registry: "+$AadOnly)
