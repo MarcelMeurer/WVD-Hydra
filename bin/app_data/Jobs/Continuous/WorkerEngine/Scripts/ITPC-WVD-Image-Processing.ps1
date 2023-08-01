@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 6.4
+# Current Version of this script: 6.5
 
 param(
 	[Parameter(Mandatory)]
@@ -300,6 +300,11 @@ if ($mode -eq "Generalize") {
 	LogWriter("Disabling ITPC-LogAnalyticAgent and MySmartScale if exist") 
 	Disable-ScheduledTask  -TaskName "ITPC-LogAnalyticAgent for RDS and Citrix" -ErrorAction Ignore
 	Disable-ScheduledTask  -TaskName "ITPC-MySmartScaleAgent" -ErrorAction Ignore
+
+	LogWriter("Prevent removing language packs")
+	New-Item -Path "HKLM:\Software\Policies\Microsoft\Control Panel" -Name "International" -force -ErrorAction Ignore
+	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Control Panel\International" -Name "BlockCleanupOfUnusedPreinstalledLangPacks" -Value 1 -force
+
 	
 	LogWriter("Cleaning up reliability messages")
 	$key="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Reliability"
@@ -496,6 +501,11 @@ if ($mode -eq "Generalize") {
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
 	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+
+	# Prevent removing language packs
+	LogWriter("Prevent removing language packs")
+	New-Item -Path "HKLM:\Software\Policies\Microsoft\Control Panel" -Name "International" -force -ErrorAction Ignore
+	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Control Panel\International" -Name "BlockCleanupOfUnusedPreinstalledLangPacks" -Value 1 -force
 
 	# Removing Intune dependency
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement" -Recurse -Force -ErrorAction Ignore
