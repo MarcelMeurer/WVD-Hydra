@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 6.5
+# Current Version of this script: 6.6
 
 param(
 	[Parameter(Mandatory)]
@@ -240,6 +240,15 @@ if ($LocalAdminName64) {$LocalAdminName=[System.Text.Encoding]::UTF8.GetString([
 if ($LocalAdminPassword64) {$LocalAdminPassword=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminPassword64))}
 if ($DomainJoinUserName64) {$DomainJoinUserName=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserName64))}
 if ($DomainJoinUserPassword64) {$DomainJoinUserPassword=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserPassword64))}
+
+# Stop schedule tasks using this script
+Stop-ScheduledTask  -TaskName "ITPC-AVD-CleanFirstStart-Helper" -ErrorAction SilentlyContinue
+Stop-ScheduledTask  -TaskName "ITPC-AVD-Enroll-To-Intune" -ErrorAction SilentlyContinue
+Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Helper" -ErrorAction SilentlyContinue
+Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-2" -ErrorAction SilentlyContinue
+Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-1" -ErrorAction SilentlyContinue
+Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction SilentlyContinue
+
 
 # check for the existend of the helper scripts
 if ((Test-Path ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
