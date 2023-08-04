@@ -76,6 +76,9 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.04  (2023/08/04)
+  - Add: Delay of the scale down for one host (pooled host pool) after the last user logged off: Autoscaling -> Advanced options -> Scale down -> Delay shutdown of the last host in minutes
+  - Fix: Fix the issue of an interim in the imaging and deployment script: In some cases, imaging/rollout failed for some hosts. Problems exist for deployments and updates on 8/3 and 8/4, 2023. 
 - 1.0.3.02  (2023/07/30)
   - Add: Checkbox on the rollout configuration to join a host to intune for hybrid-joined hosts (before: only for AAD-only)
   - Add: New advanced option for schedules in the autoscaling configuration: Active only (the schedule is only enabled if at least one session is in the pool)
