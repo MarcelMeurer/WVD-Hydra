@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 6.6
+# Current Version of this script: 6.7
 
 param(
 	[Parameter(Mandatory)]
@@ -241,14 +241,6 @@ if ($LocalAdminPassword64) {$LocalAdminPassword=[System.Text.Encoding]::UTF8.Get
 if ($DomainJoinUserName64) {$DomainJoinUserName=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserName64))}
 if ($DomainJoinUserPassword64) {$DomainJoinUserPassword=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserPassword64))}
 
-# Stop schedule tasks using this script
-Stop-ScheduledTask  -TaskName "ITPC-AVD-CleanFirstStart-Helper" -ErrorAction SilentlyContinue
-Stop-ScheduledTask  -TaskName "ITPC-AVD-Enroll-To-Intune" -ErrorAction SilentlyContinue
-Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Helper" -ErrorAction SilentlyContinue
-Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-2" -ErrorAction SilentlyContinue
-Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-1" -ErrorAction SilentlyContinue
-Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction SilentlyContinue
-
 
 # check for the existend of the helper scripts
 if ((Test-Path ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
@@ -260,7 +252,7 @@ if ((Test-Path ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 	if ((Test-Path ("${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 		LogWriter("Creating ITPC-WVD-Image-Processing.ps1")
 		Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")
-	} else {Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig+"\")}
+	} else {Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig+"\") -ErrorAction SilentlyContinue}
 }
 if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 	if ((Test-Path ($LocalConfig+"\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
@@ -300,6 +292,14 @@ catch {}
 
 # Start script by mode
 if ($mode -eq "Generalize") {
+	LogWriter("Stop schedule tasks using this script")
+	Stop-ScheduledTask  -TaskName "ITPC-AVD-CleanFirstStart-Helper" -ErrorAction SilentlyContinue
+	Stop-ScheduledTask  -TaskName "ITPC-AVD-Enroll-To-Intune" -ErrorAction SilentlyContinue
+	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Helper" -ErrorAction SilentlyContinue
+	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-2" -ErrorAction SilentlyContinue
+	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-1" -ErrorAction SilentlyContinue
+	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction SilentlyContinue
+
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
