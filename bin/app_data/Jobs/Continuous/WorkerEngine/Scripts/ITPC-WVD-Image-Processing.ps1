@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 6.7
+# Current Version of this script: 6.8
 
 param(
 	[Parameter(Mandatory)]
@@ -108,7 +108,33 @@ function DownloadFile($url, $outFile) {
     } while (!$ok)
 	LogWriter("Download done")
 }
-
+function CopyFileWithRetry($source, $destination) {
+    $i=5
+    $ok=$false;
+    do {
+        try {
+			Copy-Item $source -Destination $destination -ErrorAction Stop
+            $ok=$true
+        } catch {
+            $i--;
+            if ($i -le 0) {
+				LogWriter("Copy failed: $_")
+				return
+            }
+            LogWriter("Re-trying copy after 3 seconds")
+            Start-Sleep -Seconds 3
+		}
+    } while (!$ok)
+	LogWriter("File copied successfully")
+}
+function StopAndRemoveSchedTask($taskName) {
+	$task=Get-ScheduledTask -TaskName  $taskName -ErrorAction SilentlyContinue
+	if ($task -ne $null) {
+	    LogWriter("Stopping and removing task $taskName")
+		Stop-ScheduledTask -TaskName $taskName -ErrorAction Ignore
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+	}
+}
 function SysprepPreClean() {
 	# DISM cleanup (only if forced)
 	if (Test-Path "$env:windir\system32\Dism.exe") {
@@ -246,13 +272,16 @@ if ($DomainJoinUserPassword64) {$DomainJoinUserPassword=[System.Text.Encoding]::
 if ((Test-Path ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 	# Create local directory for script(s) and copy files (including the RD agent and boot loader - rename it to the specified name)
 	LogWriter("Copy files to local session host or downloading files from Microsoft")
-	new-item $LocalConfig -ItemType Directory -ErrorAction Ignore
+	New-Item $LocalConfig -ItemType Directory -ErrorAction Ignore
 	try {(Get-Item $LocalConfig -ErrorAction Ignore).attributes="Hidden"} catch {}
 
 	if ((Test-Path ("${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
-		LogWriter("Creating ITPC-WVD-Image-Processing.ps1")
+		LogWriter("Creating ITPC-WVD-Image-Processing.ps1 from invocation")
 		Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")
-	} else {Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig+"\") -ErrorAction SilentlyContinue}
+	} else {
+		LogWriter("Creating ITPC-WVD-Image-Processing.ps1 from PSScriptRoot")
+		Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig+"\") -ErrorAction SilentlyContinue
+	}
 }
 if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 	if ((Test-Path ($LocalConfig+"\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
@@ -270,7 +299,12 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 }
 
 # updating local script (from maybe an older version from the last image process)
-Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1") -Force -ErrorAction SilentlyContinue
+if ("$($MyInvocation.MyCommand.Path)" -ne ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")) {
+	LogWriter("Updating ITPC-WVD-Image-Processing.ps1")
+	CopyFileWithRetry "$($MyInvocation.MyCommand.Path)" ($LocalConfig+"\ITPC-WVD-Image-Processing.ps1")
+}
+
+
 
 # check, if secure boot is enabled (used by the snapshot workaround)
 $isSecureBoot=$false
@@ -292,14 +326,6 @@ catch {}
 
 # Start script by mode
 if ($mode -eq "Generalize") {
-	LogWriter("Stop schedule tasks using this script")
-	Stop-ScheduledTask  -TaskName "ITPC-AVD-CleanFirstStart-Helper" -ErrorAction SilentlyContinue
-	Stop-ScheduledTask  -TaskName "ITPC-AVD-Enroll-To-Intune" -ErrorAction SilentlyContinue
-	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Helper" -ErrorAction SilentlyContinue
-	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-2" -ErrorAction SilentlyContinue
-	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-1" -ErrorAction SilentlyContinue
-	Stop-ScheduledTask  -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction SilentlyContinue
-
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
@@ -310,11 +336,18 @@ if ($mode -eq "Generalize") {
 	Disable-ScheduledTask  -TaskName "ITPC-LogAnalyticAgent for RDS and Citrix" -ErrorAction Ignore
 	Disable-ScheduledTask  -TaskName "ITPC-MySmartScaleAgent" -ErrorAction Ignore
 
+	LogWriter("Removing schedule tasks maybe created by this script on an existing host")
+	StopAndRemoveSchedTask "ITPC-AVD-CleanFirstStart-Helper"
+	StopAndRemoveSchedTask "ITPC-AVD-Enroll-To-Intune"
+	StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Helper"
+	StopAndRemoveSchedTask "ITPC-AVD-RDAgentMonitoring-Monitor"
+	StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Monitor-1"
+	StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Monitor-2"
+
 	LogWriter("Prevent removing language packs")
 	New-Item -Path "HKLM:\Software\Policies\Microsoft\Control Panel" -Name "International" -force -ErrorAction Ignore
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Control Panel\International" -Name "BlockCleanupOfUnusedPreinstalledLangPacks" -Value 1 -force
 
-	
 	LogWriter("Cleaning up reliability messages")
 	$key="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Reliability"
 	Remove-ItemProperty -Path $key -Name "DirtyShutdown" -ErrorAction Ignore
