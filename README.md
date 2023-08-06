@@ -76,7 +76,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-- 1.0.3.04  (2023/08/04)
+- 1.0.3.04  (2023/08/06)
+  - Add: During the imaging process, all resources (VM, snapshot, nic, disk) get tags and inherit tags from the original VM
+  - Add: You can now start a host from Hydra if the resource id of the VM was changed during the imaging process
+  - Add: If the master VM of a host is a session host, the master will be started after the imaging process completes (configure autoscaling to deallocate the hosts after a while if no longer used)
+- 1.0.3.03  (2023/08/04)
   - Add: Delay of the scale down for one host (pooled host pool) after the last user logged off: Autoscaling -> Advanced options -> Scale down -> Delay shutdown of the last host in minutes
   - Fix: Fix the issue of an interim in the imaging and deployment script: In some cases, imaging/rollout failed for some hosts. Problems exist for deployments and updates on 8/3 and 8/4, 2023. 
 - 1.0.3.02  (2023/07/30)
