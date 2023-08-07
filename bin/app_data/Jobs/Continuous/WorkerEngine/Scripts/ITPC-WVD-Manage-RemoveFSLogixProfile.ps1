@@ -72,24 +72,27 @@ foreach ($user in $users.Split(";")) {
                 # Test for custom naming
                 $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
                 $noProfileContainingFolder=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("NoProfileContainingFolder")
-                if ($noProfileContainingFolder -ne $null -and $noProfileContainingFolder -eq "1") {$dirName=""}
-
-                if ($dirName -eq $null -or $dirName -eq "") {
-                    $regPath1="HKLM:\Software\FSLogix\Profiles"
-                    $regPath2="HKLM:\Software\Policies\FSLogix\ODFC"
-                    $flipFlop=$false
-                                        
-                    if ((Test-Path $regPath1) -and (Get-Item $regPath1 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
-                    if ((Test-Path $regPath2) -and (Get-Item $regPath2 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
-                    if ($flipFlop) {
-                        $profilePathUser="$($profilePath)\$($adUser.Properties.samaccountname)_$($sid)"
-                        LogWriter("FlipFlopProfileDirectoryName is set to 1")
-                    } else  {
-                        $profilePathUser="$($profilePath)\$($sid)_$($adUser.Properties.samaccountname)"
-                        LogWriter("FlipFlopProfileDirectoryName is set to 0")
-                    }
+                if ($noProfileContainingFolder -ne $null -and $noProfileContainingFolder -eq "1") {
+                    LogWriter("NoProfileContainingFolder is set to 1")
+                    $profilePathUser=$profilePath
                 } else {
-                    $profilePathUser="$($profilePath)\$dirName"
+                    if ($dirName -eq $null -or $dirName -eq "") {
+                        $regPath1="HKLM:\Software\FSLogix\Profiles"
+                        $regPath2="HKLM:\Software\Policies\FSLogix\ODFC"
+                        $flipFlop=$false
+                                        
+                        if ((Test-Path $regPath1) -and (Get-Item $regPath1 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
+                        if ((Test-Path $regPath2) -and (Get-Item $regPath2 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
+                        if ($flipFlop) {
+                            $profilePathUser="$($profilePath)\$($adUser.Properties.samaccountname)_$($sid)"
+                            LogWriter("FlipFlopProfileDirectoryName is set to 1")
+                        } else  {
+                            $profilePathUser="$($profilePath)\$($sid)_$($adUser.Properties.samaccountname)"
+                            LogWriter("FlipFlopProfileDirectoryName is set to 0")
+                        }
+                    } else {
+                        $profilePathUser="$($profilePath)\$dirName"
+                    }
                 }
                 $env:userName=$adUser.Properties.samaccountname
                 $profilePathUser=ResolveEnvVariable($profilePathUser)
