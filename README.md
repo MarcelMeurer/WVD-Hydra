@@ -76,6 +76,9 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.05  (2023/08/18)
+  - Add: Search fields for some list boxes (like VM size)
+  - Add: Stretch mode can also be used to enumerate AVD resources (AAD)
 - 1.0.3.04  (2023/08/06)
   - Add: During the imaging process, all resources (VM, snapshot, nic, disk) get tags and inherit tags from the original VM
   - Add: You can now start a host from Hydra if the resource id of the VM was changed during the imaging process
