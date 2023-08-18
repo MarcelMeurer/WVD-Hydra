@@ -79,6 +79,7 @@ If this item is not shown in your installation, update Hydra once on the deploye
 - 1.0.3.05  (2023/08/18)
   - Add: Search fields for some list boxes (like VM size)
   - Add: Stretch mode can also be used to enumerate AVD resources (AAD)
+  - Fix: Generating new names for a host failed, if failed hosts are in Azure
 - 1.0.3.04  (2023/08/06)
   - Add: During the imaging process, all resources (VM, snapshot, nic, disk) get tags and inherit tags from the original VM
   - Add: You can now start a host from Hydra if the resource id of the VM was changed during the imaging process
