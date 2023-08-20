@@ -76,7 +76,10 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.06  (2023/08/20)
+  - Add: Search fields for the script and and script collection selector
 - 1.0.3.05  (2023/08/18)
+  - Add: A filter for host pools in the dashboard
   - Add: Search fields for some list boxes (like VM size)
   - Add: Stretch mode can also be used to enumerate AVD resources (AAD)
   - Fix: Generating new names for a host failed, if failed hosts are in Azure
