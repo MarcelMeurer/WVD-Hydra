@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.0
+# Current Version of this script: 7.1
 
 param(
 	[Parameter(Mandatory)]
@@ -400,7 +400,9 @@ if ($mode -eq "Generalize") {
 	
 	# Removing the state of an olde AAD Join
 	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
-	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension"  -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "c:\Packages\Plugins\Microsoft.Azure.ActiveDirectory.AADLoginForWindows" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\HandlerState\Microsoft.Azure.ActiveDirectory.AADLoginForWindows_*" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin"  -Recurse -Force -ErrorAction Ignore
 	$AadCert = Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Issuer -match "CN=MS-Organization-P2P-Access*" }
 	if ($AadCert -ne $null) {
@@ -1048,12 +1050,39 @@ elseif ($mode -eq "StartBootloaderIfNotRunning") {
 	$run = $true
 	$counter = 0
 	$serviceName = "RDAgentBootLoader"
+	
+	$aadOnly=$false
+	$aadOnly=Get-ItemProperty -Path "HKLM:\\SOFTWARE\ITProCloud\WVD.Runtime" -Name "AadOnly" -ErrorAction SilentlyContinue
+	if ($aadOnly -ne $null -and $aadOnly.AadOnly -eq 1) {
+		$aadOnly=$true
+		LogWriter "Detected an AadOnly environment. Monitoring the Aad-join process and restart the bootloader if an error is shown"
+	}
+
 	do {
 		Start-Sleep -Seconds $interval
 		$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
 		if ($service -ne $null -and $service.Status -ne [System.ServiceProcess.ServiceControllerStatus](4)) {
 			LogWriter "Starting service: $serviceName"
 			Start-Service -Name $serviceName -ErrorAction SilentlyContinue
+		}
+		# Restart bootloader in case of AadOnly and not joined to domain (force the agent to be completed)
+		if ($aadOnly) {
+			try {
+				$healthCheck=Get-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -Name "AgentHealthCheckReport" -ErrorAction SilentlyContinue
+				if ($healthCheck -ne $null) {
+					$healthObj=$healthCheck.AgentHealthCheckReport | ConvertFrom-Json -ErrorAction SilentlyContinue
+					if ($healthObj -ne $null) {
+							if ($healthObj.DomainJoinedCheck.HealthCheckResult -ne 1) {
+								LogWriter "DomainJoinFailure detected. Restarting RDAgentBootLoader"
+								Stop-Service -Name $serviceName -ErrorAction SilentlyContinue
+								Start-Service -Name $serviceName -ErrorAction SilentlyContinue
+								Start-Sleep -Seconds $interval
+							}
+					}
+				}
+			} catch {
+				LogWriter "Getting the AVD health-state failed: $_"
+			}
 		}
 		$counter++
 		if ($counter -gt 10) { $interval = 90 }

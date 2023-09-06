@@ -76,6 +76,13 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.07  (2023/09/04)
+  - Add: Extending the imaging script to handle AADLoginForWindowsWithIntune issues (the installation doesn't continue after the deployment of the extension if an older extension version was installed on the master)
+  - Add: Extending the rollout script to bring an AAD-only VM faster online (shortens the error message that the host is not domain-joined)
+  - Add: Scripts and collection schedules for personal pools: The select script or collection will run on all hosts where the assigned user is a direct member of a given group. The group object ID is expected; only direct memberships
+  - Add: New task for script collections: VmStartIfNoSchedule - Starts a VM if no personal start configuration of an assigned host exists
+  - Add: My Sessions and Hosts: Users can configure the start time of the personal hosts.
+  - Add: New option for pooled host pools: Autoscaling & Shutdown -> Advanced Settings -> Details -> Don't create temporary hosts - Create persistent hosts
 - 1.0.3.06  (2023/08/20)
   - Add: Search fields for the script and and script collection selector
 - 1.0.3.05  (2023/08/18)
