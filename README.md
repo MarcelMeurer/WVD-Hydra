@@ -76,6 +76,15 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.08  (2023/09/19)
+  - Add: New option for generating images: Tag as 'TestImage' - Tags an image optionally as a 'TestImage'. Test images are ignored if the rollout configuration is set to use the newest image from a gallery definition or from a VM. Regardless, these images can be selected directly in the rollout configuration (e.g., in a test host pool). To untag, remove the tag 'AVD.TestImage' from an image or gallery version in the Azure Portal.
+  - Add: Dashboard shows the number of hosts and the number of running hosts (also in drain-mode)
+  - Add: The logs from the menu can now be downloaded (default retention time: 60 days)
+  - Add: New option in the global settings: "Add timestamps to script, imaging, and rollout logs"
+  - Add: New option in the global settings: "Try to adjust quota" - Hydra can try to increase the core quotas for non spot VMs automtically (handle with care)
+  - Change: The tag "AVD.Source" contains the resolved image resource id (e.g., the image version of a gallery definition, even if "newest" was selected)
+  - Removed: Strong generalization from the imaging menu: Is applied automatically if sysprep fails
+  - Fix: In some cases, a scheduled script was executed more then one time (again after 5 minutes)
 - 1.0.3.07  (2023/09/04)
   - Add: Extending the imaging script to handle AADLoginForWindowsWithIntune issues (the installation doesn't continue after the deployment of the extension if an older extension version was installed on the master)
   - Add: Extending the rollout script to bring an AAD-only VM faster online (shortens the error message that the host is not domain-joined)
