@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.1
+# Current Version of this script: 7.2
 
 param(
 	[Parameter(Mandatory)]
@@ -154,17 +154,47 @@ function SysprepPreClean() {
 }
 
 function GetAccessToFolder($accessPath) {
-	# Get access to folders
+	# Get access to folders and files
 	try {
-		$accessPathItem = Get-Item $accessPath.Replace("C:\", "\\localhost\\c$\") -ErrorAction Ignore
+        LogWriter("Taking ownership and resetting permissions in subfolders and files of $accessPath")
+        $accessPath=$accessPath.ToLower();
+        try {
+	        $accessPathItem = Get-Item $accessPath.Replace("c:\", "\\localhost\\c$\") -ErrorAction Stop
+        } catch {
+            LogWriter("Using native path without using \\localhost")
+	        $accessPathItem = Get-Item $accessPath -ErrorAction Stop
+        }
 		$acl = $accessPathItem.GetAccessControl()
 		$acl.SetOwner((New-Object System.Security.Principal.NTAccount("System")))
-		$accessPathItem.SetAccessControl($acl)
-		$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("System", "FullControl", "Allow")
+        try {
+		    $accessPathItem.SetAccessControl($acl)
+        } catch {
+            LogWriter("Unable to take ownership to path with PowerShell")
+        }
+        try {
+		    $oea=$ErrorActionPreference
+			$ErrorActionPreference = 'Stop'
+            takeown /R /F "$accessPath"
+        } catch {
+            LogWriter("Unable to take ownership with takeown.exe")
+        }		
+		$ErrorActionPreference=$oea
+        $acl = $accessPathItem.GetAccessControl()
+		$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("SYSTEM", "FullControl",([System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit), [System.Security.AccessControl.PropagationFlags]::InheritOnly, "Allow")
+		$acl.AddAccessRule($aclSystemFull)
+		$aclSystemFull = New-Object System.Security.AccessControl.FileSystemAccessRule("SYSTEM", "FullControl", "Allow")
 		$acl.AddAccessRule($aclSystemFull)
 		$accessPathItem.SetAccessControl($acl)
+        
+        LogWriter("Reseting inheritance of permissions")
+        Get-ChildItem -Path $accessPathItem -Recurse | foreach {
+            $acl = get-acl $_.FullName
+            $acl.SetAccessRuleProtection($false,$false)
+            Set-Acl -Path $_.FullName -AclObject $acl -ErrorAction SilentlyContinue
+   
+        }
 	} catch {
-		LogWrite("Getting access for system to path $accessPath failed: $_")
+		LogWriter("Getting access for system to path $accessPath failed: $_")
 	}
 }
 function RunSysprep($parameters) {	
