@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.3.09  (2023/09/23)
+  - Fix: Resolved a typo in the imaging and rollout script (in some cases, the imaging process failed with an error about LogWrite not found (instead of LogWriter))
 - 1.0.3.08  (2023/09/19)
   - Add: New option for generating images: Tag as 'TestImage' - Tags an image optionally as a 'TestImage'. Test images are ignored if the rollout configuration is set to use the newest image from a gallery definition or from a VM. Regardless, these images can be selected directly in the rollout configuration (e.g., in a test host pool). To untag, remove the tag 'AVD.TestImage' from an image or gallery version in the Azure Portal.
   - Add: Dashboard shows the number of hosts and the number of running hosts (also in drain-mode)
