@@ -864,27 +864,6 @@ Do a deployment to verify that the disk is ADE encrypted:
 
 ![](media/ADE-02.png)
 
-## External REST Calls
-Hydra can accept REST-Calls to create new session hosts. To enable this feature, create a new secret in the Key Vault deployed with Hydra (you have to give yourself access to the secrets of the Key Vault first).
-- Name: Hydra-RESTAccess
-- Secret value: A complex (URL encoded) self-defined secret with at least 32 characters. Make this complex to secure access.
-
-If the secret does not exist, is empty, or has less than 32 characters, Hydra will not accept REST Calls.
-
-After creating or changing the secret, a restart of Hydra (the app service) is necessary. Do this only if no imaging or deployment is currently running. Hydra can be restarted using the avatar menu (upper-right corner) and select Restart Engine.
-
-Authorization:
-- Authorization: Using the Authorization header with the value "SharedKey <Secret Value>"
-
-Accessible APIs:
-- /rest/hostpools/<HostPool-Guid>/addhosts
--- POST
--- The body can contain:
---- VmSize:	String; e.g. Standard_D8as_v5
---- AssigneUser:	String; e.g. user@domain.com
---- DiskSizeInGb: Number; Size of the OS disk
---- PoolGroup: string; custom, only valid if host pool Guid is Guid.Empty
--- Other properties are used from the default deployment configuration of the host pool
 
 ## Updating the client secret of the app service
 During the rollout of Hydra, a service principal of the app service was created using the PowerShell script. The service principal is used by the web GUI to authenticate users and get the profile data, like the group membership. The secret of the service principal typically expires after one year and must be recreated. To do that, go into Azure AD -> App registrations -> All applications and select the used service principal (by default named "svc-HydraWebAuthentication". Generate a new client secret in "Certificates & secrets". Copy the new secret value into the clipboard and navigate to the deployed key vault (having the same name as the website of the Hydra portal). In the key vault, go to Secrets and update the secret "AzureAd--ClientSecret" with the copied secret. Restart the app service to use the updated secret.
