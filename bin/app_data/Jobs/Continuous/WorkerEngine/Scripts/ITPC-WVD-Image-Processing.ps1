@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.2
+# Current Version of this script: 7.3
 
 param(
 	[Parameter(Mandatory)]
@@ -452,7 +452,7 @@ if ($mode -eq "Generalize") {
 	}
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement" -Recurse -Force -ErrorAction Ignore
-#	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseResourceManager" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseResourceManager" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current" -Recurse -Force -ErrorAction Ignore
 	Uninstall-Package -Name "Microsoft Intune Management Extension" -AllVersions -Force -ErrorAction SilentlyContinue 
