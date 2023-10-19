@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.4.30  (2023/10/19)
+  - Add: Update of the rollout script to retry the installation of the AVD agent and bootloader
 - 1.0.4.20  (2023/10/03)
   - Fix: In a view cases the global settings couldn't show up in the portal
 - 1.0.4.10  (2023/09/28)

@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.3
+# Current Version of this script: 7.4
 
 param(
 	[Parameter(Mandatory)]
@@ -806,7 +806,16 @@ elseif ($mode -eq "JoinDomain") {
 	if ($WvdRegistrationKey -ne "") {
 		if ([System.Environment]::OSVersion.Version.Major -gt 6) {
 			LogWriter("Installing AVD agent")
-			Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
+			$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
+			LogWriter("Installing AVD agent completed with exit code: $($ret.ExitCode)")
+
+			if ($ret.ExitCode -ne 0) {
+				LogWriter("Exit code in not 0. Retrying one time the installion after 15 seconds") 
+				Start-Sleep -Seconds 15
+				$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
+				LogWriter("Installing AVD agent completed with exit code: $($ret.ExitCode)")
+			}
+
 			if ($false) {
 				LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
 				Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
@@ -972,7 +981,16 @@ elseif ($Mode -eq "DataPartition") {
 }
 elseif ($Mode -eq "RDAgentBootloader") {
 	LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
-	Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
+	$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
+	LogWriter("Installing AVD boot loader completed with exit code: $($ret.ExitCode)")
+	
+	if ($ret.ExitCode -ne 0) {
+		LogWriter("Exit code in not 0. Retrying one time the installion after 15 seconds") 
+		Start-Sleep -Seconds 15
+		$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
+		LogWriter("Installing AVD boot loader completed with exit code: $($ret.ExitCode)")
+	}
+
 	LogWriter("Waiting for the service RDAgentBootLoader")
 	$bootloaderServiceName = "RDAgentBootLoader"
 	$retryCount = 0
@@ -983,12 +1001,14 @@ elseif ($Mode -eq "RDAgentBootloader") {
 			LogWriter("Retrying again in 30 seconds, this will be retry $retryCount")
 		} 
 		else {
-			LogWriter("Retry limit exceeded" )
-			throw "RDAgentBootLoader didn't become available after 6 retries"
+			LogWriter("Retry limit exceeded: RDAgentBootLoader didn't become available after $retry retries")
+			throw "Retry limit exceeded: RDAgentBootLoader didn't become available after $retry retries"
 		}            
 		$retryCount++
 		Start-Sleep -Seconds 30
 	}
+
+
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
