@@ -518,7 +518,7 @@ Go back to the configuration and give your new tenant configuration a display na
 
 ## Imaging and Rollout of new Hosts
 
-###Capturing an image
+### Capturing an image
 Hydra can create an image from a Golden Master without destroying the master; therefore, Hydra first copies the VM to run the imaging process. Afterwards, the copy is deleted. In the end, you have an Image and the untouched master.
 
 Note:
@@ -538,7 +538,7 @@ Go to: *Image Builder -> Create an image*
 The image process takes 6 to 45 minutes, depending on the size of the master, the targets (compute galleries), and the installed application. Please keep an eye on the log.
 
 
-###Rollout Session Hosts
+### Rollout Session Hosts
 To roll out a session host, start creating a default rollout configuration at the host pool.
 
 Go to: *Dashboard -> Bruger menu of the host pool -> New Session Host Rollout*
