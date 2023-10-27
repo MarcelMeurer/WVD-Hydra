@@ -516,6 +516,52 @@ Go back to the configuration and give your new tenant configuration a display na
 
 
 
+## Imaging and Rollout of new Hosts
+
+###Capturing an image
+Hydra can create an image from a Golden Master without destroying the master; therefore, Hydra first copies the VM to run the imaging process. Afterwards, the copy is deleted. In the end, you have an Image and the untouched master.
+
+Note:
+- A custom image can be created directly into a resource group if the golden master is not "trusted launch" enabled. The image can also be copied to an existing Compute Gallery definition.
+- A trusted launch VM must be stored in  an existing Compute Gallery definition (the definition must be of the type "Trusted launch"
+
+Go to: *Image Builder -> Create an image*
+- Select the Golden Master from the virtual machine list
+- Select the "Target Resource Group" of the image to be created
+- Modify the other options if needed
+- Trusted Launch: For trusted launch enabled Golden Master: Open "Azure Compute Gallery" and select the prepared Azure Compute Gallery Definition and the target location(s)
+
+**Click on "Create Image"**
+
+![](media/Capturing-Image-01.png)
+
+The image process takes 6 to 45 minutes, depending on the size of the master, the targets (compute galleries), and the installed application. Please keep an eye on the log.
+
+
+###Rollout Session Hosts
+To roll out a session host, start creating a default rollout configuration at the host pool.
+
+Go to: *Dashboard -> Bruger menu of the host pool -> New Session Host Rollout*
+
+![](media/Roloutconfig-01.png)
+
+Configure the parameters for deployments, like:
+- Naming Schema (must end with several # to count up the computer names)
+- Network and Subnet
+- Image: Most important to rollout new hosts based on a custom image
+- Resource Group of the VM
+- VM size
+- Etc.
+
+Hovering over the fields pops up a description for each field.
+
+**Don't forget to click on "Save"**
+
+Go to the session host view: *Dashboard -> Click in the middle of a host pool -> Click on the "+" icon -> Enter the number of new hosts*:
+
+![](media/Roloutconfig-02.png)
+
+
 ## Deployment, special operations
 
 ### Spot instances
