@@ -76,6 +76,12 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.4.40  (2023/11/08)
+  - Change: Important: Users in role "Host pool resource manager" can now create images (before: "Full Admin" role was needed)
+  - Add: New type of host pool configuration called "Hosts". Can be used to configure the hosts on a pool base with some basic settings: FSLogix profiles, OS settings, RDS settings, Teams optimization "on"
+  - Add: New tasks in script collections: "VM - Apply OS Settings" (see before); "Host - Drain mode revert" (brings the drain-mode into the state of starting a script collection)
+  - Add: Optional await a hybrid domain-join during the rollout
+  - Add: Marketplace images for Windows 11 23H1
 - 1.0.4.30  (2023/10/19)
   - Add: Update of the rollout script to retry the installation of the AVD agent and bootloader
 - 1.0.4.20  (2023/10/03)

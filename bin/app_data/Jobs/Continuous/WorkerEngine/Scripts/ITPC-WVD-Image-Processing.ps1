@@ -1,10 +1,10 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.4
+# Current Version of this script: 7.5
 
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid')]
+	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid')]
 	[string] $Mode,
 	[string] $StrongGeneralize = '0',
 	[string] $ComputerNewname = '', 					#Only for SecureBoot process (workaround, normaly not used)
@@ -27,6 +27,7 @@ param(
 	[string] $HydraAgentUri = '', 						#Only used by Hydra
 	[string] $HydraAgentSecret = '', 					#Only used by Hydra
 	[string] $DownloadNewestAgent = '0', 				#Download the newes agent, event if a local agent exist
+	[string] $WaitForHybridJoin = '0',					#Awaits the completion of a hybrid join before joining the host pool
 	[string] $parameters								#Additional parameters, e.g.: used to configure sysprep
 )
 
@@ -128,6 +129,22 @@ function CopyFileWithRetry($source, $destination) {
 	} while (!$ok)
 	LogWriter("File copied successfully")
 }
+function WaitForServiceExist ($serviceName,$timeOutSeconds,$repeat) {
+	$retryCount = 0
+	while ( -not (Get-Service $serviceName -ErrorAction SilentlyContinue)) {
+		$retry = ($retryCount -lt $repeat)
+		if ($retry) { 
+			LogWriter("Service $serviceName was not found - Retrying again in $timeOutSeconds seconds, this will be retry $retryCount")
+		} 
+		else {
+			LogWriter("Service $serviceName was not found - Retry limit exceeded: $serviceName didn't become available after $retry retries")
+			return $false
+		}            
+		$retryCount++
+		Start-Sleep -Seconds $timeOutSeconds
+	}
+    return $true
+}
 function StopAndRemoveSchedTask($taskName) {
 	$task = Get-ScheduledTask -TaskName  $taskName -ErrorAction SilentlyContinue
 	if ($task -ne $null) {
@@ -135,6 +152,123 @@ function StopAndRemoveSchedTask($taskName) {
 		Stop-ScheduledTask -TaskName $taskName -ErrorAction Ignore
 		Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
 	}
+}
+function AddRegistyKey($key) {
+	if (-not (Test-Path $key)) {
+		New-Item -Path $key -Force -ErrorAction SilentlyContinue
+	}
+}
+function ApplyOsSettings() {
+	LogWriter("Applying host configuration if configured: Start")
+	try {
+		$osSettingsObj = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($parameters)) | ConvertFrom-Json
+		if ($osSettingsObj.FrxProfile.Enabled) {
+			LogWriter("Configuring FSLogix profile settings")
+
+			$regPath="HKLM:\SOFTWARE\FSLogix\Profiles"
+			AddRegistyKey $regPath
+			if ($osSettingsObj.FrxProfile.VHDLocations -and $osSettingsObj.FrxProfile.VHDLocations -ne "") {
+				LogWriter("Configuring FSLogix profile settings: VHDLocation = $($osSettingsObj.FrxProfile.VHDLocations)")
+				New-ItemProperty -Path $regPath -Name "VHDLocations" -Value $osSettingsObj.FrxProfile.VHDLocations -force
+			}
+			if ($osSettingsObj.FrxProfile.RedirXMLSourceFolder -and $osSettingsObj.FrxProfile.RedirXMLSourceFolder -ne "") {
+				LogWriter("Configuring FSLogix profile settings: RedirXMLSourceFolder = $($osSettingsObj.FrxProfile.RedirXMLSourceFolder)")
+				New-ItemProperty -Path $regPath -Name "RedirXMLSourceFolder" -Value $osSettingsObj.FrxProfile.RedirXMLSourceFolder -force
+			}
+			LogWriter("Configuring FSLogix profile settings: DeleteLocalProfileWhenVHDShouldApply = $($osSettingsObj.FrxProfile.DeleteLocalProfileWhenVHDShouldApply)")
+			New-ItemProperty -Path $regPath -Name "DeleteLocalProfileWhenVHDShouldApply" -Value ([int]$osSettingsObj.FrxProfile.DeleteLocalProfileWhenVHDShouldApply) -force
+			LogWriter("Configuring FSLogix profile settings: FlipFlopProfileDirectoryName = $($osSettingsObj.FrxProfile.FlipFlopProfileDirectoryName)")
+			New-ItemProperty -Path $regPath -Name "FlipFlopProfileDirectoryName" -Value ([int]$osSettingsObj.FrxProfile.FlipFlopProfileDirectoryName) -force
+			LogWriter("Configuring FSLogix profile settings: IsDynamic = $($osSettingsObj.FrxProfile.IsDynamic)")
+			New-ItemProperty -Path $regPath -Name "IsDynamic" -Value ([int]$osSettingsObj.FrxProfile.IsDynamic) -force
+			LogWriter("Configuring FSLogix profile settings: KeepLocalDir = $($osSettingsObj.FrxProfile.KeepLocalDir)")
+			New-ItemProperty -Path $regPath -Name "KeepLocalDir" -Value ([int]$osSettingsObj.FrxProfile.KeepLocalDir) -force
+			LogWriter("Configuring FSLogix profile settings: SizeInMBs = $($osSettingsObj.FrxProfile.SizeInMBs)")
+			New-ItemProperty -Path $regPath -Name "SizeInMBs" -Value $osSettingsObj.FrxProfile.SizeInMBs -force
+			LogWriter("Configuring FSLogix profile settings: VolumeType = $($osSettingsObj.FrxProfile.VolumeType)")
+			New-ItemProperty -Path $regPath -Name "VolumeType" -Value $osSettingsObj.FrxProfile.VolumeType -force
+			if ($osSettingsObj.FrxProfile.EntraIdKerberos) {
+				LogWriter("Configuring FSLogix profile settings: EntraIdKerberos")
+				AddRegistyKey "HKLM:\Software\Policies\Microsoft\AzureADAccount"
+		        New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\AzureADAccount" -Name "LoadCredKeyFromProfile" -Value 1 -force
+				AddRegistyKey "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
+		        New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters" -Name "CloudKerberosTicketRetrievalEnabled" -Value 1 -force
+			}
+			if ($osSettingsObj.FrxProfile.UpdateBinaries) {
+				LogWriter("Configuring FSLogix profile settings: Update Binaries from Microsoft website")
+				try {
+		            Remove-Item -Path "$($env:temp)\FSLogixInstall" -Recurse -Force -ErrorAction SilentlyContinue
+		            DownloadFile "https://aka.ms/fslogix_download" "$($env:temp)\FSLogix.zip"
+		            UnzipFile "$($env:temp)\FSLogix.zip" "$($env:temp)\FSLogixInstall"
+		            Start-Process -FilePath "$($env:temp)\FSLogixInstall\*\x64\Release\FSLogixAppsSetup.exe" -ArgumentList "/install /quiet /norestart"
+				} catch {
+					LogWriter("Configuring FSLogix profile settings: Update Binaries from Microsoft website failed: $_")
+				}
+			}
+		}
+		if ($osSettingsObj.Os.Enabled) {
+			LogWriter("Configuring OS settings")
+			if ($osSettingsObj.Os.AllowPrinterDriver) {
+				LogWriter("Configuring OS profile settings: Allow users to install printer driver = $($osSettingsObj.Os.AllowPrinterDriver)")
+		        AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint\AddIns"
+		        New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" -Name "RestrictDriverInstallationToAdministrators " -Value 0 -force
+		        New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" -Name "Restricted " -Value 0 -force
+		        AddRegistyKey "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverInstall\Restrictions\AllowUserDeviceClasses\AddIns"
+		        New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverInstall\Restrictions\AllowUserDeviceClasses" -Name "1 " -Value "{4d36e979-e325-11ce-bfc1-08002be10318}" -force
+		        New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverInstall\Restrictions\AllowUserDeviceClasses" -Name "2 " -Value "{4658ee7e-f050-11d1-b6bd-00c04fa372a7}" -force
+		        New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverInstall\Restrictions\AllowUserDeviceClasses" -Name "3 " -Value "{4d36e973-e325-11ce-bfc1-08002be10318}" -force
+			}
+		}
+		if ($osSettingsObj.Rds.Enabled) {
+			LogWriter("Configuring RDS settings")
+			$regPath="HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
+			AddRegistyKey $regPath
+			LogWriter("Configuring RDS settings: fEnableTimeZoneRedirection = $($osSettingsObj.Rds.fEnableTimeZoneRedirection)")
+			New-ItemProperty -Path $regPath -Name "fEnableTimeZoneRedirection" -Value ([int]$osSettingsObj.Rds.fEnableTimeZoneRedirection) -force
+			LogWriter("Configuring RDS settings: fForceClientLptDef = $($osSettingsObj.Rds.fForceClientLptDef)")
+			New-ItemProperty -Path $regPath -Name "fForceClientLptDef" -Value ([int]$osSettingsObj.Rds.fForceClientLptDef) -force
+			LogWriter("Configuring RDS settings: AVC444ModePreferred = $($osSettingsObj.Rds.AVC444ModePreferred)")
+			New-ItemProperty -Path $regPath -Name "AVC444ModePreferred" -Value ([int]$osSettingsObj.Rds.AVC444ModePreferred) -force
+			LogWriter("Configuring RDS settings: bEnumerateHWBeforeSW = $($osSettingsObj.Rds.bEnumerateHWBeforeSW)")
+			New-ItemProperty -Path $regPath -Name "bEnumerateHWBeforeSW" -Value ([int]$osSettingsObj.Rds.bEnumerateHWBeforeSW) -force
+			LogWriter("Configuring RDS settings: fEnableRemoteFXAdvancedRemoteApp = $($osSettingsObj.Rds.fEnableRemoteFXAdvancedRemoteApp)")
+			New-ItemProperty -Path $regPath -Name "fEnableRemoteFXAdvancedRemoteApp" -Value ([int]$osSettingsObj.Rds.fEnableRemoteFXAdvancedRemoteApp) -force
+			LogWriter("Configuring RDS settings: AVCHardwareEncodePreferred = $($osSettingsObj.Rds.AVCHardwareEncodePreferred)")
+			New-ItemProperty -Path $regPath -Name "AVCHardwareEncodePreferred" -Value $osSettingsObj.Rds.AVCHardwareEncodePreferred -force
+			LogWriter("Configuring RDS settings: MaxIdleTime = $($osSettingsObj.Rds.MaxIdleTime)")
+			if ($osSettingsObj.Rds.MaxIdleTime -lt 0) {
+				Remove-ItemProperty -Path $regPath -Name "MaxIdleTime" -force -ErrorAction SilentlyContinue
+			} else {
+				New-ItemProperty -Path $regPath -Name "MaxIdleTime" -Value $osSettingsObj.Rds.MaxIdleTime -force
+			}
+			LogWriter("Configuring RDS settings: RemoteAppLogoffTimeLimit = $($osSettingsObj.Rds.RemoteAppLogoffTimeLimit)")
+			if ($osSettingsObj.Rds.RemoteAppLogoffTimeLimit -lt 0) {
+				Remove-ItemProperty -Path $regPath -Name "RemoteAppLogoffTimeLimit" -force -ErrorAction SilentlyContinue
+			} else {
+				New-ItemProperty -Path $regPath -Name "RemoteAppLogoffTimeLimit" -Value $osSettingsObj.Rds.RemoteAppLogoffTimeLimit -force
+			}
+			$regPath="HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations"
+			AddRegistyKey $regPath
+			LogWriter("Configuring RDS settings: fUseUdpPortRedirector = $($osSettingsObj.Rds.fUseUdpPortRedirector)")
+			New-ItemProperty -Path $regPath -Name "fUseUdpPortRedirector" -Value ([int]$osSettingsObj.Rds.fUseUdpPortRedirector) -force
+			if ($osSettingsObj.Rds.fUseUdpPortRedirector) {
+				LogWriter("Configuring RDS settings: UdpPortNumber = 3390")
+				New-ItemProperty -Path $regPath -Name "UdpPortNumber" -Value 3390 -force
+				LogWriter("Configuring RDS settings: Configuring Windows Firewall")
+				New-NetFirewallRule -DisplayName "Remote Desktop - Shortpath (UDP)"  -Action Allow -Description "Inbound rule for the Remote Desktop service to allow RDP traffic on UDP 3390" -Group "@FirewallAPI.dll,-28752" -Name 'RemoteDesktop-RDP-Shortpath-UDP'  -PolicyStore PersistentStore -Profile Any -Service TermService -Protocol udp -LocalPort 3390 -Program "%SystemRoot%\system32\svchost.exe" -Enabled:True -ErrorAction SilentlyContinue
+			}
+		}
+		if ($osSettingsObj.Teams.Enabled) {
+			LogWriter("Optimizing Teams")
+			AddRegistyKey "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\AddIns\WebRTC Redirector\Policy"
+			New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\AddIns\WebRTC Redirector\Policy" -Name "ShareClientDesktop" -Value 1 -force
+			New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\AddIns\WebRTC Redirector\Policy" -Name "DisableRAILScreensharing" -Value 0 -force
+			New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\AddIns\WebRTC Redirector\Policy" -Name "DisableRAILAppSharing" -Value 0 -force
+		}
+	} catch {
+		LogWriter("Applying host configuration failed: $_")
+	}
+	LogWriter("Applying host configuration if configured: End")
 }
 function SysprepPreClean() {
 	# DISM cleanup (only if forced)
@@ -152,7 +286,6 @@ function SysprepPreClean() {
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" -Name "ActiveScenario" -Value 0 -force  -ErrorAction Ignore
 	}
 }
-
 function GetAccessToFolder($accessPath) {
 	# Get access to folders and files
 	try {
@@ -217,7 +350,7 @@ function RunSysprepInternal($parameters) {
 		Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\Sysprep" -Name "SysprepCorrupt" -ErrorAction Ignore
 		New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "State" -Value 2 -force
 		New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "GeneralizationState" -Value 7 -force
-		New-Item -Path "HKLM:\Software\Microsoft\DesiredStateConfiguration" -ErrorAction Ignore
+		AddRegistyKey "HKLM:\Software\Microsoft\DesiredStateConfiguration"
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\DesiredStateConfiguration" -Name "AgentId" -Value "" -force  -ErrorAction Ignore
 
 		if ($errorReason -ne "") {
@@ -395,7 +528,7 @@ if ($mode -eq "Generalize") {
 	StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Monitor-2"
 
 	LogWriter("Prevent removing language packs")
-	New-Item -Path "HKLM:\Software\Policies\Microsoft\Control Panel" -Name "International" -force -ErrorAction Ignore
+	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Control Panel\International"
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Control Panel\International" -Name "BlockCleanupOfUnusedPreinstalledLangPacks" -Value 1 -force
 
 	LogWriter("Cleaning up reliability messages")
@@ -503,14 +636,13 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\Sysprep" -Name "SysprepCorrupt" -ErrorAction Ignore
 	New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "State" -Value 2 -force
 	New-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status\SysprepStatus" -Name "GeneralizationState" -Value 7 -force
-	New-Item -Path "HKLM:\Software\Microsoft\DesiredStateConfiguration" -ErrorAction Ignore
+	AddRegistyKey "HKLM:\Software\Microsoft\DesiredStateConfiguration"
 	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\DesiredStateConfiguration" -Name "AgentId" -Value "" -force  -ErrorAction Ignore
 
 	LogWriter("Saving time zone info for re-deploy")
 	$timeZone = (Get-TimeZone).Id
 	LogWriter("Current time zone is: " + $timeZone)
-	New-Item -Path "HKLM:\SOFTWARE" -Name "ITProCloud" -ErrorAction Ignore
-	New-Item -Path "HKLM:\SOFTWARE\ITProCloud" -Name "WVD.Runtime" -ErrorAction Ignore
+	AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "TimeZone.Origin" -Value $timeZone -force
 	
 	LogWriter("Removing existing Azure Monitoring Certificates")
@@ -559,10 +691,7 @@ if ($mode -eq "Generalize") {
 	if ([System.Environment]::OSVersion.Version.Major -le 6) {
 		#Windows 7
 		LogWriter("Enabling RDP8 on Windows 7")
-		New-Item -Path "HKLM:\SOFTWARE" -Name "Policies" -ErrorAction Ignore
-		New-Item -Path "HKLM:\SOFTWARE\Policies" -Name "Microsoft" -ErrorAction Ignore
-		New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft" -Name "Windows NT" -ErrorAction Ignore
-		New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT" -Name "Terminal Services" -ErrorAction Ignore
+		AddRegistyKey "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Name "fServerEnableRDP8" -Value 1 -force
 		RunSysprep "/generalize /oobe /shutdown"
 		#Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown"
@@ -595,7 +724,7 @@ elseif ($mode -eq "JoinDomain") {
 
 	# Prevent removing language packs
 	LogWriter("Prevent removing language packs")
-	New-Item -Path "HKLM:\Software\Policies\Microsoft\Control Panel" -Name "International" -force -ErrorAction Ignore
+	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Control Panel\International"
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Control Panel\International" -Name "BlockCleanupOfUnusedPreinstalledLangPacks" -Value 1 -force
 
 	# Removing Intune dependency
@@ -603,9 +732,12 @@ elseif ($mode -eq "JoinDomain") {
 
 	# Storing AadOnly to registry
 	LogWriter("Storing AadOnly to registry: " + $AadOnly)
-	New-Item -Path "HKLM:\SOFTWARE" -Name "ITProCloud" -ErrorAction Ignore
-	New-Item -Path "HKLM:\SOFTWARE\ITProCloud" -Name "WVD.Runtime" -ErrorAction Ignore
+	AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "AadOnly" -Value $AadOnly -force
+
+	# Flagging WaitForHybridJoin
+	LogWriter("Storing WaitForHybridJoin to registry: " + $WaitForHybridJoin)
+	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "WaitForHybridJoin" -Value $WaitForHybridJoin -force
 
 	# Checking for a saved time zone information
 	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime") {
@@ -890,6 +1022,11 @@ elseif ($mode -eq "JoinDomain") {
 		Start-Process -wait -FilePath PowerShell.exe -WorkingDirectory "C:\ProgramData\Optimize" -ArgumentList '-ExecutionPolicy Bypass -File "C:\ProgramData\Optimize\Win10_VirtualDesktop_Optimize.ps1 -AcceptEULA -Optimizations WindowsMediaPlayer,AppxPackages,ScheduledTasks,DefaultUserSettings,Autologgers,Services,NetworkOptimizations"' -RedirectStandardOutput "$($LogDir)\VirtualDesktop_Optimize.Stage2.Out.txt" -RedirectStandardError "$($LogDir)\VirtualDesktop_Optimize.Stage2.Warning.txt"
 	}
 
+	if ($parameters -and $parameters -ne "") {
+		LogWriter("Running ApplyOsSettings")
+		ApplyOsSettings
+	}
+	
 	# Final reboot
 	LogWriter("Finally restarting session host")
 	Restart-Computer -Force -ErrorAction SilentlyContinue
@@ -980,34 +1117,41 @@ elseif ($Mode -eq "DataPartition") {
 	}
 }
 elseif ($Mode -eq "RDAgentBootloader") {
+	$WaitForHybridJoin = (Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -ErrorAction Ignore)."WaitForHybridJoin"
+
+	if ($WaitForHybridJoin -and $WaitForHybridJoin -eq "1") {
+		LogWriter("Delaying the installation of the AVD boot loader. Waiting for the Hybrid-Join to Azure AD")
+		
+		$retryCount = 0
+		while ($null -eq (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*" -ErrorAction SilentlyContinue) -and $retryCount -le 420) {
+			$retryCount++
+			Start-Sleep -Seconds 5
+			LogWriter("Delaying the installation of the AVD boot loader. Waiting for the Hybrid-Join to Azure AD")
+		}
+		LogWriter("Delaying the installation of the AVD boot loader. Host is hybrid-joined: $($null -ne (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*" -ErrorAction SilentlyContinue))")
+	}
+
 	LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
 	$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
 	LogWriter("Installing AVD boot loader completed with exit code: $($ret.ExitCode)")
 	
-	if ($ret.ExitCode -ne 0) {
-		LogWriter("Exit code in not 0. Retrying one time the installion after 15 seconds") 
+	$retryCount = 0
+	while ($ret.ExitCode -ne 0 -and $retryCount -le 120)
+	{
+		$retryCount++
+		LogWriter("Exit code in not 0. Retrying one time the installion after 15 seconds. Retry count: $($retryCount)") 
 		Start-Sleep -Seconds 15
 		$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgentBootLoader.msi" -ArgumentList "/quiet /qn /norestart /passive"
 		LogWriter("Installing AVD boot loader completed with exit code: $($ret.ExitCode)")
 	}
+	
 
 	LogWriter("Waiting for the service RDAgentBootLoader")
 	$bootloaderServiceName = "RDAgentBootLoader"
-	$retryCount = 0
-	while ( -not (Get-Service "RDAgentBootLoader" -ErrorAction SilentlyContinue)) {
-		$retry = ($retryCount -lt 6)
-		LogWriter("Service RDAgentBootLoader was not found")
-		if ($retry) { 
-			LogWriter("Retrying again in 30 seconds, this will be retry $retryCount")
-		} 
-		else {
-			LogWriter("Retry limit exceeded: RDAgentBootLoader didn't become available after $retry retries")
-			throw "Retry limit exceeded: RDAgentBootLoader didn't become available after $retry retries"
-		}            
-		$retryCount++
-		Start-Sleep -Seconds 30
+	
+	if (-not (WaitForServiceExist $bootloaderServiceName 30 6)) {
+		throw "Retry limit exceeded: RDAgentBootLoader didn't become available"
 	}
-
 
 	LogWriter("Disable scheduled task")
 	try {
@@ -1049,6 +1193,9 @@ elseif ($Mode -eq "RDAgentBootloader") {
 		Start-Sleep -Seconds 10
 	} while ($run)
 }
+elseif ($Mode -eq "ApplyOsSettings") {
+	ApplyOsSettings
+}
 elseif ($Mode -eq "CleanFirstStart") {
 	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
 	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
@@ -1082,63 +1229,71 @@ elseif ($mode -eq "RepairMonitoringAgent") {
 }
 elseif ($mode -eq "StartBootloader") {
 	$LogFile = $LogDir + "\AVD.AgentBootloaderErrorHandling.log"
-	LogWriter "Start service was triggered by an event"
-	LogWriter "Waiting for 5 seconds"
-	Start-Sleep -Seconds 5
-	LogWriter "Starting service"
-	Start-Service -Name "RDAgentBootLoader"
-	LogWriter "Waiting for 60 seconds"
-	Start-Sleep -Seconds 60
-	LogWriter "Starting service (if not running)"
-	Start-Service -Name "RDAgentBootLoader"
-	LogWriter "Waiting for 60 seconds"
-	Start-Sleep -Seconds 60
-	LogWriter "Starting service (if not running)"
-	Start-Service -Name "RDAgentBootLoader"
+	if (WaitForServiceExist "RDAgentBootLoader" 5 480) {
+		LogWriter "Start service was triggered by an event"
+		LogWriter "Waiting for 5 seconds"
+		Start-Sleep -Seconds 5
+		LogWriter "Starting service"
+		Start-Service -Name "RDAgentBootLoader"
+		LogWriter "Waiting for 60 seconds"
+		Start-Sleep -Seconds 60
+		LogWriter "Starting service (if not running)"
+		Start-Service -Name "RDAgentBootLoader"
+		LogWriter "Waiting for 60 seconds"
+		Start-Sleep -Seconds 60
+		LogWriter "Starting service (if not running)"
+		Start-Service -Name "RDAgentBootLoader"
+	} else {
+		LogWriter "The service was not found. Skipping the StartBootloader task"
+	}
 }
 elseif ($mode -eq "StartBootloaderIfNotRunning") {
-	$interval = 30
-	$run = $true
-	$counter = 0
 	$serviceName = "RDAgentBootLoader"
+	if (WaitForServiceExist $serviceName 5 480) {
+		$interval = 30
+		$run = $true
+		$counter = 0
 	
-	$aadOnly=$false
-	$aadOnly=Get-ItemProperty -Path "HKLM:\\SOFTWARE\ITProCloud\WVD.Runtime" -Name "AadOnly" -ErrorAction SilentlyContinue
-	if ($aadOnly -ne $null -and $aadOnly.AadOnly -eq 1) {
-		$aadOnly=$true
-		LogWriter "Detected an AadOnly environment. Monitoring the Aad-join process and restart the bootloader if an error is shown"
-	}
+		$aadOnly=$false
+		$aadOnly=Get-ItemProperty -Path "HKLM:\\SOFTWARE\ITProCloud\WVD.Runtime" -Name "AadOnly" -ErrorAction SilentlyContinue
+		if ($aadOnly -ne $null -and $aadOnly.AadOnly -eq 1) {
+			$aadOnly=$true
+			LogWriter "Detected an AadOnly environment. Monitoring the Aad-join process and restart the bootloader if an error is shown"
+		}
 
-	do {
-		Start-Sleep -Seconds $interval
-		$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-		if ($service -ne $null -and $service.Status -ne [System.ServiceProcess.ServiceControllerStatus](4)) {
-			LogWriter "Starting service: $serviceName"
-			Start-Service -Name $serviceName -ErrorAction SilentlyContinue
-		}
-		# Restart bootloader in case of AadOnly and not joined to domain (force the agent to be completed)
-		if ($aadOnly) {
-			try {
-				$healthCheck=Get-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -Name "AgentHealthCheckReport" -ErrorAction SilentlyContinue
-				if ($healthCheck -ne $null) {
-					$healthObj=$healthCheck.AgentHealthCheckReport | ConvertFrom-Json -ErrorAction SilentlyContinue
-					if ($healthObj -ne $null) {
-							if ($healthObj.DomainJoinedCheck.HealthCheckResult -ne 1) {
-								LogWriter "DomainJoinFailure detected. Restarting RDAgentBootLoader"
-								Stop-Service -Name $serviceName -ErrorAction SilentlyContinue
-								Start-Service -Name $serviceName -ErrorAction SilentlyContinue
-								Start-Sleep -Seconds $interval
-							}
-					}
-				}
-			} catch {
-				LogWriter "Getting the AVD health-state failed: $_"
+		do {
+			Start-Sleep -Seconds $interval
+			$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+			if ($service -ne $null -and $service.Status -ne [System.ServiceProcess.ServiceControllerStatus](4)) {
+				LogWriter "Starting service: $serviceName"
+				Start-Service -Name $serviceName -ErrorAction SilentlyContinue
 			}
-		}
-		$counter++
-		if ($counter -gt 10) { $interval = 90 }
-		if ($counter -gt 20) { $run = $false }
-	} while ($run)
+			# Restart bootloader in case of AadOnly and not joined to domain (force the agent to be completed)
+			if ($aadOnly) {
+				try {
+					$healthCheck=Get-ItemProperty -Path "HKLM:\\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -Name "AgentHealthCheckReport" -ErrorAction SilentlyContinue
+					if ($healthCheck -ne $null) {
+						$healthObj=$healthCheck.AgentHealthCheckReport | ConvertFrom-Json -ErrorAction SilentlyContinue
+						if ($healthObj -ne $null) {
+								if ($healthObj.DomainJoinedCheck.HealthCheckResult -ne 1) {
+									LogWriter "DomainJoinFailure detected. Restarting RDAgentBootLoader"
+									Stop-Service -Name $serviceName -ErrorAction SilentlyContinue
+									Start-Service -Name $serviceName -ErrorAction SilentlyContinue
+									Start-Sleep -Seconds $interval
+								}
+						}
+					}
+				} catch {
+					LogWriter "Getting the AVD health-state failed: $_"
+				}
+			}
+			$counter++
+			if ($counter -gt 10) { $interval = 90 }
+			if ($counter -gt 20) { $run = $false }
+		} while ($run)
+	} else {
+		LogWriter "The service was not found. Skipping the StartBootloaderIfNotRunning task"
+	}
 }
 elseif ($mode -eq "JoinMEMFromHybrid") {
 	# Check, if registry key exist
