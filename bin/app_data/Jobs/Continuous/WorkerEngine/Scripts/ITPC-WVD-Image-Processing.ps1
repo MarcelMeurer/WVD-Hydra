@@ -174,6 +174,8 @@ function ApplyOsSettings() {
 				LogWriter("Configuring FSLogix profile settings: RedirXMLSourceFolder = $($osSettingsObj.FrxProfile.RedirXMLSourceFolder)")
 				New-ItemProperty -Path $regPath -Name "RedirXMLSourceFolder" -Value $osSettingsObj.FrxProfile.RedirXMLSourceFolder -force
 			}
+			LogWriter("Configuring FSLogix profile settings: Enabled = True")
+			New-ItemProperty -Path $regPath -Name "Enabled" -Value 1 -force
 			LogWriter("Configuring FSLogix profile settings: DeleteLocalProfileWhenVHDShouldApply = $($osSettingsObj.FrxProfile.DeleteLocalProfileWhenVHDShouldApply)")
 			New-ItemProperty -Path $regPath -Name "DeleteLocalProfileWhenVHDShouldApply" -Value ([int]$osSettingsObj.FrxProfile.DeleteLocalProfileWhenVHDShouldApply) -force
 			LogWriter("Configuring FSLogix profile settings: FlipFlopProfileDirectoryName = $($osSettingsObj.FrxProfile.FlipFlopProfileDirectoryName)")
