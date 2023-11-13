@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.4.50  (2023/11/13)
+  - Add: Update of the deployment script to work-around if an image is not deployable in case of unapplied deployments
 - 1.0.4.40  (2023/11/08)
   - Change: Important: Users in role "Host pool resource manager" can now create images (before: "Full Admin" role was needed)
   - Add: New type of host pool configuration called "Hosts". Can be used to configure the hosts on a pool base with some basic settings: FSLogix profiles, OS settings, RDS settings, Teams optimization "on"

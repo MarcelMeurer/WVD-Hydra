@@ -1,6 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.5
-
+# Current Version of this script: 7.6
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -687,6 +686,35 @@ if ($mode -eq "Generalize") {
 		RedirectPageFileToC
 	}
 
+	LogWriter("Preparing image to do one retry if the rollout of the VM failes (ADMINISTRATOR: Error Handler)")
+	$patchFile="$($env:WinDir)\OEM\ErrorHandler.cmd"
+	if (Test-Path -Path $patchFile) {
+		try {
+		LogWriter("Removing the old trigger file")
+		Remove-Item -Path "$($env:WinDir)\OEM\DoOnce.txt" -Force -ErrorAction SilentlyContinue	
+		write-host ("Checking file $patchFile")
+		if (-not (Get-Content $patchFile | Select-String -Pattern "ITPC")) {
+			LogWriter("Patching file")
+
+			$PatchContent = @(
+			"::ITPC - Patch",
+			"set FileTrigger=%windir%\OEM\DoOnce.txt",
+			"if not exist `"%FileTrigger%`" (",
+			"    ECHO ErrorHandler.cmd FILETRIGGER >> %windir%\Panther\WaSetup.log",
+			"    ECHO ErrorHandler.cmd FILETRIGGER >> %FileTrigger%",
+			"    reg delete `"HKEY_LOCAL_MACHINE\SYSTEM\Setup\SetupCl`" /f",
+			"    EXIT",
+			") "
+			)
+			Set-ItemProperty -Path $patchFile -Name IsReadOnly -Value $false
+			($PatchContent+(Get-Content $patchFile)) | Set-Content $patchFile
+			Set-ItemProperty -Path $patchFile -Name IsReadOnly -Value $true
+		}
+		} catch {
+			LogWriter("Error patching file: $_")
+		}
+	}
+	
 	LogWriter("Preparing sysprep to generalize session host")
 	if ([System.Environment]::OSVersion.Version.Major -le 6) {
 		#Windows 7
