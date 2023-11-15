@@ -53,7 +53,7 @@ function ShowPageFiles() {
 function RedirectPageFileToC() {
 	$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
 	LogWriter("Pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
-	$CurrentPageFile.delete()
+	if ($CurrentPageFile) $CurrentPageFile.delete()
 	LogWriter("Pagefile deleted")
 	$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
 	if ($null -eq $CurrentPageFile) {
