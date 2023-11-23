@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.7
+# Current Version of this script: 7.8
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -602,6 +602,7 @@ if ($mode -eq "Generalize") {
 	[xml]$xml = Get-Content -Path "$sysPrepActionPath\$sysPrepActionFile"
 	$xml.SelectNodes("//sysprepModule") | ForEach-Object {
 		if ($_.moduleName -match "AppxSysprep.dll") { $_.ParentNode.ParentNode.RemoveChild($_.ParentNode) | Out-Null }
+		if ($_.moduleName -match "spwmp.dll") { $_.ParentNode.ParentNode.RemoveChild($_.ParentNode) | Out-Null }
 	}
 	$xml.Save("$sysPrepActionPath\$sysPrepActionFile.new")
 	Remove-Item "$sysPrepActionPath\$sysPrepActionFile.old.*" -Force -ErrorAction Ignore
