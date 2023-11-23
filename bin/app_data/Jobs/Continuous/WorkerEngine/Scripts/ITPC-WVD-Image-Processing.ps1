@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.6
+# Current Version of this script: 7.7
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -274,8 +274,9 @@ function ApplyOsSettings() {
 function SysprepPreClean() {
 	# DISM cleanup (only if forced)
 	if (Test-Path "$env:windir\system32\Dism.exe") {
-		LogWriter("DISM cleanup")
+		LogWriter("DISM cleanup - Start")
 		Start-Process -FilePath "$env:windir\system32\Dism.exe" -Wait -ArgumentList "/online /cleanup-image /startcomponentcleanup /resetbase" -ErrorAction SilentlyContinue
+		LogWriter("DISM cleanup - Done")
 	}
 
 	# Disable reserved storage (only if forced)
@@ -417,7 +418,7 @@ function RunSysprepInternal($parameters) {
 				}
 				if ($hasError -and $restrartSysprepOnce -gt 0) {
 					# Do one time a force clean-up for sysprep
-					LogWriter("Convincing sysprep to sysprep the system")
+					LogWriter("Convincing sysprep to sysprep the system. Last error: $errorReason")
 					Start-Sleep -Seconds 5
 					try { Stop-Process -Id $proc.Id -ErrorAction SilentlyContinue } catch {}
 					SysprepPreClean
@@ -587,10 +588,10 @@ if ($mode -eq "Generalize") {
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseDesktopAppManagement" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\EnterpriseResourceManager" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\DeviceManageabilityCSP" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current" -Recurse -Force -ErrorAction Ignore
 	Uninstall-Package -Name "Microsoft Intune Management Extension" -AllVersions -Force -ErrorAction SilentlyContinue 
-
 
 	# Get access to sysprep action files
 	$sysPrepActionPath = "$env:windir\System32\Sysprep\ActionFiles"

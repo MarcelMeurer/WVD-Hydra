@@ -76,8 +76,10 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.4.70  (2023/11/23)
+  - Change: Update of the imaging script to workaround a specific random issue: Session host cannot be joined to Entra ID and Intune if the master was enrolled in AVD and Intune before
 - 1.0.4.60  (2023/11/15)
-  - Add:Support for hibernation (if available in the subscription)
+  - Add: Support for hibernation (if available in the subscription)
 - 1.0.4.50  (2023/11/13)
   - Add: Update of the deployment script to work-around if an image is not deployable in case of unapplied deployments
 - 1.0.4.40  (2023/11/08)
