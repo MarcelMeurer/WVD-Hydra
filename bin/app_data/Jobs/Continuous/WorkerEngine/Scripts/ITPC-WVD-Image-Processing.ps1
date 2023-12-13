@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 7.8
+# Current Version of this script: 8.0
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -240,13 +240,13 @@ function ApplyOsSettings() {
 			if ($osSettingsObj.Rds.MaxIdleTime -lt 0) {
 				Remove-ItemProperty -Path $regPath -Name "MaxIdleTime" -force -ErrorAction SilentlyContinue
 			} else {
-				New-ItemProperty -Path $regPath -Name "MaxIdleTime" -Value $osSettingsObj.Rds.MaxIdleTime -force
+				New-ItemProperty -Path $regPath -Name "MaxIdleTime" -Value (60000*$($osSettingsObj.Rds.MaxIdleTime)) -PropertyType DWord -force
 			}
 			LogWriter("Configuring RDS settings: RemoteAppLogoffTimeLimit = $($osSettingsObj.Rds.RemoteAppLogoffTimeLimit)")
 			if ($osSettingsObj.Rds.RemoteAppLogoffTimeLimit -lt 0) {
 				Remove-ItemProperty -Path $regPath -Name "RemoteAppLogoffTimeLimit" -force -ErrorAction SilentlyContinue
 			} else {
-				New-ItemProperty -Path $regPath -Name "RemoteAppLogoffTimeLimit" -Value $osSettingsObj.Rds.RemoteAppLogoffTimeLimit -force
+				New-ItemProperty -Path $regPath -Name "RemoteAppLogoffTimeLimit" -Value (60000*$($osSettingsObj.Rds.RemoteAppLogoffTimeLimit)) -PropertyType DWord -force
 			}
 			$regPath="HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations"
 			AddRegistyKey $regPath
@@ -540,8 +540,11 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "LastAliveStamp" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
 
-	LogWriter("Cleaning up some blocking sysprep apps")
+	LogWriter("Cleaning up some Defender For Endpoint properties - the master should not be onboarded")
+	Remove-Item -Path "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cyber\*.*" -Recurse -Force -ErrorAction Ignore
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection" -Name "senseGuid" -ErrorAction Ignore
+	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection" -Name "7DC0B629-D7F6-4DB3-9BF7-64D5AAF50F1A" -ErrorAction Ignore
+	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\48A68F11-7A16-4180-B32C-7F974C7BD783" -Name "7DC0B629-D7F6-4DB3-9BF7-64D5AAF50F1A" -ErrorAction Ignore
 
 	# Triggering dotnet to execute queued items
 	$dotnetRoot = "$env:windir\Microsoft.NET\Framework"

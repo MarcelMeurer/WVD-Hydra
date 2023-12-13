@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.00  (2023/12/12)
+  - Fix: Using the "Hosts" settings: Idle timeout was not configured correctly (seconds instead of minutes)
 - 1.0.4.90  (2023/11/26)
   - Change: Improvement of rolling out hosts with hibernation (Hydra will warn, if a VM-size doesn't fit)
 - 1.0.4.80  (2023/11/23)
