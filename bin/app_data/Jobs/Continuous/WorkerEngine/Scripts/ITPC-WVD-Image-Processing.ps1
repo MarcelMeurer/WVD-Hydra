@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 8.0
+# Current Version of this script: 8.1
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -781,6 +781,15 @@ elseif ($mode -eq "JoinDomain") {
 			LogWriter("Setting time zone to: " + $timeZone)
 			Set-TimeZone -Id $timeZone
 		}
+	}
+	
+	# Check for defender onboarding script
+	if (Test-Path -Path "$env:windir\Temp\Onboard-NonPersistentMachine.ps1") {
+		LogWriter("Onboarding to Defender for Endpoints (non-persistent)")
+		. "$env:windir\Temp\Onboard-NonPersistentMachine.ps1"
+	} elseif (Test-Path -Path "$env:windir\Temp\WindowsDefenderATPOnboardingScript.cmd") {
+		LogWriter("Onboarding to Defender for Endpoints (persistent)")
+		Start-Process -FilePath "$env:windir\system32\cmd.exe" -ArgumentList "/c WindowsDefenderATPOnboardingScript.cmd" -WorkingDirectory "$env:windir\temp" -Wait -PassThru
 	}
 
 	# Handling workaround for Windows 11 22H2

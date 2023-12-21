@@ -76,6 +76,10 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.10  (2023/12/21)
+  - Add: Defender Onboarding scripts are triggered in front of a domain join if the onboarding script is placed in C:\Windows\Temp of the Golden Master (first Onboard-NonPersistentMachine.ps1 and if not exist WindowsDefenderATPOnboardingScript.cmd)
+  - Add: Support for ADE 2
+  - Change: Some configuration are moved into the detail section (like hibernation enabled for autoscaling - it's still in the session time outs for personal pools)
 - 1.0.5.00  (2023/12/12)
   - Fix: Using the "Hosts" settings: Idle timeout was not configured correctly (seconds instead of minutes)
 - 1.0.4.90  (2023/11/26)
