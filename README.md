@@ -76,6 +76,10 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.20  (2024/01/10)
+  - Change: Script and collections - By default, only Full-Administrators can add and edit scripts and script collections. The Host Pool Administrators of full tenants can add and modify scripts by enabling "Allow Host Pool Administrators of a tenant access to scripts and collections" in the Global Settings. These scripts are only available to their tenant. With the updated concept, scripts and collections can be assigned to single or all tenants. All tenants' scripts and collections can only be assigned and modified by Full-Administrators.
+  - Change: Non Full-Administrators will no longer see some menu items where they don't have access (like roll base access, tenant configuration, etc.)
+  - Fix: Getting the newes version of an image gallery definition sometimes failed, if the version name includes 4-digit numbers (like: 2024.0001.1234)
 - 1.0.5.10  (2023/12/21)
   - Add: Defender Onboarding scripts are triggered in front of a domain join if the onboarding script is placed in C:\Windows\Temp of the Golden Master (first Onboard-NonPersistentMachine.ps1 and if not exist WindowsDefenderATPOnboardingScript.cmd)
   - Add: Support for ADE 2
