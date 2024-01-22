@@ -1,9 +1,9 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 8.1
+# Current Version of this script: 8.2
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid')]
+	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid','RegistertAppX')]
 	[string] $Mode,
 	[string] $StrongGeneralize = '0',
 	[string] $ComputerNewname = '', 					#Only for SecureBoot process (workaround, normaly not used)
@@ -127,6 +127,32 @@ function CopyFileWithRetry($source, $destination) {
 		}
 	} while (!$ok)
 	LogWriter("File copied successfully")
+}
+function ExecuteFileAndAwait($file) {
+    # Supports the execution of ps1, cmd, bat, and exe files
+    try {
+        $filePath = [System.IO.Path]::GetDirectoryName($file)
+        $fileExtension = [System.IO.Path]::GetExtension($file)
+        $fileName = [System.IO.Path]::GetFileName($file)
+        if (Test-Path -Path "$file") {
+            LogWriter("ExecuteFileAndAwait: Starting $file")
+            if ($fileExtension -like ".bat" -or $fileExtension -like ".cmd") {
+                Start-Process -FilePath "$env:windir\system32\cmd.exe" -ArgumentList "/c $fileName" -WorkingDirectory "$filePath" -Wait -PassThru
+                LogWriter("ExecuteFileAndAwait: Finished $file")
+            } elseif ($fileExtension -like ".exe") {
+                Start-Process -FilePath "$file" -WorkingDirectory "$filePath" -Wait -PassThru
+                LogWriter("ExecuteFileAndAwait: Finished $file")
+            } elseif ($fileExtension -like ".ps1") {
+                . "$file"
+                LogWriter("ExecuteFileAndAwait: Finished $file")
+            } else {
+                LogWriter("ExecuteFileAndAwait: Unknown file format: $fileExtension")
+            }
+        }
+
+    } catch {
+        LogWriter("ExecuteFileAndAwait: $_")
+    }
 }
 function WaitForServiceExist ($serviceName,$timeOutSeconds,$repeat) {
 	$retryCount = 0
@@ -511,6 +537,12 @@ catch {}
 
 # Start script by mode
 if ($mode -eq "Generalize") {
+	LogWriter("Check for PreImageCustomizing scripts")
+	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.exe"
+	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.cmd"
+	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.bat"
+	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.ps1"
+
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
@@ -786,10 +818,10 @@ elseif ($mode -eq "JoinDomain") {
 	# Check for defender onboarding script
 	if (Test-Path -Path "$env:windir\Temp\Onboard-NonPersistentMachine.ps1") {
 		LogWriter("Onboarding to Defender for Endpoints (non-persistent)")
-		. "$env:windir\Temp\Onboard-NonPersistentMachine.ps1"
+		ExecuteFileAndAwait "$env:windir\Temp\Onboard-NonPersistentMachine.ps1"
 	} elseif (Test-Path -Path "$env:windir\Temp\WindowsDefenderATPOnboardingScript.cmd") {
 		LogWriter("Onboarding to Defender for Endpoints (persistent)")
-		Start-Process -FilePath "$env:windir\system32\cmd.exe" -ArgumentList "/c WindowsDefenderATPOnboardingScript.cmd" -WorkingDirectory "$env:windir\temp" -Wait -PassThru
+		ExecuteFileAndAwait "$env:windir\Temp\WindowsDefenderATPOnboardingScript.cmd"
 	}
 
 	# Handling workaround for Windows 11 22H2
@@ -1360,4 +1392,23 @@ elseif ($mode -eq "JoinMEMFromHybrid") {
 			Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/join" -ErrorAction SilentlyContinue
 		}
 	}
+}
+elseif ($mode -eq "RegistertAppX") {
+        $AppXPackages = Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications"
+        $AppXPackages+= Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Applications"
+        $Done = @();
+        LogWriter("Re-registering AppX packages for all users")
+        ForEach($key in $AppXPackages) {
+            $path=(Get-ItemProperty -Path $key.PsPath).Path
+            if ($path -in $Done) {
+            } else {
+                try {
+                    #Add-AppxPackage -DisableDevelopmentMode -Register $path  -ErrorAction SilentlyContinue
+                    LogWriter("Appx: Registering done:   $path")
+                }  catch {
+                    LogWriter("Appx: Registering failed: $path")
+                }
+                $Done+= $path;
+            }
+        }
 }

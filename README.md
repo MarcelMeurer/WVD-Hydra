@@ -76,6 +76,9 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.30  (2024/01/22)
+  - Fix: Full-Administrators wouldn't see the scripts if the global configuration the following option was not set "Read access for Host Pool Administrators of a tenant to the content of all tenants' scripts"
+  - Add: During the imaging process, a local file is executed shortly bevore running sysprep to do some last minute generalizations (C:\Windows\Temp\PreImageCustomizing.ps1 or bat or cmd or exe)
 - 1.0.5.20  (2024/01/10)
   - Change: Script and collections - By default, only Full-Administrators can add and edit scripts and script collections. The Host Pool Administrators of full tenants can add and modify scripts by enabling "Allow Host Pool Administrators of a tenant access to scripts and collections" in the Global Settings. These scripts are only available to their tenant. With the updated concept, scripts and collections can be assigned to single or all tenants. All tenants' scripts and collections can only be assigned and modified by Full-Administrators.
   - Change: Non Full-Administrators will no longer see some menu items where they don't have access (like roll base access, tenant configuration, etc.)
