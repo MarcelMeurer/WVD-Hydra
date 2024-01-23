@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.40  (2024/01/23)
+  - Add: Preview feature: Allowing special [REST calls](#External-REST-Calls) updated
 - 1.0.5.30  (2024/01/22)
   - Fix: Full-Administrators wouldn't see the scripts if the global configuration the following option was not set "Read access for Host Pool Administrators of a tenant to the content of all tenants' scripts"
   - Add: During the imaging process, a local file is executed shortly bevore running sysprep to do some last minute generalizations (C:\Windows\Temp\PreImageCustomizing.ps1 or bat or cmd or exe)
@@ -968,14 +970,25 @@ Accessible APIs:
       - Other properties are used from the default deployment configuration of the host pool
   - Return:
     - A guid to query the state of the task
-	
-- State of the task
+
+- Delete a host with VM: /rest/sessionhosts/\<SessionHost-Guid\>/delete
+  - GET
+  - Return:
+    - A guid to query the state of the task
+
+- Get assigned session hosts for a user: /rest/hostpools/\<HostPool-Guid\/users/\<UPN\>/sessionhosts
+  - GET
+  - Return:
+    - A list of session hosts where the user is assigned. If HostPool-Guid is Guid.Empty, all assigned hosts in all pools are returned
+
+- State of tasks
   - GET
   - Http return code: /rest/actions/\<task-guid\>
     - 200: Done successfully
     - 404: Not found
     - 202: Still running
     - 409: Failed
+
 
 ## Updating the client secret of the app service
 During the rollout of Hydra, a service principal of the app service was created using the PowerShell script. The service principal is used by the web GUI to authenticate users and get the profile data, like the group membership. The secret of the service principal typically expires after one year and must be recreated. To do that, go into Azure AD -> App registrations -> All applications and select the used service principal (by default named "svc-HydraWebAuthentication". Generate a new client secret in "Certificates & secrets". Copy the new secret value into the clipboard and navigate to the deployed key vault (having the same name as the website of the Hydra portal). In the key vault, go to Secrets and update the secret "AzureAd--ClientSecret" with the copied secret. Restart the app service to use the updated secret.

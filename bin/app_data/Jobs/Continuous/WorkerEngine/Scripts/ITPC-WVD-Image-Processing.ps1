@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 8.2
+# Current Version of this script: 8.3
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -127,6 +127,22 @@ function CopyFileWithRetry($source, $destination) {
 		}
 	} while (!$ok)
 	LogWriter("File copied successfully")
+}
+function RemoveHiddenIfExist($file) {
+    try {
+        if (Test-Path -Path $file) {
+            LogWriter("RemoveHiddenIfExist: File exist: $($file)")
+            $fileItem=Get-Item $file -Force
+            if (($fileItem.Attributes -band  [System.IO.FileAttributes]::Hidden) -eq [System.IO.FileAttributes]::Hidden) {
+                LogWriter("RemoveHiddenIfExist: Removing hidden flag from file $($fileItem.Name)")
+                $fileItem.Attributes = $fileItem.Attributes -band -bnot [System.IO.FileAttributes]::Hidden
+            } else {
+                LogWriter("RemoveHiddenIfExist: File is not hidden: $($fileItem.Name)")
+            }
+        }
+    } catch {
+        LogWriter("RemoveHiddenIfExist failed: $_")
+    }
 }
 function ExecuteFileAndAwait($file) {
     # Supports the execution of ps1, cmd, bat, and exe files
@@ -405,6 +421,8 @@ function RunSysprepInternal($parameters) {
 			}
 		}
 
+		# Workaround for a hidden system file
+		RemoveHiddenIfExist "$env:windir\system32\VMAgentDisabler.dll"
 		LogWriter("Starting sysprep executable")
 		$proc = Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList $parameters -PassThru
 
@@ -1324,6 +1342,9 @@ elseif ($mode -eq "StartBootloader") {
 	}
 }
 elseif ($mode -eq "StartBootloaderIfNotRunning") {
+	# Workaround for a hidden system file
+	RemoveHiddenIfExist "$env:windir\system32\VMAgentDisabler.dll"
+	# Monitor service
 	$serviceName = "RDAgentBootLoader"
 	if (WaitForServiceExist $serviceName 5 480) {
 		$interval = 30
