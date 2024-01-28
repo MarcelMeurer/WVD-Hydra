@@ -3,7 +3,7 @@
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid','RegistertAppX')]
+	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid')]
 	[string] $Mode,
 	[string] $StrongGeneralize = '0',
 	[string] $ComputerNewname = '', 					#Only for SecureBoot process (workaround, normaly not used)
@@ -991,7 +991,6 @@ elseif ($mode -eq "JoinDomain") {
 	# check to move pagefile finally to C
 	if ($MovePagefileToC -eq "1") {
 		RedirectPageFileToC
-
 	}
 	# install Hydra Agent (Hydra only)
 	if ($HydraAgentUri -ne "") {
@@ -1413,23 +1412,4 @@ elseif ($mode -eq "JoinMEMFromHybrid") {
 			Start-Process -wait -FilePath  "$($env:WinDir)\system32\Dsregcmd.exe" -ArgumentList "/join" -ErrorAction SilentlyContinue
 		}
 	}
-}
-elseif ($mode -eq "RegistertAppX") {
-        $AppXPackages = Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\InboxApplications"
-        $AppXPackages+= Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Applications"
-        $Done = @();
-        LogWriter("Re-registering AppX packages for all users")
-        ForEach($key in $AppXPackages) {
-            $path=(Get-ItemProperty -Path $key.PsPath).Path
-            if ($path -in $Done) {
-            } else {
-                try {
-                    #Add-AppxPackage -DisableDevelopmentMode -Register $path  -ErrorAction SilentlyContinue
-                    LogWriter("Appx: Registering done:   $path")
-                }  catch {
-                    LogWriter("Appx: Registering failed: $path")
-                }
-                $Done+= $path;
-            }
-        }
 }
