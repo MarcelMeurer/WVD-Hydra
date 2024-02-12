@@ -76,6 +76,10 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.70  (2024/02/04)
+  - Add: The session host list of a personal pool shows if a user has configured a personal start time (icon close to the user name)
+  - Fix: The host pool image update could be interrupted if a host was manually removed during the update
+  - Change: Update of the API versions while accessing the AVD backend
 - 1.0.5.60  (2024/02/04)
   - Fix: The value "0" in the configuration "Dynamically rollout new session hosts up to a max. number..." in Autoscale configuration was not handled correct (0 disabled the limitation)
 - 1.0.5.50  (2024/01/28)
