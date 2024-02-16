@@ -305,7 +305,7 @@
           "lib/netstandard2.0/AutoMapper.dll": {}
         }
       },
-      "Azure.Core/1.32.0": {
+      "Azure.Core/1.36.0": {
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.1.1",
           "System.Diagnostics.DiagnosticSource": "5.0.1",
@@ -317,8 +317,8 @@
         },
         "runtime": {
           "lib/netcoreapp2.1/Azure.Core.dll": {
-            "assemblyVersion": "1.32.0.0",
-            "fileVersion": "1.3200.23.26002"
+            "assemblyVersion": "1.36.0.0",
+            "fileVersion": "1.3600.23.56006"
           }
         },
         "compile": {
@@ -327,7 +327,7 @@
       },
       "Azure.Identity/1.6.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
+          "Azure.Core": "1.36.0",
           "Microsoft.Identity.Client": "4.39.0",
           "Microsoft.Identity.Client.Extensions.Msal": "2.19.3",
           "System.Memory": "4.5.4",
@@ -345,15 +345,15 @@
           "lib/netstandard2.0/Azure.Identity.dll": {}
         }
       },
-      "Azure.ResourceManager/1.6.0": {
+      "Azure.ResourceManager/1.9.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
+          "Azure.Core": "1.36.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.dll": {
-            "assemblyVersion": "1.6.0.0",
-            "fileVersion": "1.600.23.26504"
+            "assemblyVersion": "1.9.0.0",
+            "fileVersion": "1.900.23.56505"
           }
         },
         "compile": {
@@ -362,8 +362,8 @@
       },
       "Azure.ResourceManager.Compute/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -376,10 +376,42 @@
           "lib/netstandard2.0/Azure.ResourceManager.Compute.dll": {}
         }
       },
+      "Azure.ResourceManager.Hci/1.2.0-beta.1": {
+        "dependencies": {
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.Hci.dll": {
+            "assemblyVersion": "1.2.0.0",
+            "fileVersion": "1.200.23.60101"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.ResourceManager.Hci.dll": {}
+        }
+      },
+      "Azure.ResourceManager.HybridCompute/1.0.0-beta.7": {
+        "dependencies": {
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.HybridCompute.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.24.5302"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.ResourceManager.HybridCompute.dll": {}
+        }
+      },
       "Azure.ResourceManager.Network/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -394,8 +426,8 @@
       },
       "Azure.ResourceManager.Quota/1.0.0-beta.3": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -410,8 +442,8 @@
       },
       "Azure.ResourceManager.Storage/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -426,7 +458,7 @@
       },
       "Azure.Security.KeyVault.Certificates/4.1.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
+          "Azure.Core": "1.36.0",
           "System.Memory": "4.5.4",
           "System.Text.Json": "5.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
@@ -443,7 +475,7 @@
       },
       "Azure.Security.KeyVault.Secrets/4.1.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
+          "Azure.Core": "1.36.0",
           "System.Memory": "4.5.4",
           "System.Text.Json": "5.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
@@ -3771,6 +3803,8 @@
           "AutoMapper": "10.1.1",
           "Azure.Identity": "1.6.0",
           "Azure.ResourceManager.Compute": "1.0.0-beta.7",
+          "Azure.ResourceManager.Hci": "1.2.0-beta.1",
+          "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
           "Azure.ResourceManager.Network": "1.0.0-beta.7",
           "Azure.ResourceManager.Quota": "1.0.0-beta.3",
           "Azure.ResourceManager.Storage": "1.0.0-beta.7",
@@ -5268,12 +5302,12 @@
       "path": "automapper/10.1.1",
       "hashPath": "automapper.10.1.1.nupkg.sha512"
     },
-    "Azure.Core/1.32.0": {
+    "Azure.Core/1.36.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NmnJxaNqKjPwnHXngVg63SrkwbJXrkT0mcK8uCx9rSq0nK6Q3Q+/GZRCaTWcdcECoRP5XK0lr3Ce8PZkHkuHNg==",
-      "path": "azure.core/1.32.0",
-      "hashPath": "azure.core.1.32.0.nupkg.sha512"
+      "sha512": "sha512-vwqFZdHS4dzPlI7FFRkPx9ctA+aGGeRev3gnzG8lntWvKMmBhAmulABi1O9CEvS3/jzYt7yA+0pqVdxkpAd7dQ==",
+      "path": "azure.core/1.36.0",
+      "hashPath": "azure.core.1.36.0.nupkg.sha512"
     },
     "Azure.Identity/1.6.0": {
       "type": "package",
@@ -5282,12 +5316,12 @@
       "path": "azure.identity/1.6.0",
       "hashPath": "azure.identity.1.6.0.nupkg.sha512"
     },
-    "Azure.ResourceManager/1.6.0": {
+    "Azure.ResourceManager/1.9.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pd7DRK7UpsQagSwgkXiWl6k5v3aXTcEwLvyjAtozd/pr86bsmaWEtcA2aa+kt82wMH2L8nw1ByfRIY0hQQSIVg==",
-      "path": "azure.resourcemanager/1.6.0",
-      "hashPath": "azure.resourcemanager.1.6.0.nupkg.sha512"
+      "sha512": "sha512-Ki3ethQJOkr0JuKnkazhKP5/bV849x1scwDSS61rrzf2/nmDM56jJmmCARHsFBoZfYQPd4lwCC2SeYfmLOY2wQ==",
+      "path": "azure.resourcemanager/1.9.0",
+      "hashPath": "azure.resourcemanager.1.9.0.nupkg.sha512"
     },
     "Azure.ResourceManager.Compute/1.0.0-beta.7": {
       "type": "package",
@@ -5295,6 +5329,20 @@
       "sha512": "sha512-ZKblB51Q6ds0rwTaxROGHlQk1I6aisk5qyQnw5rcy7IVtGZaBGYsvFX8E14Ezq69G//JH3Vxs/BxnaSJKk1tHw==",
       "path": "azure.resourcemanager.compute/1.0.0-beta.7",
       "hashPath": "azure.resourcemanager.compute.1.0.0-beta.7.nupkg.sha512"
+    },
+    "Azure.ResourceManager.Hci/1.2.0-beta.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HdB6mKyMiJEaS9nd1dd8LfILRNifQudVxCyMxvd7DLhLsTxXpg8PZqhXO4CSVDAlRvsu7SXCqGqNGmBN54aOSA==",
+      "path": "azure.resourcemanager.hci/1.2.0-beta.1",
+      "hashPath": "azure.resourcemanager.hci.1.2.0-beta.1.nupkg.sha512"
+    },
+    "Azure.ResourceManager.HybridCompute/1.0.0-beta.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pWBe5R8tisiUhRa5AepuMgxTHoCHX1RWz1uvUb3abPVTUoQPZO8e97p8/EN4yg4l/BgUgFog8CHkS/b+wB6xuA==",
+      "path": "azure.resourcemanager.hybridcompute/1.0.0-beta.7",
+      "hashPath": "azure.resourcemanager.hybridcompute.1.0.0-beta.7.nupkg.sha512"
     },
     "Azure.ResourceManager.Network/1.0.0-beta.7": {
       "type": "package",

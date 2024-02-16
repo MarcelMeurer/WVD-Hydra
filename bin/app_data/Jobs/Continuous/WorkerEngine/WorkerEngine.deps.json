@@ -10,6 +10,8 @@
         "dependencies": {
           "AutoMapper": "10.1.1",
           "Azure.Identity": "1.6.0",
+          "Azure.ResourceManager.Hci": "1.2.0-beta.1",
+          "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
           "Azure.Security.KeyVault.Secrets": "4.1.0",
           "HydraShared": "1.0.0",
           "Microsoft.Azure.Management.Fluent": "1.36.1",
@@ -23,7 +25,8 @@
           "Microsoft.Extensions.DependencyInjection": "5.0.2",
           "Microsoft.Extensions.Hosting": "5.0.0",
           "Microsoft.Extensions.Http": "5.0.0",
-          "Newtonsoft.Json": "13.0.1"
+          "Newtonsoft.Json": "13.0.1",
+          "System.Diagnostics.DiagnosticSource": "8.0.0"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -41,10 +44,10 @@
           }
         }
       },
-      "Azure.Core/1.32.0": {
+      "Azure.Core/1.36.0": {
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.1.1",
-          "System.Diagnostics.DiagnosticSource": "5.0.1",
+          "System.Diagnostics.DiagnosticSource": "8.0.0",
           "System.Memory.Data": "1.0.2",
           "System.Numerics.Vectors": "4.5.0",
           "System.Text.Encodings.Web": "4.7.2",
@@ -53,17 +56,17 @@
         },
         "runtime": {
           "lib/netcoreapp2.1/Azure.Core.dll": {
-            "assemblyVersion": "1.32.0.0",
-            "fileVersion": "1.3200.23.26002"
+            "assemblyVersion": "1.36.0.0",
+            "fileVersion": "1.3600.23.56006"
           }
         }
       },
       "Azure.Identity/1.6.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
+          "Azure.Core": "1.36.0",
           "Microsoft.Identity.Client": "4.39.0",
           "Microsoft.Identity.Client.Extensions.Msal": "2.19.3",
-          "System.Memory": "4.5.4",
+          "System.Memory": "4.5.5",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
           "System.Text.Json": "5.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
@@ -75,22 +78,22 @@
           }
         }
       },
-      "Azure.ResourceManager/1.6.0": {
+      "Azure.ResourceManager/1.9.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
+          "Azure.Core": "1.36.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.dll": {
-            "assemblyVersion": "1.6.0.0",
-            "fileVersion": "1.600.23.26504"
+            "assemblyVersion": "1.9.0.0",
+            "fileVersion": "1.900.23.56505"
           }
         }
       },
       "Azure.ResourceManager.Compute/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -100,10 +103,36 @@
           }
         }
       },
+      "Azure.ResourceManager.Hci/1.2.0-beta.1": {
+        "dependencies": {
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.Hci.dll": {
+            "assemblyVersion": "1.2.0.0",
+            "fileVersion": "1.200.23.60101"
+          }
+        }
+      },
+      "Azure.ResourceManager.HybridCompute/1.0.0-beta.7": {
+        "dependencies": {
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
+          "System.Text.Json": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.HybridCompute.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.24.5302"
+          }
+        }
+      },
       "Azure.ResourceManager.Network/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -115,8 +144,8 @@
       },
       "Azure.ResourceManager.Quota/1.0.0-beta.3": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -128,8 +157,8 @@
       },
       "Azure.ResourceManager.Storage/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "Azure.ResourceManager": "1.6.0",
+          "Azure.Core": "1.36.0",
+          "Azure.ResourceManager": "1.9.0",
           "System.Text.Json": "5.0.0"
         },
         "runtime": {
@@ -141,8 +170,8 @@
       },
       "Azure.Security.KeyVault.Secrets/4.1.0": {
         "dependencies": {
-          "Azure.Core": "1.32.0",
-          "System.Memory": "4.5.4",
+          "Azure.Core": "1.36.0",
+          "System.Memory": "4.5.5",
           "System.Text.Json": "5.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
@@ -164,7 +193,7 @@
       "dotMorten.Microsoft.SqlServer.Types/1.3.0": {
         "dependencies": {
           "System.Data.SqlClient": "4.8.2",
-          "System.Memory": "4.5.4"
+          "System.Memory": "4.5.5"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.SqlServer.Types.dll": {
@@ -182,7 +211,7 @@
           "Microsoft.EntityFrameworkCore.Sqlite": "3.1.13",
           "NetTopologySuite.IO.SqlServerBytes": "2.0.0",
           "System.Data.SqlClient": "4.8.2",
-          "System.Diagnostics.DiagnosticSource": "5.0.1",
+          "System.Diagnostics.DiagnosticSource": "8.0.0",
           "dotMorten.Microsoft.SqlServer.Types": "1.3.0"
         },
         "runtime": {
@@ -770,7 +799,7 @@
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.8.0",
           "Microsoft.Win32.Registry": "5.0.0",
           "System.Configuration.ConfigurationManager": "6.0.0",
-          "System.Diagnostics.DiagnosticSource": "5.0.1",
+          "System.Diagnostics.DiagnosticSource": "8.0.0",
           "System.Runtime.Caching": "4.7.0",
           "System.Security.Principal.Windows": "5.0.0",
           "System.Text.Encoding.CodePages": "4.7.0"
@@ -848,7 +877,7 @@
           "Microsoft.Extensions.Logging": "5.0.0",
           "System.Collections.Immutable": "5.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
-          "System.Diagnostics.DiagnosticSource": "5.0.1"
+          "System.Diagnostics.DiagnosticSource": "8.0.0"
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.EntityFrameworkCore.dll": {
@@ -1190,7 +1219,7 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
           "Microsoft.Extensions.Options": "5.0.0",
-          "System.Diagnostics.DiagnosticSource": "5.0.1"
+          "System.Diagnostics.DiagnosticSource": "8.0.0"
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.Extensions.Logging.dll": {
@@ -1344,7 +1373,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Newtonsoft.Json": "13.0.1",
-          "System.Diagnostics.DiagnosticSource": "5.0.1",
+          "System.Diagnostics.DiagnosticSource": "8.0.0",
           "System.Net.Http": "4.3.4",
           "System.ValueTuple": "4.3.0"
         },
@@ -1599,7 +1628,7 @@
       },
       "NetTopologySuite/2.0.0": {
         "dependencies": {
-          "System.Memory": "4.5.4"
+          "System.Memory": "4.5.5"
         },
         "runtime": {
           "lib/netstandard2.0/NetTopologySuite.dll": {
@@ -1728,7 +1757,7 @@
       },
       "SQLitePCLRaw.core/2.0.2": {
         "dependencies": {
-          "System.Memory": "4.5.4"
+          "System.Memory": "4.5.5"
         },
         "runtime": {
           "lib/netstandard2.0/SQLitePCLRaw.core.dll": {
@@ -2022,11 +2051,15 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.Diagnostics.DiagnosticSource/5.0.1": {
+      "System.Diagnostics.DiagnosticSource/8.0.0": {
+        "dependencies": {
+          "System.Memory": "4.5.5",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        },
         "runtime": {
-          "lib/netstandard1.3/System.Diagnostics.DiagnosticSource.dll": {
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.220.61120"
+          "lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
           }
         }
       },
@@ -2319,7 +2352,7 @@
           }
         }
       },
-      "System.Memory/4.5.4": {},
+      "System.Memory/4.5.5": {},
       "System.Memory.Data/1.0.2": {
         "dependencies": {
           "System.Text.Encodings.Web": "4.7.2",
@@ -2337,7 +2370,7 @@
           "Microsoft.NETCore.Platforms": "5.0.0",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
-          "System.Diagnostics.DiagnosticSource": "5.0.1",
+          "System.Diagnostics.DiagnosticSource": "8.0.0",
           "System.Diagnostics.Tracing": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Globalization.Extensions": "4.3.0",
@@ -2532,6 +2565,14 @@
           }
         }
       },
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+        "runtime": {
+          "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        }
+      },
       "System.Runtime.Extensions/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "5.0.0",
@@ -2698,7 +2739,7 @@
       },
       "System.Security.Cryptography.ProtectedData/6.0.0": {
         "dependencies": {
-          "System.Memory": "4.5.4"
+          "System.Memory": "4.5.5"
         },
         "runtime": {
           "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
@@ -3038,6 +3079,8 @@
           "AutoMapper": "10.1.1",
           "Azure.Identity": "1.6.0",
           "Azure.ResourceManager.Compute": "1.0.0-beta.7",
+          "Azure.ResourceManager.Hci": "1.2.0-beta.1",
+          "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
           "Azure.ResourceManager.Network": "1.0.0-beta.7",
           "Azure.ResourceManager.Quota": "1.0.0-beta.3",
           "Azure.ResourceManager.Storage": "1.0.0-beta.7",
@@ -3074,12 +3117,12 @@
       "path": "automapper/10.1.1",
       "hashPath": "automapper.10.1.1.nupkg.sha512"
     },
-    "Azure.Core/1.32.0": {
+    "Azure.Core/1.36.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NmnJxaNqKjPwnHXngVg63SrkwbJXrkT0mcK8uCx9rSq0nK6Q3Q+/GZRCaTWcdcECoRP5XK0lr3Ce8PZkHkuHNg==",
-      "path": "azure.core/1.32.0",
-      "hashPath": "azure.core.1.32.0.nupkg.sha512"
+      "sha512": "sha512-vwqFZdHS4dzPlI7FFRkPx9ctA+aGGeRev3gnzG8lntWvKMmBhAmulABi1O9CEvS3/jzYt7yA+0pqVdxkpAd7dQ==",
+      "path": "azure.core/1.36.0",
+      "hashPath": "azure.core.1.36.0.nupkg.sha512"
     },
     "Azure.Identity/1.6.0": {
       "type": "package",
@@ -3088,12 +3131,12 @@
       "path": "azure.identity/1.6.0",
       "hashPath": "azure.identity.1.6.0.nupkg.sha512"
     },
-    "Azure.ResourceManager/1.6.0": {
+    "Azure.ResourceManager/1.9.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pd7DRK7UpsQagSwgkXiWl6k5v3aXTcEwLvyjAtozd/pr86bsmaWEtcA2aa+kt82wMH2L8nw1ByfRIY0hQQSIVg==",
-      "path": "azure.resourcemanager/1.6.0",
-      "hashPath": "azure.resourcemanager.1.6.0.nupkg.sha512"
+      "sha512": "sha512-Ki3ethQJOkr0JuKnkazhKP5/bV849x1scwDSS61rrzf2/nmDM56jJmmCARHsFBoZfYQPd4lwCC2SeYfmLOY2wQ==",
+      "path": "azure.resourcemanager/1.9.0",
+      "hashPath": "azure.resourcemanager.1.9.0.nupkg.sha512"
     },
     "Azure.ResourceManager.Compute/1.0.0-beta.7": {
       "type": "package",
@@ -3101,6 +3144,20 @@
       "sha512": "sha512-ZKblB51Q6ds0rwTaxROGHlQk1I6aisk5qyQnw5rcy7IVtGZaBGYsvFX8E14Ezq69G//JH3Vxs/BxnaSJKk1tHw==",
       "path": "azure.resourcemanager.compute/1.0.0-beta.7",
       "hashPath": "azure.resourcemanager.compute.1.0.0-beta.7.nupkg.sha512"
+    },
+    "Azure.ResourceManager.Hci/1.2.0-beta.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HdB6mKyMiJEaS9nd1dd8LfILRNifQudVxCyMxvd7DLhLsTxXpg8PZqhXO4CSVDAlRvsu7SXCqGqNGmBN54aOSA==",
+      "path": "azure.resourcemanager.hci/1.2.0-beta.1",
+      "hashPath": "azure.resourcemanager.hci.1.2.0-beta.1.nupkg.sha512"
+    },
+    "Azure.ResourceManager.HybridCompute/1.0.0-beta.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pWBe5R8tisiUhRa5AepuMgxTHoCHX1RWz1uvUb3abPVTUoQPZO8e97p8/EN4yg4l/BgUgFog8CHkS/b+wB6xuA==",
+      "path": "azure.resourcemanager.hybridcompute/1.0.0-beta.7",
+      "hashPath": "azure.resourcemanager.hybridcompute.1.0.0-beta.7.nupkg.sha512"
     },
     "Azure.ResourceManager.Network/1.0.0-beta.7": {
       "type": "package",
@@ -4194,12 +4251,12 @@
       "path": "system.diagnostics.debug/4.3.0",
       "hashPath": "system.diagnostics.debug.4.3.0.nupkg.sha512"
     },
-    "System.Diagnostics.DiagnosticSource/5.0.1": {
+    "System.Diagnostics.DiagnosticSource/8.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-uXQEYqav2V3zP6OwkOKtLv+qIi6z3m1hsGyKwXX7ZA7htT4shoVccGxnJ9kVRFPNAsi1ArZTq2oh7WOto6GbkQ==",
-      "path": "system.diagnostics.diagnosticsource/5.0.1",
-      "hashPath": "system.diagnostics.diagnosticsource.5.0.1.nupkg.sha512"
+      "sha512": "sha512-c9xLpVz6PL9lp/djOWtk5KPDZq3cSYpmXoJQY524EOtuFl5z9ZtsotpsyrDW40U1DRnQSYvcPKEUV0X//u6gkQ==",
+      "path": "system.diagnostics.diagnosticsource/8.0.0",
+      "hashPath": "system.diagnostics.diagnosticsource.8.0.0.nupkg.sha512"
     },
     "System.Diagnostics.EventLog/5.0.0": {
       "type": "package",
@@ -4341,12 +4398,12 @@
       "path": "system.management/6.0.0",
       "hashPath": "system.management.6.0.0.nupkg.sha512"
     },
-    "System.Memory/4.5.4": {
+    "System.Memory/4.5.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
-      "path": "system.memory/4.5.4",
-      "hashPath": "system.memory.4.5.4.nupkg.sha512"
+      "sha512": "sha512-XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw==",
+      "path": "system.memory/4.5.5",
+      "hashPath": "system.memory.4.5.5.nupkg.sha512"
     },
     "System.Memory.Data/1.0.2": {
       "type": "package",
@@ -4480,6 +4537,13 @@
       "sha512": "sha512-NdvNRjTPxYvIEhXQszT9L9vJhdQoX6AQ0AlhjTU+5NqFQVuacJTfhPVAvtGWNA2OJCqRiR/okBcZgMwI6MqcZg==",
       "path": "system.runtime.caching/4.7.0",
       "hashPath": "system.runtime.caching.4.7.0.nupkg.sha512"
+    },
+    "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
+      "path": "system.runtime.compilerservices.unsafe/6.0.0",
+      "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
     "System.Runtime.Extensions/4.3.0": {
       "type": "package",

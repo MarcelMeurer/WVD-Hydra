@@ -76,6 +76,8 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
+- 1.0.5.80  (2024/02/16)
+  - Add: Additional option to the Hydra REST calls](#External-REST-Calls) (filtering of subscriptions, pool types, pool groups)
 - 1.0.5.70  (2024/02/04)
   - Add: The session host list of a personal pool shows if a user has configured a personal start time (icon close to the user name)
   - Fix: The host pool image update could be interrupted if a host was manually removed during the update
@@ -997,6 +999,11 @@ Accessible APIs:
     - 202: Still running
     - 409: Failed
 
+Optional filtering:
+HTTP-Get commands to query VMs by user or to delete a host can have additional filter in the header:
+ - "LimitToSubscriptions" = "49f90bf9-ddf8-48b2-bf90-629f3dbef550,f7f733a1-92f8-4ff4-8e49-6ecd7c3533f3"	(filtering by subscriptions of the VMs/hosts)
+ - "LimitToPoolGroups" = "engineering,sales"	(filtering by pool groups)
+ - "LimitToPoolType" = "personal"	(filtering by host pool type: personal or pooled)
 
 ## Updating the client secret of the app service
 During the rollout of Hydra, a service principal of the app service was created using the PowerShell script. The service principal is used by the web GUI to authenticate users and get the profile data, like the group membership. The secret of the service principal typically expires after one year and must be recreated. To do that, go into Azure AD -> App registrations -> All applications and select the used service principal (by default named "svc-HydraWebAuthentication". Generate a new client secret in "Certificates & secrets". Copy the new secret value into the clipboard and navigate to the deployed key vault (having the same name as the website of the Hydra portal). In the key vault, go to Secrets and update the secret "AzureAd--ClientSecret" with the copied secret. Restart the app service to use the updated secret.

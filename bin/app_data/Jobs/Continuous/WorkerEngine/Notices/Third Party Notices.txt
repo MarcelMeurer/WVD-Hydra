@@ -10,6 +10,12 @@ https://licenses.nuget.org/MIT
 Azure.ResourceManager.Compute, Microsoft
 https://licenses.nuget.org/MIT
 
+Azure.ResourceManager.Hci, Microsoft
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.HybridCompute, Microsoft
+https://licenses.nuget.org/MIT
+
 Azure.ResourceManager.Network, Microsoft
 https://licenses.nuget.org/MIT
 
@@ -45,6 +51,9 @@ https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE
 
 Microsoft.Azure.Services.AppAuthentication, Microsoft
 https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE
+
+System.Diagnostics.DiagnosticSource
+https://licenses.nuget.org/MIT
 
 Microsoft.EntityFrameworkCore, Microsoft
 https://licenses.nuget.org/Apache-2.0
