@@ -39,7 +39,7 @@ Give users or a user group the role "User" in Hydra. After this, users can acces
 ## How to create a custom image and do a roll out
 Creating images based on a "Golden Master" is one of the strengths of Hydra. Compared to a manual approach, Hydra always runs the imaging process of a clone of the Golden Master. This is important to avoid that sysprep destroying the Golden Master. So, with Hydra, administrators can use the original Golden Master to update and maintain the image the next time. The imaging process looks like this:
 
-![](../media/HCI-Hydra-003.png)
+![](./media/HCI-Hydra-003.png)
 
 After creating the image, the clone is deleted during the clean-up.
 Imaging for HCI works in the same way, but we must consider a few points right now:
@@ -63,11 +63,11 @@ We can create a custom image for HCI with the following steps:
  
 **Caution:** Never let Hydra delete an image that is being used by a virtual machine. VMs can no longer be started or stopped if the base image is deleted. Only deletion would work.
  
-![](../media/HCI-Hydra-004.png)
+![](./media/HCI-Hydra-004.png)
 
 The VM will be cloned, and the image will be transferred to the custom location (that could take a while). After that, you can create new hosts in a host pool by configuring the rollout configuration in the Hydra settings "New Session Host Rollout" of the host pool:
  
-![](../media/HCI-Hydra-005.png)
+![](./media/HCI-Hydra-005.png)
 
 Click on the plus icon in the session host list of a host pool to roll out hosts with the custom image.
 
