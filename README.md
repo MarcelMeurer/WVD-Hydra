@@ -466,7 +466,7 @@ Hydra can be easily updated from the portal (full administrator permissions are 
   - Role-base access and mirroring of user sessions (click on the play icon in the user overview of an active session)
 <sup>* Currently not available in the US</sup>
 
-</summary>
+</details>
 
 
 
