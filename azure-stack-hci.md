@@ -2,7 +2,7 @@
 
 Hydra is the one-stop solution for managing and operating AVD in a clever and easy way. Hydra supports administrators in managing user sessions, creating images without losing the Golden Master, deploying and re-deploying session hosts, and automating daily tasks with a powerful and easy-to-use engine. This and much more for single and multiple tenants.
 
-Right now, starting from version 1.0.6, Hydra supports hosts on **Azure Stack HCI 22H3**. Does mean you can leverage the feature set of Hydra to handle hosts on HCI in mostly the same way as hosts in Azure:
+Right now, starting from version 1.0.6, Hydra supports hosts on **Azure Stack HCI 23H2**. Does mean you can leverage the feature set of Hydra to handle hosts on HCI in mostly the same way as hosts in Azure:
 -	Autoscaling of pooled and personal host pools
 -	Let user start their personal hosts
 -	Create images from Azure VMs and store them in a custom location (on HCI)
