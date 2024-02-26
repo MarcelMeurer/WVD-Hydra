@@ -34,7 +34,7 @@ Please note that Power-On-Connect is not working for HCI right now.
 ## How to give users access to start their personal hosts
 Give users or a user group the role "User" in Hydra. After this, users can access Hydra and only see the menu item "My Sessions & Hosts". From this, users can start/stop/restart the personal hosts or log off their sessions. 
 
-![](../media/HCI-Hydra-006.png)
+![](./media/HCI-Hydra-006.png)
 
 ## How to create a custom image and do a roll out
 Creating images based on a "Golden Master" is one of the strengths of Hydra. Compared to a manual approach, Hydra always runs the imaging process of a clone of the Golden Master. This is important to avoid that sysprep destroying the Golden Master. So, with Hydra, administrators can use the original Golden Master to update and maintain the image the next time. The imaging process looks like this:
