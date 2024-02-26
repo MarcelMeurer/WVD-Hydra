@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 8.3
+# Current Version of this script: 8.5
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -503,9 +503,13 @@ if ((Test-Path ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 
 	if ((Test-Path ("${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 		LogWriter("Creating ITPC-WVD-Image-Processing.ps1 from invocation")
-		Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1")
+		if ($CallScript -and $CallScript -ne "") {
+			Copy-Item $CallScript -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1") -Container:$false
+		} else {
+			Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1") -Container:$false
+		}
 	}
- else {
+	else {
 		LogWriter("Creating ITPC-WVD-Image-Processing.ps1 from PSScriptRoot")
 		Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig + "\") -ErrorAction SilentlyContinue
 	}
@@ -622,17 +626,18 @@ if ($mode -eq "Generalize") {
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\HandlerState\Microsoft.Azure.ActiveDirectory.AADLoginForWindows_*" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin"  -Recurse -Force -ErrorAction Ignore
-	$AadCert = Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Issuer -match "CN=MS-Organization-P2P-Access*" }
-	if ($AadCert -ne $null) {
-		$cn = $AadCert.Subject.Split(",")[0]
+	$AadCerts = Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Issuer -match "CN=MS-Organization-P2P-Access*" -or $_.Issuer -match "CN=Microsoft Intune MDM Device CA" -or $_.Issuer -match "CN=MS-Organization-Access" -or $_.Issuer -match "DC=Windows Azure CRP Certificate Generator"}
+	if ($AadCerts -ne $null) {
+		$AadCerts | ForEach-Object {
+			$cn = $_.Subject.Split(",")
 
-		LogWriter("Found probaly a AAD certificate with name: $cn")
-		Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Subject -match "$($cn)*" } | ForEach-Object {
-			LogWriter("Deleting certificate from image with subject: $($_.Subject)")
-			Remove-Item -Path $_.PSPath
+			write-host("Found probaly a AAD/Intune certificate with name: $cn")
+			Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Subject -match "$($cn)*" } | ForEach-Object {
+				LogWriter("Deleting certificate from image with subject: $($_.Subject)")
+				Remove-Item -Path $_.PSPath
+			}    
 		}
 	}
-
 	# Removing an old intune configuration to avoid an uninstall of installed applications
 	LogWriter("Removing intune configuration")
 	if ((Get-Service -Name IntuneManagementExtension -ErrorAction SilentlyContinue) -ne $null) {
@@ -644,6 +649,9 @@ if ($mode -eq "Generalize") {
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\DeviceManageabilityCSP" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\current" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Enrollments\C4CAE00E-51B1-4736-A39A-D59275FD6816\DMClient\MS DM Server" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Provisioning\Diagnostics\Autopilot" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Provisioning\OMADM\Accounts\C4CAE00E-51B1-4736-A39A-D59275FD6816" -Recurse -Force -ErrorAction Ignore
 	Uninstall-Package -Name "Microsoft Intune Management Extension" -AllVersions -Force -ErrorAction SilentlyContinue 
 
 	# Get access to sysprep action files
@@ -1122,7 +1130,8 @@ elseif ($mode -eq "JoinDomain") {
 	
 	# Final reboot
 	LogWriter("Finally restarting session host")
-	Restart-Computer -Force -ErrorAction SilentlyContinue
+	Start-Process -FilePath PowerShell.exe -ArgumentList "-noexit -command & {Start-Sleep -Seconds 20; Restart-Computer -Force -ErrorAction SilentlyContinue}"
+	#Restart-Computer -Force -ErrorAction SilentlyContinue
 }
 elseif ($Mode -eq "RunSysprep") {
 	RunSysprepInternal $parameters

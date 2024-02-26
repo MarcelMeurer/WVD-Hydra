@@ -23,6 +23,7 @@ If you are not familiar with the first configuration and creating a service prin
 
 ## Features
 - Multi-tenancy
+- [Azure Stack HCI support](azure-stack-hci.md)
 - Role-based access
 - Image management
   - Create images from VMs / Golden Masters without destroying the source VM
@@ -72,12 +73,13 @@ If you are not familiar with the first configuration and creating a service prin
 
 
 ## Updates and releases
-Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website.
+Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
-
+<details><summary>Release history:</summary>
+- 1.0.6.00  (2024/02/24)
+  - Add: [Support for Azure Stack HCI 22H3](azure-stack-hci.md)
 - 1.0.5.80  (2024/02/16)
-  - Add: Additional option to the Hydra REST calls](#External-REST-Calls) (filtering of subscriptions, pool types, pool groups)
+  - Add: Additional option to the Hydra [REST calls](#External-REST-Calls) (filtering of subscriptions, pool types, pool groups)
 - 1.0.5.70  (2024/02/04)
   - Add: The session host list of a personal pool shows if a user has configured a personal start time (icon close to the user name)
   - Fix: The host pool image update could be interrupted if a host was manually removed during the update
@@ -462,8 +464,11 @@ If this item is not shown in your installation, update Hydra once on the deploye
   - Autoscale schedules can now include serving a minimum number of free sessions.
 - 1.0.0.5	(2021/06/15)
   - Role-base access and mirroring of user sessions (click on the play icon in the user overview of an active session)
-
 <sup>* Currently not available in the US</sup>
+
+</summary>
+
+
 
 ## Installation
 
@@ -956,6 +961,9 @@ Hint: If you left the ADE Encryption Key Url empty, Hydra creates a new key for 
 Do a deployment to verify that the disk is ADE encrypted:
 
 ![](media/ADE-02.png)
+
+## Support for Azure Stack HCI 22H3
+Go to [Azure Stack HCI support](azure-stack-hci.md) site.
 
 ## External REST Calls
 Hydra can accept REST-Calls to create new session hosts. To enable this feature, create a new secret in the Key Vault deployed with Hydra (you have to give yourself access to the secrets of the Key Vault first).
