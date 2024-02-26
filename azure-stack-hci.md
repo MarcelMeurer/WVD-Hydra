@@ -27,7 +27,7 @@ Autoscaling works in the same way as hosts in Azure. Follow the documentation to
 
 As shown in the screenshot, Hydra starts session hosts automatically before users try to log in. And in the other direction, if users are logging off at the end of the work day.
  
-![](../media/HCI-Hydra-002.png)
+![](./media/HCI-Hydra-002.png)
 
 Please note that Power-On-Connect is not working for HCI right now.
 
