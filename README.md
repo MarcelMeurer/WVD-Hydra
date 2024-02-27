@@ -75,10 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.6.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.6.1.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.6.01 | 2024-02-27 | Fix: Update of the built-in in scripts and collections
 1.0.6.00 | 2024-02-24 | Add: [Support for Azure Stack HCI 22H3](azure-stack-hci.md)
 1.0.5.80 | 2024-02-16 | Add: Additional option to the Hydra [REST calls](#External-REST-Calls) (filtering of subscriptions, pool types, pool groups)
 1.0.5.70 | 2024-02-04 | Add: The session host list of a personal pool shows if a user has configured a personal start time (icon close to the user name)<br/>Fix: The host pool image update could be interrupted if a host was manually removed during the update<br/>Change: Update of the API versions while accessing the AVD backend
