@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 8.5
+# Current Version of this script: 8.6
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -1037,6 +1037,15 @@ elseif ($mode -eq "JoinDomain") {
 
 	# install AVD Agent if a registration key given
 	if ($WvdRegistrationKey -ne "") {
+		# Detect Windows Server
+		try {
+			if ((Get-WmiObject -class Win32_OperatingSystem).Caption.Contains("Windows Server")) {
+				LogWriter("Windows Server detected - Installing RDS-role")
+				Add-WindowsFeature rds-rd-server
+			}
+		} catch {
+			LogWriter("Error detecting Windows Server OS: $_")
+		}
 		if ([System.Environment]::OSVersion.Version.Major -gt 6) {
 			LogWriter("Installing AVD agent")
 			$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
