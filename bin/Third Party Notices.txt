@@ -22,6 +22,9 @@ https://licenses.nuget.org/MIT
 Azure.ResourceManager.Storage, Microsoft
 https://licenses.nuget.org/MIT
 
+Azure.ResourceManager.Monitor, Microsoft
+https://licenses.nuget.org/MIT
+
 Azure.Security.KeyVault.Secrets, Microsoft
 https://licenses.nuget.org/MIT
 
