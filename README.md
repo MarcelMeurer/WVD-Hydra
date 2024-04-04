@@ -79,6 +79,7 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.6.04 | 2024-04-04 | Add: Imaging defintions are now available
 1.0.6.03 | 2024-03-26 | Add: New schedule type for scripts and collections (AllWithoutSessionsNotInDrainmode); Add: Users without modify permissions of the host pool configuration can not view the configuration; Add: Support for Azure Monitoring Agent (AMA) - select an existing DCR to target the workspace
 1.0.6.02 | 2024-02-29 | Add: Create and rollout images based on a Marketplace plans (caution: using plans can result in additional costs for the plan)
 1.0.6.01 | 2024-02-27 | Fix: Update of the built-in in scripts and collections
