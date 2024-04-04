@@ -75,11 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.6.3.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.6.4.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
-1.0.6.04 | 2024-04-04 | Add: Imaging defintions are now available; Fix: Azure Monitoring Agent was not ever applied in the previous version
+1.0.6.04 | 2024-04-04 | Add: [Imaging defintions](#Imaging-definitions) are now available; Fix: Azure Monitoring Agent was not ever applied in the previous version
 1.0.6.03 | 2024-03-26 | Add: New schedule type for scripts and collections (AllWithoutSessionsNotInDrainmode); Add: Users without modify permissions of the host pool configuration can not view the configuration; Add: Support for Azure Monitoring Agent (AMA) - select an existing DCR to target the workspace
 1.0.6.02 | 2024-02-29 | Add: Create and rollout images based on a Marketplace plans (caution: using plans can result in additional costs for the plan)
 1.0.6.01 | 2024-02-27 | Fix: Update of the built-in in scripts and collections
@@ -334,12 +334,18 @@ Go to: *Image Builder -> Create an image*
 - Select the "Target Resource Group" of the image to be created
 - Modify the other options if needed
 - Trusted Launch: For trusted launch enabled Golden Master: Open "Azure Compute Gallery" and select the prepared Azure Compute Gallery Definition and the target location(s)
+- For Azure Stack HCI: Open "Azure Stack HCI" and select the custom location (please note: Don't let Hydra delete older images if thoses images still in use)
 
 **Click on "Create Image"**
 
 ![](media/Capturing-Image-01.png)
 
 The image process takes 6 to 45 minutes, depending on the size of the master, the targets (compute galleries), and the installed application. Please keep an eye on the log.
+
+#### Imaging definitions
+You can save an imaging configuration with "Store imaging configuration" or "Update imaging configuration." Imaging configurations include all settings made on this screen to capture an image. Image definitions are visible in the node: *Image builder -> Imaging definitions*
+In Imaging definitions, you can start, delete, modify, and schedule the imaging process. If you schedule an imaging process, ensure that older images are deleted in the configuration (e.g., keep the last 5 images) to avoid costs. Image schedules are perfect with the session host rollout configuration based on the newest image. It's also a good practices to include the collection for Windows Update to keep images automatically up to date:
+![](media/Imaging-Definitions-01.png)
 
 
 ### Rollout Session Hosts
