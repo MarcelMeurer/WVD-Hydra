@@ -1232,13 +1232,13 @@ elseif ($Mode -eq "RDAgentBootloader") {
 	$WaitForHybridJoin = (Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -ErrorAction Ignore)."WaitForHybridJoin"
 
 	if ($WaitForHybridJoin -and $WaitForHybridJoin -eq "1") {
-		LogWriter("Delaying the installation of the AVD boot loader. Waiting for the Hybrid-Join to Azure AD")
+		LogWriter("Delaying the installation of the AVD boot loader. Waiting for the Hybrid-Join to Entra ID")
 		
 		$retryCount = 0
 		while ($null -eq (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*" -ErrorAction SilentlyContinue) -and $retryCount -le 420) {
 			$retryCount++
 			Start-Sleep -Seconds 5
-			LogWriter("Delaying the installation of the AVD boot loader. Waiting for the Hybrid-Join to Azure AD")
+			LogWriter("Delaying the installation of the AVD boot loader. Waiting for the Hybrid-Join to Entra ID")
 		}
 		LogWriter("Delaying the installation of the AVD boot loader. Host is hybrid-joined: $($null -ne (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*" -ErrorAction SilentlyContinue))")
 	}

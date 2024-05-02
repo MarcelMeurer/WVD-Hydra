@@ -75,10 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.6.6.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.6.7.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.6.07 | 2024-05-02 | Fix: Hosts based on Marketplace plans shows error while chanigng properties or installing extensions (caution: using plans can result in additional costs for the plan)
 1.0.6.06 | 2024-04-24 | Add: Additional option to the Hydra [REST calls](#External-REST-Calls): Session host information are now containing the VM size and OSDisk size
 1.0.6.05 | 2024-04-17 | Add: Additional option to the Hydra [REST calls](#External-REST-Calls) (change VM size and size of OS-disk) 
 1.0.6.04 | 2024-04-04 | Add: [Imaging defintions](#Imaging-definitions) are now available; Fix: Azure Monitoring Agent was not ever applied in the previous version
