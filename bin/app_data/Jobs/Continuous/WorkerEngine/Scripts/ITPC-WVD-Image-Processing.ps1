@@ -382,13 +382,6 @@ function RunSysprepInternal($parameters) {
 	LogWriter("Starting sysprep to generalize session host")
 	$sysprepErrorLogFile = "$env:windir\System32\Sysprep\Panther\setuperr.log"
 
-	# Disable Bitlocker, if needed
-	try {
-		manage-bde -autounlock -ClearAllKeys C:
-		Disable-BitLocker -MountPoint C:
-		LogWriter("Disable Bitlocker")
-	} catch {}
-
 	# Stopping windows update service during the imaging process
 	LogWriter("Stopping windows update service during the imaging process")
 	Stop-Service wuauserv -Force -NoWait -ErrorAction SilentlyContinue
@@ -603,6 +596,13 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "DirtyShutdownTime" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "LastAliveStamp" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
+
+	# Disable Bitlocker, if needed
+	try {
+		manage-bde -autounlock -ClearAllKeys C:
+		Disable-BitLocker -MountPoint C:
+		LogWriter("Disable Bitlocker")
+	} catch {}
 
 	LogWriter("Cleaning up some Defender For Endpoint properties - the master should not be onboarded")
 	Remove-Item -Path "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cyber\*.*" -Recurse -Force -ErrorAction Ignore
