@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.0
+# Current Version of this script: 9.1
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -382,6 +382,17 @@ function RunSysprepInternal($parameters) {
 	LogWriter("Starting sysprep to generalize session host")
 	$sysprepErrorLogFile = "$env:windir\System32\Sysprep\Panther\setuperr.log"
 
+	# Disable Bitlocker, if needed
+	try {
+		manage-bde -autounlock -ClearAllKeys C:
+		Disable-BitLocker -MountPoint C:
+		LogWriter("Disable Bitlocker")
+	} catch {}
+
+	# Stopping windows update service during the imaging process
+	LogWriter("Stopping windows update service during the imaging process")
+	Stop-Service wuauserv -Force -NoWait -ErrorAction SilentlyContinue
+
 	# Get access to the log files
 	$sysPrepLogPath = "$env:windir\System32\Sysprep\Panther"
 	GetAccessToFolder $sysPrepLogPath
@@ -436,7 +447,7 @@ function RunSysprepInternal($parameters) {
 			if ((Get-Process -Id $proc.Id -ErrorAction SilentlyContinue) -eq $null) {
 				LogWriter("Sysprep executable finished")
 				$again = $false
-				$restrartSysprepOnce = 0
+				#$restrartSysprepOnce = 0
 			}
 			$sysprepErrorLog = Get-Content -Path $sysprepErrorLogFile -ErrorAction SilentlyContinue
 			if ($sysprepErrorLog) {
@@ -467,10 +478,9 @@ function RunSysprepInternal($parameters) {
 					try { Stop-Process -Id $proc.Id -ErrorAction SilentlyContinue } catch {}
 					SysprepPreClean
 				} 
-				# elseif ($hasError -and $restrartSysprepOnce -le 0) {
-				# 	LogWriter("Sysprep failed. Check the logfile on the temporary VM in: $sysprepErrorLogFile")
-				# 	throw("Sysprep failed. Check the logfile on the temporary VM in: $sysprepErrorLogFile")
-				# }
+			}
+			if ($again -eq $false -and $hasError -eq $false) {
+				$restrartSysprepOnce = 0
 			}
 		} while ($again)
 	} while ($restrartSysprepOnce -gt 0)
@@ -808,7 +818,11 @@ elseif ($mode -eq "RenameComputer") {
 	LogWriter("Renaming computer to: " + $readComputerNewname)
 	Rename-Computer -NewName $ComputerNewname -Force -ErrorAction SilentlyContinue
 }
-elseif ($mode -eq "JoinDomain") {	
+elseif ($mode -eq "JoinDomain") {
+	# Stopping windows update service during the rollout process
+	LogWriter("Stopping windows update service during the rollout process")
+	Stop-Service wuauserv -Force -NoWait -ErrorAction SilentlyContinue
+
 	# Removing existing agent if exist
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 

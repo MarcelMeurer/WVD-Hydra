@@ -75,10 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.6.8.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.6.9.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.6.09 | 2024-05-10 | Change: Imaging of server OS improved; Change: After a session host was imaged, the host is started and deallocated; Fix: Selection of users or hosts was reaplied after triggering an action; Fix: AMA extension now gets the deployment tags
 1.0.6.08 | 2024-05-07 | Add: Option to resize (increase only) the OS disk of a VM by a script collection task or from the session host overview in a pool (icon in the burger menu)
 1.0.6.07 | 2024-05-02 | Fix: Hosts based on Marketplace plans shows error while chanigng properties or installing extensions (caution: using plans can result in additional costs for the plan)
 1.0.6.06 | 2024-04-24 | Add: Additional option to the Hydra [REST calls](#External-REST-Calls): Session host information are now containing the VM size and OSDisk size
@@ -87,7 +88,7 @@ Release | Date | Changes & Notes
 1.0.6.03 | 2024-03-26 | Add: New schedule type for scripts and collections (AllWithoutSessionsNotInDrainmode); Add: Users without modify permissions of the host pool configuration can not view the configuration; Add: Support for Azure Monitoring Agent (AMA) - select an existing DCR to target the workspace
 1.0.6.02 | 2024-02-29 | Add: Create and rollout images based on a Marketplace plans (caution: using plans can result in additional costs for the plan)
 1.0.6.01 | 2024-02-27 | Fix: Update of the built-in in scripts and collections
-1.0.6.00 | 2024-02-24 | Add: [Support for Azure Stack HCI 22H3](azure-stack-hci.md)
+1.0.6.00 | 2024-02-24 | Add: [Support for Azure Stack HCI 23H2](azure-stack-hci.md)
 1.0.5.80 | 2024-02-16 | Add: Additional option to the Hydra [REST calls](#External-REST-Calls) (filtering of subscriptions, pool types, pool groups)
 1.0.5.70 | 2024-02-04 | Add: The session host list of a personal pool shows if a user has configured a personal start time (icon close to the user name)<br/>Fix: The host pool image update could be interrupted if a host was manually removed during the update<br/>Change: Update of the API versions while accessing the AVD backend
 1.0.5.60 | 2024-02-04 | Fix: The value "0" in the configuration "Dynamically rollout new session hosts up to a max. number..." in Autoscale configuration was not handled correct (0 disabled the limitation)
@@ -731,7 +732,7 @@ Do a deployment to verify that the disk is ADE encrypted:
 
 ![](media/ADE-02.png)
 
-## Support for Azure Stack HCI 22H3
+## Support for Azure Stack HCI 23H2
 Go to [Azure Stack HCI support](azure-stack-hci.md) site.
 
 ## External REST Calls
