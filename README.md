@@ -79,7 +79,7 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 Release | Date | Changes & Notes
 --- | --- | ---
-1.0.6.10 | 2024-05-10 | Fix: Issue in imaging script
+1.0.6.10 | 2024-05-13 | Fix: Issue in imaging script with Bitlocker disks in a few environments
 1.0.6.09 | 2024-05-10 | Change: Imaging of server OS improved; Change: After a session host was imaged, the host is started and deallocated; Fix: Selection of users or hosts was reaplied after triggering an action; Fix: AMA extension now gets the deployment tags
 1.0.6.08 | 2024-05-07 | Add: Option to resize (increase only) the OS disk of a VM by a script collection task or from the session host overview in a pool (icon in the burger menu)
 1.0.6.07 | 2024-05-02 | Fix: Hosts based on Marketplace plans shows error while chanigng properties or installing extensions (caution: using plans can result in additional costs for the plan)
