@@ -599,10 +599,10 @@ if ($mode -eq "Generalize") {
 
 	# Disable Bitlocker, if needed
 	#try {
-	#	manage-bde -autounlock -ClearAllKeys C:
-	#	Disable-BitLocker -MountPoint C:
-	#	LogWriter("Disable Bitlocker")
-	#} catch {}
+		manage-bde -autounlock -ClearAllKeys C:
+		Disable-BitLocker -MountPoint C: -ErrorAction SilentlyContinue
+		LogWriter("Disable Bitlocker")
+	} catch {}
 
 	LogWriter("Cleaning up some Defender For Endpoint properties - the master should not be onboarded")
 	Remove-Item -Path "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cyber\*.*" -Recurse -Force -ErrorAction Ignore
