@@ -598,7 +598,7 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
 
 	# Disable Bitlocker, if needed
-	#try {
+	try {
 		manage-bde -autounlock -ClearAllKeys C:
 		Disable-BitLocker -MountPoint C: -ErrorAction SilentlyContinue
 		LogWriter("Disable Bitlocker")
