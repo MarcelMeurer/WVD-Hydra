@@ -75,10 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.6.9.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.6.10.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.6.10 | 2024-05-10 | Fix: Issue in imaging script
 1.0.6.09 | 2024-05-10 | Change: Imaging of server OS improved; Change: After a session host was imaged, the host is started and deallocated; Fix: Selection of users or hosts was reaplied after triggering an action; Fix: AMA extension now gets the deployment tags
 1.0.6.08 | 2024-05-07 | Add: Option to resize (increase only) the OS disk of a VM by a script collection task or from the session host overview in a pool (icon in the burger menu)
 1.0.6.07 | 2024-05-02 | Fix: Hosts based on Marketplace plans shows error while chanigng properties or installing extensions (caution: using plans can result in additional costs for the plan)

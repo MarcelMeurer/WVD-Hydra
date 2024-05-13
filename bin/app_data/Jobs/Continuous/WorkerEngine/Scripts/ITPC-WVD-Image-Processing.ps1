@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.1
+# Current Version of this script: 9.2
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -598,11 +598,11 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
 
 	# Disable Bitlocker, if needed
-	try {
-		manage-bde -autounlock -ClearAllKeys C:
-		Disable-BitLocker -MountPoint C:
-		LogWriter("Disable Bitlocker")
-	} catch {}
+	#try {
+	#	manage-bde -autounlock -ClearAllKeys C:
+	#	Disable-BitLocker -MountPoint C:
+	#	LogWriter("Disable Bitlocker")
+	#} catch {}
 
 	LogWriter("Cleaning up some Defender For Endpoint properties - the master should not be onboarded")
 	Remove-Item -Path "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cyber\*.*" -Recurse -Force -ErrorAction Ignore
