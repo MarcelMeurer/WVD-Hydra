@@ -1,12 +1,20 @@
 {
   "runtimeOptions": {
-    "tfm": "netcoreapp3.1",
-    "framework": {
-      "name": "Microsoft.AspNetCore.App",
-      "version": "3.1.0"
-    },
+    "tfm": "net8.0",
+    "frameworks": [
+      {
+        "name": "Microsoft.NETCore.App",
+        "version": "8.0.0"
+      },
+      {
+        "name": "Microsoft.AspNetCore.App",
+        "version": "8.0.0"
+      }
+    ],
     "configProperties": {
       "System.GC.Server": true,
+      "System.Reflection.Metadata.MetadataUpdater.IsSupported": false,
+      "System.Reflection.NullabilityInfoContext.IsSupported": true,
       "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
     }
   }
