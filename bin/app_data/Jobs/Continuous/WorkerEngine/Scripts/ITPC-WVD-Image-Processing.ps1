@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.2
+# Current Version of this script: 9.3
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -822,6 +822,12 @@ elseif ($mode -eq "JoinDomain") {
 	# Stopping windows update service during the rollout process
 	LogWriter("Stopping windows update service during the rollout process")
 	Stop-Service wuauserv -Force -NoWait -ErrorAction SilentlyContinue
+
+	LogWriter("Check for PreJoin scripts")
+	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.exe"
+	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.cmd"
+	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.bat"
+	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.ps1"
 
 	# Removing existing agent if exist
 	LogWriter("Removing existing Remote Desktop Agent Boot Loader")

@@ -75,10 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.7.00.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.7.10.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.7.10 | 2024-05-28 | Add: Autoretry to upload images to HCI; Fix: Disconected time was not shown in version 1.0.7.0
 1.0.7.00 | 2024-05-28 | Add: Adjust the chart of the host pool capacity to store and show up to 24h or 36h; Add: Performance improvements; Fix: A cloned VM during the imaging process is now keeping the encrypted on host property; Change: Upgrade to net. 8
 1.0.6.10 | 2024-05-13 | Fix: Issue in imaging script with Bitlocker disks in a few environments
 1.0.6.09 | 2024-05-10 | Change: Imaging of server OS improved; Change: After a session host was imaged, the host is started and deallocated; Fix: Selection of users or hosts was reaplied after triggering an action; Fix: AMA extension now gets the deployment tags
