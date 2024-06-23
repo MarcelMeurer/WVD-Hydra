@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.3
+# Current Version of this script: 9.4
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -600,8 +600,13 @@ if ($mode -eq "Generalize") {
 	# Disable Bitlocker, if needed
 	try {
 		manage-bde -autounlock -ClearAllKeys C:
-		Disable-BitLocker -MountPoint C: -ErrorAction SilentlyContinue
+		Disable-BitLocker -MountPoint C: -ErrorAction Stop
 		LogWriter("Disable Bitlocker")
+		do {
+			$isBitLocker=(Get-BitLockerVolume -MountPoint C: -ErrorAction Stop).EncryptionPercentage
+			LogWriter("Wait for encryption of drive C:")
+			if ($isBitLocker -ne 0) {Start-Sleep -Seconds 5}
+		} while ($isBitLocker -ne 0)
 	} catch {}
 
 	LogWriter("Cleaning up some Defender For Endpoint properties - the master should not be onboarded")
