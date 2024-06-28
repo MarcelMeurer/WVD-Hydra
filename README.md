@@ -79,6 +79,7 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.7.50 | 2024-06-28 | Fix: While replacing a lot of hosts with a task schedule, the names for the new VMs were generated in a few events doubled; Fix: Start a rollout for an HCI host failed for a new pool with version 1.0.7.4; Add: Notification of orhphan session hosts
 1.0.7.40 | 2024-06-25 | Add: Notification for orphan VMs and unresponsive AVD agents (running VMs but not reporting to the AVD backend). A notification appears on the dashboard for tagged VMs (AVD.Type=SessionHost) if an issue is detected multiple times (at least for an hour). That helps to identify some resources without value but generating costs. This is only a warning, and you must be qualified in your environment. Can be disabled in the global settings.
 1.0.7.30 | 2024-06-23 | Add: Support for confidential session hosts and imaging (blog post: [https://blog.itprocloud.de/AVD-How-to-image-a-Golden-Master-VM-based-on-a-plan-to-a-compute-gallery-definition/](https://blog.itprocloud.de/AVD-How-to-image-a-Golden-Master-VM-based-on-a-plan-to-a-compute-gallery-definition/))
 1.0.7.20 | 2024-06-16 | Add: Capturing images based on a trusted launch Golden Master to HCI; Change: NewestImageByVM will ignore failed images or images still uploading
