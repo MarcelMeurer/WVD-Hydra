@@ -97,9 +97,6 @@ https://www.sqlite.org/copyright.html
 Microsoft.Graph
 https://aka.ms/deprecateLicenseUrl
 
-EFCore.BulkExtensions    
-https://aka.ms/deprecateLicenseUrl
-
 Microsoft.Azure.Services.AppAuthentication   
 https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE    
 
