@@ -73,7 +73,7 @@ If you are not familiar with the first configuration and creating a service prin
 
 
 ## Updates and releases
-Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. Please only run an update if no deployments, scripts or imaging processes are running.
+Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. Please only run an update if **no** deployments, scripts or imaging processes are running.
 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
