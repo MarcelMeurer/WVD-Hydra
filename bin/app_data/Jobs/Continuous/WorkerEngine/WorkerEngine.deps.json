@@ -29,7 +29,7 @@
           "Newtonsoft.Json": "13.0.3",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
           "HydraAgent": "2.1.0.0",
-          "HydraShared.Reference": "1.0.7.6"
+          "HydraShared.Reference": "1.0.7.7"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -2968,11 +2968,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.0.7.6": {
+      "HydraShared.Reference/1.0.7.7": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.0.7.6",
-            "fileVersion": "1.0.7.6"
+            "assemblyVersion": "1.0.7.7",
+            "fileVersion": "1.0.7.7"
           }
         }
       }
@@ -4812,7 +4812,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.0.7.6": {
+    "HydraShared.Reference/1.0.7.7": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

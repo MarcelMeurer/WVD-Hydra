@@ -75,10 +75,11 @@ If you are not familiar with the first configuration and creating a service prin
 ## Updates and releases
 Hydra can be easily updated from the portal (full administrator permissions are needed): Click on the avatar (roboter icon) in the upper right corner and select: "Update Engine". After a while, reload the Hydra Portal website. If this item is not shown in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 
-<details><summary>Open to see the release history. Current version is 1.0.7.6.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.7.7.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.7.70 | 2024-07-04 | Add: If a host deployment is interrupted by a restart of the engine (which can happen and is controlled by Microsoft), the VM can run but is not visible in AVD (orphan VM). If detected, those VMs are deallocated by default (can configured in the global settings)
 1.0.7.60 | 2024-07-02 | Add: Performance improvement for larger environments (5k to 200k+ users), also scale Hydra's app service plan and database, holding users sessions NOT in the database can be configured on the app settings: "config:UseLocalUserDb" to "1"; it's expected that this will change to default in upcoming versions 
 1.0.7.50 | 2024-06-28 | Fix: While replacing a lot of hosts with a task schedule, the names for the new VMs were generated in a few events doubled; Fix: Start a rollout for an HCI host failed for a new pool with version 1.0.7.4; Add: Notification of orhphan session hosts
 1.0.7.40 | 2024-06-25 | Add: Notification for orphan VMs and unresponsive AVD agents (running VMs but not reporting to the AVD backend). A notification appears on the dashboard for tagged VMs (AVD.Type=SessionHost) if an issue is detected multiple times (at least for an hour). That helps to identify some resources without value but generating costs. This is only a warning, and you must be qualified in your environment. Can be disabled in the global settings.

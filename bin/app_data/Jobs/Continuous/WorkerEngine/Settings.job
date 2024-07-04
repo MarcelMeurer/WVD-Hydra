@@ -1,5 +1,7 @@
 {
-  "is_singleton": true
+  "is_singleton": true //,
+  //"stopping_wait_time": 31104000
+
   //    Examples:
 
   //    Runs every minute
@@ -19,4 +21,7 @@
 
   //    Runs at 9:30 AM every week day
   //    "schedule": "0 30 9 * * 1-5"
+
+
+  // https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache
 }
