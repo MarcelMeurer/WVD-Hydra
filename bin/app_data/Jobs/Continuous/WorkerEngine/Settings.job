@@ -1,6 +1,6 @@
 {
   "is_singleton": true //,
-  //"stopping_wait_time": 31104000
+  //"stopping_wait_time": 60   // careful: This time is awaited after an update of the engine
 
   //    Examples:
 
@@ -24,4 +24,5 @@
 
 
   // https://learn.microsoft.com/en-us/azure/app-service/overview-local-cache
+  // WEBSITE_PROACTIVE_AUTOHEAL_ENABLED=false
 }
