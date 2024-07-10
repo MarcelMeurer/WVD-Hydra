@@ -78,11 +78,12 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.7.8.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.7.9.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
-1.0.7.70 | 2024-07-08 | Fix: ADE disks was not shown the Key Vault information in the Azure Portal; Add: Configure a "Teams notification Workflow URL" in the Global Settings to get inforamtion about orphan resources or old service principal secrets in teams (configre a notification); Add: New script collection task: Disconnect users
+1.0.7.90 | 2024-07-10 | Add: More monitoring for rollout new hosts 
+1.0.7.80 | 2024-07-08 | Fix: ADE disks was not shown the Key Vault information in the Azure Portal; Add: Configure a "Teams notification Workflow URL" in the Global Settings to get inforamtion about orphan resources or old service principal secrets in teams (configre a notification); Add: New script collection task: Disconnect users
 1.0.7.70 | 2024-07-04 | Add: If a host deployment is interrupted by a restart of the engine (which can happen and is controlled by Microsoft), the VM can run but is not visible in AVD (orphan VM). If detected, those VMs are deallocated by default (can configured in the global settings)
 1.0.7.60 | 2024-07-02 | Add: Performance improvement for larger environments (5k to 200k+ users), also scale Hydra's app service plan and database, holding users sessions NOT in the database can be configured on the app settings: "config:UseLocalUserDb" to "1"; it's expected that this will change to default in upcoming versions 
 1.0.7.50 | 2024-06-28 | Fix: While replacing a lot of hosts with a task schedule, the names for the new VMs were generated in a few events doubled; Fix: Start a rollout for an HCI host failed for a new pool with version 1.0.7.4; Add: Notification of orhphan session hosts
