@@ -21,6 +21,16 @@ Please make sure to send feedback and update the solution regularly.
 ## Get help
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
+
+## Possible Rollout issues
+We got some feedback that, in very few situations, the rollout of new hosts (v1.0.7.3 and higher) is not working. No error message is shown on the host list, and no new host is shown. We are investigating this issue. If you are running into this issue, perform the following steps:
+- Download the log file and send it to support@itprocloud.com; Roboter icon in the top right corner -> Download log file
+- Update to the newest version; Roboter icon in the top right corner -> Update Engine
+
+If the issue comes back, please download and send the log file again; the newer versions have an improved logging
+- To bring the functionality back: Restart the engine: Roboter icon in the top right corner -> Restart Engine
+
+
 ## Features
 - Multi-tenancy
 - [Azure Stack HCI support](azure-stack-hci.md)
