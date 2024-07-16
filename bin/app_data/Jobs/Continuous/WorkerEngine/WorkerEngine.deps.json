@@ -9,6 +9,7 @@
       "WorkerEngine/1.0.0": {
         "dependencies": {
           "AutoMapper": "13.0.1",
+          "Azure.Core": "1.41.0",
           "Azure.Identity": "1.12.0",
           "Azure.ResourceManager.Hci": "1.2.0-beta.1",
           "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
@@ -29,7 +30,7 @@
           "Newtonsoft.Json": "13.0.3",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
           "HydraAgent": "2.1.0.0",
-          "HydraShared.Reference": "1.0.8.0"
+          "HydraShared.Reference": "1.0.8.1"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -46,7 +47,7 @@
           }
         }
       },
-      "Azure.Core/1.40.0": {
+      "Azure.Core/1.41.0": {
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "System.ClientModel": "1.0.0",
@@ -59,14 +60,14 @@
         },
         "runtime": {
           "lib/net6.0/Azure.Core.dll": {
-            "assemblyVersion": "1.40.0.0",
-            "fileVersion": "1.4000.24.30605"
+            "assemblyVersion": "1.41.0.0",
+            "fileVersion": "1.4100.24.36109"
           }
         }
       },
       "Azure.Identity/1.12.0": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Microsoft.Identity.Client": "4.61.3",
           "Microsoft.Identity.Client.Extensions.Msal": "4.61.3",
           "System.Memory": "4.5.4",
@@ -83,7 +84,7 @@
       },
       "Azure.ResourceManager/1.11.1": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "System.ClientModel": "1.0.0",
           "System.Text.Json": "8.0.0"
         },
@@ -96,7 +97,7 @@
       },
       "Azure.ResourceManager.Compute/1.5.0": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
           "System.Text.Json": "8.0.0"
@@ -110,7 +111,7 @@
       },
       "Azure.ResourceManager.Hci/1.2.0-beta.1": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.Text.Json": "8.0.0"
         },
@@ -123,7 +124,7 @@
       },
       "Azure.ResourceManager.HybridCompute/1.0.0-beta.7": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.Text.Json": "8.0.0"
         },
@@ -136,7 +137,7 @@
       },
       "Azure.ResourceManager.Monitor/1.3.1": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
           "System.Text.Json": "8.0.0"
@@ -150,7 +151,7 @@
       },
       "Azure.ResourceManager.Network/1.7.0": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
           "System.Text.Json": "8.0.0"
@@ -164,7 +165,7 @@
       },
       "Azure.ResourceManager.Quota/1.0.0-beta.3": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.Text.Json": "8.0.0"
         },
@@ -177,7 +178,7 @@
       },
       "Azure.ResourceManager.Storage/1.2.3": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
           "System.Text.Json": "8.0.0"
@@ -191,7 +192,7 @@
       },
       "Azure.Security.KeyVault.Secrets/4.6.0": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "System.Memory": "4.5.4",
           "System.Text.Json": "8.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
@@ -1514,7 +1515,7 @@
       },
       "Microsoft.Kiota.Authentication.Azure/1.1.7": {
         "dependencies": {
-          "Azure.Core": "1.40.0",
+          "Azure.Core": "1.41.0",
           "Microsoft.Kiota.Abstractions": "1.9.1"
         },
         "runtime": {
@@ -2935,6 +2936,7 @@
         "dependencies": {
           "Agent for Project Hydra": "2.1.0",
           "AutoMapper": "13.0.1",
+          "Azure.Core": "1.41.0",
           "Azure.Identity": "1.12.0",
           "Azure.ResourceManager.Compute": "1.5.0",
           "Azure.ResourceManager.Hci": "1.2.0-beta.1",
@@ -2968,11 +2970,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.0.8.0": {
+      "HydraShared.Reference/1.0.8.1": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.0.8.0",
-            "fileVersion": "1.0.8.0"
+            "assemblyVersion": "1.0.8.1",
+            "fileVersion": "1.0.8.1"
           }
         }
       }
@@ -2991,12 +2993,12 @@
       "path": "automapper/13.0.1",
       "hashPath": "automapper.13.0.1.nupkg.sha512"
     },
-    "Azure.Core/1.40.0": {
+    "Azure.Core/1.41.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-eOx6wk3kQ3SCnoAj7IytAu/d99l07PdarmUc+RmMkVOTkcQ3s+UQEaGzMyEqC2Ua4SKnOW4Xw/klLeB5V2PiSA==",
-      "path": "azure.core/1.40.0",
-      "hashPath": "azure.core.1.40.0.nupkg.sha512"
+      "sha512": "sha512-7OO8rPCVSvXj2IQET3NkRf8hU2ZDCCvCIUhlrE089qkLNpNfWufJnBwHRKLAOWF3bhKBGJS/9hPBgjJ8kupUIg==",
+      "path": "azure.core/1.41.0",
+      "hashPath": "azure.core.1.41.0.nupkg.sha512"
     },
     "Azure.Identity/1.12.0": {
       "type": "package",
@@ -4812,7 +4814,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.0.8.0": {
+    "HydraShared.Reference/1.0.8.1": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

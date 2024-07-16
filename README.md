@@ -22,13 +22,11 @@ Please make sure to send feedback and update the solution regularly.
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
 
-## Possible Rollout issues
-We got some feedback that, in very few situations, the rollout of new hosts (v1.0.7.3 and higher) is not working. No error message is shown on the host list, and no new host is shown. We are investigating this issue. If you are running into this issue, perform the following steps:
-- Download the log file and send it to support@itprocloud.com; Roboter icon in the top right corner -> Download log file
-- Update to the newest version; Roboter icon in the top right corner -> Update Engine
+## **IMPORTANT**: Possible issues with version 1.0.7.3 to 1.0.8.0: Freeze of operations (Starting, Rollout, etc.)
+We got some feedback that, in very few situations, Hydra was unable to communicate with some resources in Azure. That stops the processing of some operations, like starting or creating hosts. That could also **stop autoscaling (scale-up)** from working. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package (1.41), which is now integrated into Hydra version 1.0.8.1. Issue: [https://github.com/Azure/azure-sdk-for-net/pull/44882](https://github.com/Azure/azure-sdk-for-net/pull/44882)
 
-If the issue comes back, please download and send the log file again; the newer versions have an improved logging
-- To bring the functionality back: Restart the engine: Roboter icon in the top right corner -> Restart Engine
+If you are running into this issue, perform the following steps:
+- Update to the newest version; Roboter icon in the top right corner -> Update Engine
 
 
 ## Features
@@ -92,6 +90,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.10 | 2024-07-16 | Fix: We got some feedback that, in very few situations, Hydra was unable to communitcate with some resources in Azure. That stops the processing of some operations, llike starting or creating hosts. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package which is now integrated in Hydra. Issue: https://github.com/Azure/azure-sdk-for-net/pull/448821.0.8.10 | 2024-07-16 | Fix: We got some feedback that, in very few situations, Hydra was unable to communicate with some resources in Azure. That stops the processing of some operations, like starting or creating hosts. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package, which is now integrated into Hydra. Issue: [https://github.com/Azure/azure-sdk-for-net/pull/44882](https://github.com/Azure/azure-sdk-for-net/pull/44882)
 1.0.8.00 | 2024-07-16 | Add: More monitoring for the resource authentication
 1.0.7.90 | 2024-07-10 | Add: More monitoring for rollout new hosts 
 1.0.7.80 | 2024-07-08 | Fix: ADE disks was not shown the Key Vault information in the Azure Portal; Add: Configure a "Teams notification Workflow URL" in the Global Settings to get inforamtion about orphan resources or old service principal secrets in teams (configre a notification); Add: New script collection task: Disconnect users
