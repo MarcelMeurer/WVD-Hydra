@@ -88,10 +88,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.7.9.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.8.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.00 | 2024-07-16 | Add: More monitoring for the resource authentication
 1.0.7.90 | 2024-07-10 | Add: More monitoring for rollout new hosts 
 1.0.7.80 | 2024-07-08 | Fix: ADE disks was not shown the Key Vault information in the Azure Portal; Add: Configure a "Teams notification Workflow URL" in the Global Settings to get inforamtion about orphan resources or old service principal secrets in teams (configre a notification); Add: New script collection task: Disconnect users
 1.0.7.70 | 2024-07-04 | Add: If a host deployment is interrupted by a restart of the engine (which can happen and is controlled by Microsoft), the VM can run but is not visible in AVD (orphan VM). If detected, those VMs are deallocated by default (can configured in the global settings)
