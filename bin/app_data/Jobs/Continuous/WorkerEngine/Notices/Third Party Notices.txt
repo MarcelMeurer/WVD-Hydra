@@ -37,6 +37,9 @@ https://licenses.nuget.org/MIT
 Microsoft.Extensions.Hosting  
 https://licenses.nuget.org/MIT
 
+Azure.ResourceManager.AppService
+https://licenses.nuget.org/MIT
+
 Azure.ResourceManager.Hci
 https://licenses.nuget.org/MIT
 

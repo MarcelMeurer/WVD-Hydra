@@ -86,10 +86,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.8.1.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.8.2.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.20 | 2024-07-23 | Add: Notification of orphan VMs from failed imaging processes; Change: Select all hosts or user sessions are modified: If one item is selected, a click on select all would unselect all items or (if no icon is selected) select all filtered or shown items; Fix: Paging filter was not shown for less then 50 sessions or hosts
 1.0.8.10 | 2024-07-16 | Fix: We got some feedback that, in very few situations, Hydra was unable to communitcate with some resources in Azure. That stops the processing of some operations, llike starting or creating hosts. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package which is now integrated in Hydra. Issue: https://github.com/Azure/azure-sdk-for-net/pull/448821.0.8.10 | 2024-07-16 | Fix: We got some feedback that, in very few situations, Hydra was unable to communicate with some resources in Azure. That stops the processing of some operations, like starting or creating hosts. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package, which is now integrated into Hydra. Issue: [https://github.com/Azure/azure-sdk-for-net/pull/44882](https://github.com/Azure/azure-sdk-for-net/pull/44882)
 1.0.8.00 | 2024-07-16 | Add: More monitoring for the resource authentication
 1.0.7.90 | 2024-07-10 | Add: More monitoring for rollout new hosts 

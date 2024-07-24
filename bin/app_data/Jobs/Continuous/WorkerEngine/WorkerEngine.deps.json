@@ -30,7 +30,7 @@
           "Newtonsoft.Json": "13.0.3",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
           "HydraAgent": "2.1.0.0",
-          "HydraShared.Reference": "1.0.8.1"
+          "HydraShared.Reference": "1.0.8.2"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -92,6 +92,19 @@
           "lib/netstandard2.0/Azure.ResourceManager.dll": {
             "assemblyVersion": "1.11.1.0",
             "fileVersion": "1.1100.124.22301"
+          }
+        }
+      },
+      "Azure.ResourceManager.AppService/1.0.2": {
+        "dependencies": {
+          "Azure.Core": "1.41.0",
+          "Azure.ResourceManager": "1.11.1",
+          "System.Text.Json": "8.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.AppService.dll": {
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.223.25401"
           }
         }
       },
@@ -2938,6 +2951,7 @@
           "AutoMapper": "13.0.1",
           "Azure.Core": "1.41.0",
           "Azure.Identity": "1.12.0",
+          "Azure.ResourceManager.AppService": "1.0.2",
           "Azure.ResourceManager.Compute": "1.5.0",
           "Azure.ResourceManager.Hci": "1.2.0-beta.1",
           "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
@@ -2970,11 +2984,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.0.8.1": {
+      "HydraShared.Reference/1.0.8.2": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.0.8.1",
-            "fileVersion": "1.0.8.1"
+            "assemblyVersion": "1.0.8.2",
+            "fileVersion": "1.0.8.2"
           }
         }
       }
@@ -3013,6 +3027,13 @@
       "sha512": "sha512-OIWeSpKyO2jqrb0z+KVr+pn7yUGCIA0PIioOahrwR7ZHmPAkcdc7Dhl2px8uMMLPFCJCwZG229lASW2OM3HYFg==",
       "path": "azure.resourcemanager/1.11.1",
       "hashPath": "azure.resourcemanager.1.11.1.nupkg.sha512"
+    },
+    "Azure.ResourceManager.AppService/1.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZkUHZ3RH/S4j8av+1D46kOFsXqb1d3rIbRt7nJ9Z24QORRs5x+fOHjrzG5h3p9Hv4tzfrcPfEcFcAIg3zOuhkw==",
+      "path": "azure.resourcemanager.appservice/1.0.2",
+      "hashPath": "azure.resourcemanager.appservice.1.0.2.nupkg.sha512"
     },
     "Azure.ResourceManager.Compute/1.5.0": {
       "type": "package",
@@ -4814,7 +4835,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.0.8.1": {
+    "HydraShared.Reference/1.0.8.2": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

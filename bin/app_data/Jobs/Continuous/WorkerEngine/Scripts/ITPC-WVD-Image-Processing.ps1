@@ -1125,7 +1125,7 @@ elseif ($mode -eq "JoinDomain") {
 				$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
 				$triggerM = $class | New-CimInstance -ClientOnly
 				$triggerM.Enabled = $true
-				$triggerM.Subscription = '<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''WVD-Agent'']] and System[(Level=2) and (EventID=3277)]]</Select></Query></QueryList>'
+				$triggerM.Subscription = '<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''WVD-Agent'']] and System[(Level=2) and (EventID=3277)]]</Select></Query></QueryList>' # and EventID=3019: '<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''WVD-Agent'']] and System[(Level=2) and ((EventID=3277) or (EventID=3277))]]</Select></Query></QueryList>'
 				$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RestartBootloader`""
 				$settingsM = New-ScheduledTaskSettingsSet
 				$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Restarts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
