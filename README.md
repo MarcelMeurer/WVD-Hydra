@@ -86,10 +86,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.8.2.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.8.3.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.30 | 2024-07-29 | Add: Automatic detection of the gallery definitions accelerated network setting: The clone during the imaging process will inherit this setting; Add: Additional option to the Hydra [REST calls](#External-REST-Calls): Query scripts and collections and assign them to hosts; Update: Automatic versioning name for Gallery definition during the imaging improved
 1.0.8.20 | 2024-07-23 | Add: Notification of orphan VMs from failed imaging processes; Change: Select all hosts or user sessions are modified: If one item is selected, a click on select all would unselect all items or (if no icon is selected) select all filtered or shown items; Fix: Paging filter was not shown for less then 50 sessions or hosts
 1.0.8.10 | 2024-07-16 | Fix: We got some feedback that, in very few situations, Hydra was unable to communitcate with some resources in Azure. That stops the processing of some operations, llike starting or creating hosts. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package which is now integrated in Hydra. Issue: https://github.com/Azure/azure-sdk-for-net/pull/448821.0.8.10 | 2024-07-16 | Fix: We got some feedback that, in very few situations, Hydra was unable to communicate with some resources in Azure. That stops the processing of some operations, like starting or creating hosts. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package, which is now integrated into Hydra. Issue: [https://github.com/Azure/azure-sdk-for-net/pull/44882](https://github.com/Azure/azure-sdk-for-net/pull/44882)
 1.0.8.00 | 2024-07-16 | Add: More monitoring for the resource authentication
@@ -801,6 +802,22 @@ Accessible APIs:
   - GET
   - Return:
     - A list of session hosts where the user is assigned. If HostPool-Guid is Guid.Empty, all assigned hosts in all pools are returned
+
+- Get available scripts a user: /rest/scripts
+  - GET
+  - Return:
+    - A list of scripts
+
+- Get available script collections: /rest/scriptcollections
+  - GET
+  - Return:
+    - A list of script collections
+
+- Run a script or script collection on a host: /rest/sessionhosts/\<SessionHost-Guid\>/scriptorscriptcollection
+  - POST
+    - The body should contain the id of the script or collection as text
+  - Return:
+    - A guid to query the state of the task
 
 - State of tasks
   - GET
