@@ -86,10 +86,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.8.4.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.8.5.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.50 | 2024-08-28 | Add: New target for script shedules: All hosts without a specific tag; Add: Optional teams notification for canceled jobs; Add: Add notes to single hosts in the extended view of the session host list; Add: Options to the schedules for autoscaling, script schedules, imaging: run on specific weeks in a month (advanced configuration of the schedules)
 1.0.8.40 | 2024-08-28 | Add: Support for shallow (fast) replication of images in galleries; Add: New role 'Host pool VM, user manager and remove hosts'; Add: Action log are now stored to log analytics after completition; Add: Option (Global settings) to show the dashboard as table instead of tiles; Fix: Send messages to all users of a hosts could failed with an arithmetic error message
 1.0.8.30 | 2024-07-29 | Add: Automatic detection of the gallery definitions accelerated network setting: The clone during the imaging process will inherit this setting; Add: Additional option to the Hydra [REST calls](#External-REST-Calls): Query scripts and collections and assign them to hosts; Update: Automatic versioning name for Gallery definition during the imaging improved
 1.0.8.20 | 2024-07-23 | Add: Notification of orphan VMs from failed imaging processes; Change: Select all hosts or user sessions are modified: If one item is selected, a click on select all would unselect all items or (if no icon is selected) select all filtered or shown items; Fix: Paging filter was not shown for less then 50 sessions or hosts
