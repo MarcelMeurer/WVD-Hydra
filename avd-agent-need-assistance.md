@@ -13,7 +13,7 @@ The issue is related to the AVD agent testing a UDP connection to the given (Mic
 
 ## What can we do?
 
-### Disabling UDP temporary (preffered)
+### Disabling UDP temporary (preferred)
 We can disable the use of UDP [via GPO](https://admx.help/?Category=Windows_10_2016&Policy=Microsoft.Policies.TerminalServer::TS_SELECT_TRANSPORT) or reg keys. The following script disables UDP, and it should also remove the error message. You can create the script in Hydra an run it on the hosts (test it with one host first):
 
 ```
