@@ -608,6 +608,9 @@ Scripts and script collections. Both are intended to automize Azure VMs, and Azu
 
 A Powershell script for a session host. The script runs in the system context with system permissions, variables containing data about the host pool, session hosts, etc. Optionally, a Powershell credential object (PSC) can be used to connect to other services, like files shares (the service account can be configured on the host pool level).
 
+You can add a custom script by copying an existing one (the first one). Click on the 2nd icon on the right site to copy the script. The copied script appears at the button and can be changed. Don't forget to save it by clicking on the disk icon right to the script.
+
+
 ![](media/Script-01.png)
 
 ### Script Collections
