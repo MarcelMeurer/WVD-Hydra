@@ -21,8 +21,14 @@ Please make sure to send feedback and update the solution regularly.
 ## Get help
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
+## **IMPORTANT**: Random error messages from the AVD Agent and hosts are going into "Need Assistance"
+Today, I got a lot of emails and team messages. Customers are seeing the following error message on session hosts in the Azure Portal and in Hydra:
+> NAT shape is Undetermined when probing [turn:20.202.248.2:3478?Udp] TURN relay health check failed for server [turn:20.202.248.2:3478?Udp] - One or more errors occurred.->Timed out waiting for Receive to complete - Code: -2147467259 - 2024-09-26T07:39:15.704086Z
 
-## **IMPORTANT**: Possible issues with version 1.0.7.3 to 1.0.8.0: Freeze of operations (Starting, Rollout, etc.)
+This causes several issues. [Read more](avd-agent-need-assistance)
+
+
+## Possible issues with version 1.0.7.3 to 1.0.8.0: Freeze of operations (Starting, Rollout, etc.)
 We got some feedback that, in very few situations, Hydra was unable to communicate with some resources in Azure. That stops the processing of some operations, like starting or creating hosts. That could also **stop autoscaling (scale-up)** from working. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package (1.41), which is now integrated into Hydra version 1.0.8.1. Issue: [https://github.com/Azure/azure-sdk-for-net/pull/44882](https://github.com/Azure/azure-sdk-for-net/pull/44882)
 
 If you are running into this issue, perform the following steps:

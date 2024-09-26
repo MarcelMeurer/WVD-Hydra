@@ -1,0 +1,38 @@
+# Current issues: AVD agent reports an issue and brings the hosts into **"Need Assistance"**
+
+Today, I got a lot of emails and team messages. Customers are seeing the following error message on session hosts in the Azure Portal and in Hydra:
+
+
+> NAT shape is Undetermined when probing [turn:20.202.248.2:3478?Udp] TURN relay health check failed for server [turn:20.202.248.2:3478?Udp] - One or more errors occurred.->Timed out waiting for Receive to complete - Code: -2147467259 - 2024-09-26T07:39:15.704086Z
+
+The session hosts are also going into the **"Need Assistance"** mode - even if users can still log in and continue working. It's also reported, that the time stamp of the error message stays.
+
+The issue is related to the AVD agent testing a UDP connection to the given (Microsoft) IP. This is a normal behaviour and can fail if customers are not allowing this connection through the firewall. If that is not working, connections are made via TCP. So far - so good. Unfortunately, the AVD agent shows this as an error, bringing the host into the **"Need Assistance"** mode.
+
+**Important: Session hosts in this state do not count on the capacity of a pool in Hydra. It also can break autoscaling. Also hosts in this state are **not** deallocated automatically - they stay running until the error disappears.**
+
+## What can we do?
+
+### Disabling UDP temporary (preffered)
+We can disable the use of UDP [via GPO](https://admx.help/?Category=Windows_10_2016&Policy=Microsoft.Policies.TerminalServer::TS_SELECT_TRANSPORT) or reg keys. The following script disables UDP, and it should also remove the error message. You can create the script in Hydra an run it on the hosts (test it with one host first):
+
+```
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Name "SelectTransport" -Value 1 -force # default: 0
+
+# Reset old failure state
+if (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport") {
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -Name "AgentHealthCheckReport" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -Name "AgentHealthCheckTimestamp" -ErrorAction SilentlyContinue
+}
+```
+
+### Update Hydra (2nd option)
+If disabling UPD is not an option, you can test the hotfix of Hydra as a 2nd option: There is a new release of Hydra available from today containing the hotfix to handle failed hosts. This will not remove the error message but should shows the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
+
+
+---
+It's also a good idea to open a ticket to let Microsoft fix this issue with the service/AVD agent.
+
+---
+For questions or support, please send an email to (please accept some delays): support@itprocloud.com.
+
