@@ -25,7 +25,7 @@ If you are not familiar with the first configuration and creating a service prin
 Today, I got a lot of emails and team messages. Customers are seeing the following error message on session hosts in the Azure Portal and in Hydra:
 > NAT shape is Undetermined when probing [turn:20.202.248.2:3478?Udp] TURN relay health check failed for server [turn:20.202.248.2:3478?Udp] - One or more errors occurred.->Timed out waiting for Receive to complete - Code: -2147467259 - 2024-09-26T07:39:15.704086Z
 
-This causes several issues. [Read more](avd-agent-need-assistance)
+This causes several issues. [Read more](avd-agent-need-assistance.md)
 
 
 ## Possible issues with version 1.0.7.3 to 1.0.8.0: Freeze of operations (Starting, Rollout, etc.)
