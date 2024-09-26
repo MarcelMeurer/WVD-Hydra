@@ -18,7 +18,7 @@ The issue is related to the AVD agent testing a UDP connection to the given (Mic
 You can configure the firewall to allow communication to the mentioned ports if that is an option for your environment/company. In short, the following communication from the hosts to the internet must be possible:
 - Target: 20.202.0.0/16, Port 3478 UDP
 - Target: 20.202.0.0/16, Port 443 TCP
-[Link to the blog post)(https://learn.microsoft.com/en-us/azure/virtual-desktop/rdp-shortpath?tabs=public-networks)
+- [Link to the blog post)(https://learn.microsoft.com/en-us/azure/virtual-desktop/rdp-shortpath?tabs=public-networks)
 
 ### Disabling UDP temporary (preferred)
 If option one is not possible, or the error messages are not disappearing, we can disable the use of UDP [via GPO](https://admx.help/?Category=Windows_10_2016&Policy=Microsoft.Policies.TerminalServer::TS_SELECT_TRANSPORT) or reg keys. The following script disables UDP, and it should also remove the error message. You can create the script in Hydra and run it on the hosts (test it with one host first):
