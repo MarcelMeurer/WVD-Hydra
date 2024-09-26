@@ -90,6 +90,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.60 | 2024-09-25 | Change: Hosts in "Need Assistance" mode (not failed) will count as "available" and to the host pool capacity. Additionally, hosts in "Need Assistance" mode are deallocated by autoscale (that is different from the last versions) - Note: If a host failed (e.g. during a non accessible AppAttach package), the host will stay running but no longer counting to the capacity. That can cause the start / creation of addition hosts and results into a loop starting all hosts or creating the max. number of new hosts. Always ensure not having a death loop with failed hosts. 
 1.0.8.50 | 2024-08-28 | Add: New target for script shedules: All hosts without a specific tag; Add: Optional teams notification for canceled jobs; Add: Add notes to single hosts in the extended view of the session host list; Add: Options to the schedules for autoscaling, script schedules, imaging: run on specific weeks in a month (advanced configuration of the schedules); Add: If a VM has the tag "AVD.AdvIgnoreDiskChange"="1", the disk type of the VM is not changed on start or deallocate (even autoscaling)
 1.0.8.40 | 2024-08-28 | Add: Support for shallow (fast) replication of images in galleries; Add: New role 'Host pool VM, user manager and remove hosts'; Add: Action log are now stored to log analytics after completition; Add: Option (Global settings) to show the dashboard as table instead of tiles; Fix: Send messages to all users of a hosts could failed with an arithmetic error message
 1.0.8.30 | 2024-07-29 | Add: Automatic detection of the gallery definitions accelerated network setting: The clone during the imaging process will inherit this setting; Add: Additional option to the Hydra [REST calls](#External-REST-Calls): Query scripts and collections and assign them to hosts; Update: Automatic versioning name for Gallery definition during the imaging improved
@@ -745,7 +746,7 @@ To roll out session hosts with ADE, some resources must be prepared to work: Azu
 -- Secret permissions: Set
 - Check the boxes: Azure Virtual Machines for deployment and Azure Disk Encryption for volume encryption
 - Give yourself permissions: Key and secret management
-- Go to Keys and click on Generate. Type a name and select RSA and 2048
+- Go to Keys and click on Generate. Type a name and select RSA and 4096
 - Click on the generate key and on the current version. Copy the Key identifier (must include the version). E.g., https://avd-disks.vault.azure.net/keys/ADE-Encryption/bf270e977a574813a87bb637d57a6675
 
 In Hydra, configure "New Session Host Rollout":
