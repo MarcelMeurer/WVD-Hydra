@@ -13,8 +13,14 @@ The issue is related to the AVD agent testing a UDP connection to the given (Mic
 
 ## What can we do?
 
+
+### Allowing UDP communication to specific ports (preferred)
+You can configure the firewall to allow communication to the mentioned ports if that is an option for your environment/company. In short, the following communication from the hosts to the internet must be possible:
+- Target: 20.202.0.0/16, Port 3478 UDP
+- Target: 20.202.0.0/16, Port 443 TCP
+
 ### Disabling UDP temporary (preferred)
-We can disable the use of UDP [via GPO](https://admx.help/?Category=Windows_10_2016&Policy=Microsoft.Policies.TerminalServer::TS_SELECT_TRANSPORT) or reg keys. The following script disables UDP, and it should also remove the error message. You can create the script in Hydra an run it on the hosts (test it with one host first):
+If option one is not possible, or the error messages are not disappearing, we can disable the use of UDP [via GPO](https://admx.help/?Category=Windows_10_2016&Policy=Microsoft.Policies.TerminalServer::TS_SELECT_TRANSPORT) or reg keys. The following script disables UDP, and it should also remove the error message. You can create the script in Hydra and run it on the hosts (test it with one host first):
 
 ```
 New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Name "SelectTransport" -Value 1 -force # default: 0
