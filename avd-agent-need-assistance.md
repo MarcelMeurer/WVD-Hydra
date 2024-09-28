@@ -20,7 +20,12 @@ You can configure the firewall to allow communication to the mentioned ports if 
 - Target: 20.202.0.0/16, Port 443 TCP
 - [Link to the blog post)(https://learn.microsoft.com/en-us/azure/virtual-desktop/rdp-shortpath?tabs=public-networks)
 
-### Disabling UDP temporary (preferred #2)
+
+### Update Hydra
+If disabling UPD is not an option, you can test the hotfix of Hydra as a 2nd option: There is a new release of Hydra available from today containing the hotfix to handle failed hosts. This will not remove the error message but should shows the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
+
+
+### Disabling UDP temporary
 If option one is not possible, or the error messages are not disappearing, we can disable the use of UDP [via GPO](https://admx.help/?Category=Windows_10_2016&Policy=Microsoft.Policies.TerminalServer::TS_SELECT_TRANSPORT) or reg keys. The following script disables UDP, and it should also remove the error message. You can [create the script in Hydra](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/README.md#scripts-and-script-collections) and run it on the hosts (test it with one host first):
 
 ```
@@ -33,9 +38,6 @@ if (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport") {
 }
 ```
 If you rollout a new host, make sure to reapply this settings. That can be done in Hydra -> Host Pool -> New Session Host Rollout -> Run script or script collection after deployment
-
-### Update Hydra (2nd option)
-If disabling UPD is not an option, you can test the hotfix of Hydra as a 2nd option: There is a new release of Hydra available from today containing the hotfix to handle failed hosts. This will not remove the error message but should shows the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
 
 
 ---
