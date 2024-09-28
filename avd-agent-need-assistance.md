@@ -22,7 +22,7 @@ You can configure the firewall to allow communication to the mentioned ports if 
 
 
 ### Update Hydra
-If disabling UPD is not an option, you can test the hotfix of Hydra as a 2nd option: There is a new release of Hydra available from today containing the hotfix to handle failed hosts. This will not remove the error message but should shows the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
+There is a new release of Hydra available from 09/26/2024 (v1.0.8.6) containing a hotfix to handle failed hosts. This will not remove the error message but should show the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
 
 
 ### Disabling UDP temporary
