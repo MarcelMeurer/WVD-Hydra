@@ -13,8 +13,8 @@ The issue is related to the AVD agent testing a UDP connection to the given (Mic
 
 
 
-![Download](../media/NA-AzurePortal.png)
-![Download](../media/NA-Hydra.png)
+![Download](./media/NA-AzurePortal.png)
+![Download](./media/NA-Hydra.png)
 
 
 
@@ -28,7 +28,7 @@ You can configure the firewall to allow communication to the mentioned ports if 
 - [Link to the blog post](https://learn.microsoft.com/en-us/azure/virtual-desktop/rdp-shortpath?tabs=public-networks)
 
 You can test the connection with the tool [avdnettest.exe](https://learn.microsoft.com/en-us/azure/virtual-desktop/troubleshoot-rdp-shortpath) from Microsoft:
-![Download](../media/NA-avdnettest.png)
+![Download](./media/NA-avdnettest.png)
 
 <br/>
 
