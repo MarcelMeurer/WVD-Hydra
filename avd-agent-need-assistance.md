@@ -2,14 +2,14 @@
 
 Today, I got a lot of emails and team messages. Customers are seeing the following error message on session hosts in the Azure Portal and in Hydra:
 
-
+3
 > NAT shape is Undetermined when probing [turn:20.202.248.2:3478?Udp] TURN relay health check failed for server [turn:20.202.248.2:3478?Udp] - One or more errors occurred.->Timed out waiting for Receive to complete - Code: -2147467259 - 2024-09-26T07:39:15.704086Z
 
 The session hosts are also going into the **"Need Assistance"** mode - even if users can still log in and continue working. It's also reported, that the time stamp of the error message stays.
 
 The issue is related to the AVD agent testing a UDP connection to the given (Microsoft) IP. This is a normal behaviour and can fail if customers are not allowing this connection through the firewall. If that is not working, connections are made via TCP. So far - so good. Unfortunately, the AVD agent shows this as an error, bringing the host into the **"Need Assistance"** mode.
 
-**Important: Session hosts in this state do not count on the capacity of a pool in Hydra. It also can break autoscaling if you run Hydra version 1.0.8.5 or less. Also hosts in this state are **not** deallocated automatically - they stay running until the error disappears.**
+**Important: Session hosts in this state do not count on the capacity of a pool in Hydra. It also can break autoscaling if you run Hydra version 1.0.8.7 or less. Also hosts in this state are **not** deallocated automatically - they stay running until the error disappears.**
 
 
 
@@ -33,7 +33,7 @@ You can test the connection with the tool [avdnettest.exe](https://learn.microso
 <br/>
 
 ### Update Hydra (also preferred)
-There is a new release of Hydra available from 09/26/2024 (v1.0.8.6) containing a hotfix to handle failed hosts. This will not remove the error message but should show the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
+There is a new release of Hydra available from 09/30/2024 (v1.0.8.7) containing a hotfix to handle failed hosts. This will not remove the error message but should show the correct sessions and handle autoscaling also for hosts in the **"Need Assistance"** mode. Please monitor your environment after update/hotfix: [How to update Hydra](https://github.com/MarcelMeurer/WVD-Hydra?tab=readme-ov-file#updates-and-releases)
 <br/>
 
 ### Disabling UDP temporary (workaround)
