@@ -77,7 +77,7 @@ foreach ($user in $users.Split(";")) {
                 $samaccountname=$adUser.Properties.samaccountname
                 LogWriter("User found in Active Directory: $($adUser.Path) with SID $sid")
             } else { 
-                $sid="S-1-12-?-??????????-??????????-?????????-?????????"
+                $sid="S-1-12-?-*-*-*-*"
                 $uparts=$user.Split("@")
                 if ($uparts.Count -eq 2) {
 					$samaccountname=$uparts[0]
