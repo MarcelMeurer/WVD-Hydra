@@ -15,7 +15,7 @@
           "Microsoft.Identity.Web.GraphServiceClient": "2.19.1",
           "Microsoft.Identity.Web.UI": "2.19.1",
           "HydraAgent": "2.1.0.0",
-          "HydraShared.Reference": "1.0.8.7"
+          "HydraShared.Reference": "1.0.8.8"
         },
         "runtime": {
           "Portal.dll": {}
@@ -2837,11 +2837,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.0.8.7": {
+      "HydraShared.Reference/1.0.8.8": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.0.8.7",
-            "fileVersion": "1.0.8.7"
+            "assemblyVersion": "1.0.8.8",
+            "fileVersion": "1.0.8.8"
           }
         }
       }
@@ -4674,7 +4674,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.0.8.7": {
+    "HydraShared.Reference/1.0.8.8": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

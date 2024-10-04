@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.4
+# Current Version of this script: 9.5
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -88,7 +88,7 @@ function UnzipFile($zipfile, $outdir) {
 	}
 }
 function DownloadFile($url, $outFile) {
-	$i = 3
+	$i = 6
 	$ok = $false;
 	do {
 		try {
@@ -98,12 +98,12 @@ function DownloadFile($url, $outFile) {
 		}
 		catch {
 			$i--;
+			LogWriter("Download failed: $_")
 			if ($i -le 0) {
-				LogWriter("Download failed: $_")
 				throw 
 			}
-			LogWriter("Re-trying download after 10 seconds")
-			Start-Sleep -Seconds 10
+			LogWriter("Re-trying download after 5 seconds")
+			Start-Sleep -Seconds 5
 		}
 	} while (!$ok)
 	LogWriter("Download done")

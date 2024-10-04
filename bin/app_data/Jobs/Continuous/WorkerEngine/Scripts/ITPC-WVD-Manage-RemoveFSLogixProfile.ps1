@@ -64,59 +64,75 @@ foreach ($user in $users.Split(";")) {
             $user=$user.Trim()
             LogWriter("Processing: $user")
             $search = [adsisearcher]"(&(ObjectCategory=Person)(ObjectClass=User)(|(userprincipalname=$user)(cn=$user)))"
-            $adUser = $search.FindOne()
+            try {
+                $adUser = $search.FindOne()
+            } catch {
+                LogWriter("Cannot browse Active Directory. Will try with Entra Id only account and random SID: $_.Message")
+            }
+            
+
+
             if ($adUser) {
                 $sid=(New-Object System.Security.Principal.SecurityIdentifier([byte[]]($adUser.Properties.objectsid |out-string -Stream),0)).Value
+                $samaccountname=$adUser.Properties.samaccountname
                 LogWriter("User found in Active Directory: $($adUser.Path) with SID $sid")
-
-                # Test for custom naming
-                $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
-                $noProfileContainingFolder=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("NoProfileContainingFolder")
-                if ($noProfileContainingFolder -ne $null -and $noProfileContainingFolder -eq "1") {
-                    LogWriter("NoProfileContainingFolder is set to 1")
-                    $profilePathUser=$profilePath
-                } else {
-                    if ($dirName -eq $null -or $dirName -eq "") {
-                        $regPath1="HKLM:\Software\FSLogix\Profiles"
-                        $regPath2="HKLM:\Software\Policies\FSLogix\ODFC"
-                        $flipFlop=$false
-                                        
-                        if ((Test-Path $regPath1) -and (Get-Item $regPath1 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
-                        if ((Test-Path $regPath2) -and (Get-Item $regPath2 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
-                        if ($flipFlop) {
-                            $profilePathUser="$($profilePath)\$($adUser.Properties.samaccountname)_$($sid)"
-                            LogWriter("FlipFlopProfileDirectoryName is set to 1")
-                        } else  {
-                            $profilePathUser="$($profilePath)\$($sid)_$($adUser.Properties.samaccountname)"
-                            LogWriter("FlipFlopProfileDirectoryName is set to 0")
-                        }
-                    } else {
-                        $profilePathUser="$($profilePath)\$dirName"
-                    }
-                }
-                $env:userName=$adUser.Properties.samaccountname
-                $profilePathUser=ResolveEnvVariable($profilePathUser)
-
-                LogWriter("Default FSLogix profile path is: $profilePathUser")
-                if (!(Test-Path -Path "$profilePath" -ErrorAction SilentlyContinue)) {
-                    LogWriter("Using service account to authenticate to the file share")
-                    $psc = New-Object System.Management.Automation.PSCredential("$serviceDomainUser", (ConvertTo-SecureString "$serviceDomainPw" -AsPlainText -Force))
-                    New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePath" -Credential $psc -ErrorAction SilentlyContinue
-                }
-                if (-not (Test-Path $profilePathUser)) {
-                    throw "The path $profilePathUser doesn't exist"
-                }
-                LogWriter("Start to remove all files in the path")
-                $files=Get-ChildItem -Path "$profilePathUser\*" -Include *.vhd* -Force | Where { ! $_.PSIsContainer }
-                LogWriter("Found $($files.count) file(s) in directory")
-                if  ($files.count -eq 0) {
-                    LogWriter("ERROR: No files found in $profilePathUser")
-                }
-                $files | Remove-Item -Force -Confirm:$false
-                LogWriter("Done")
-            } else {
-                LogWriter("WARNING: User $user couldn't be found in Active Directory")
+            } else { 
+                $sid="S-1-12-?-??????????-??????????-?????????-?????????"
+                $uparts=$user.Split("@")
+                if ($uparts.Count -eq 2) {
+					$samaccountname=$uparts[0]
+				} else {
+					$samaccountname=$user
+				}
+                LogWriter("Active Directory not available. We assume a cloud only identity: $($samaccountname) with SID $sid")
             }
+
+            # Test for custom naming
+            $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
+            $noProfileContainingFolder=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("NoProfileContainingFolder")
+            if ($noProfileContainingFolder -ne $null -and $noProfileContainingFolder -eq "1") {
+                LogWriter("NoProfileContainingFolder is set to 1")
+                $profilePathUser=$profilePath
+            } else {
+                if ($dirName -eq $null -or $dirName -eq "") {
+                    $regPath1="HKLM:\Software\FSLogix\Profiles"
+                    $regPath2="HKLM:\Software\Policies\FSLogix\ODFC"
+                    $flipFlop=$false
+                                        
+                    if ((Test-Path $regPath1) -and (Get-Item $regPath1 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
+                    if ((Test-Path $regPath2) -and (Get-Item $regPath2 -ErrorAction SilentlyContinue).GetValue("FlipFlopProfileDirectoryName") -eq 1) {$flipFlop=$true}
+                    if ($flipFlop) {
+                        $profilePathUser="$($profilePath)\$($samaccountname)_$($sid)"
+                        LogWriter("FlipFlopProfileDirectoryName is set to 1")
+                    } else  {
+                        $profilePathUser="$($profilePath)\$($sid)_$($samaccountname)"
+                        LogWriter("FlipFlopProfileDirectoryName is set to 0")
+                    }
+                } else {
+                    $profilePathUser="$($profilePath)\$dirName"
+                }
+            }
+            $env:userName=$samaccountname
+            $profilePathUser=ResolveEnvVariable($profilePathUser)
+
+            LogWriter("Default FSLogix profile path is: $profilePathUser")
+            if (!(Test-Path -Path "$profilePath" -ErrorAction SilentlyContinue)) {
+                LogWriter("Using service account to authenticate to the file share")
+                $psc = New-Object System.Management.Automation.PSCredential("$serviceDomainUser", (ConvertTo-SecureString "$serviceDomainPw" -AsPlainText -Force))
+                New-PSDrive -Name Profile -PSProvider FileSystem -Root "$profilePath" -Credential $psc -ErrorAction SilentlyContinue
+            }
+            if (-not (Test-Path $profilePathUser)) {
+                throw "The path $profilePathUser doesn't exist"
+            }
+            LogWriter("Start to remove all files in the path")
+            $files=Get-ChildItem -Path "$profilePathUser\*" -Include *.vhd* -Depth 1 -Force | Where { ! $_.PSIsContainer }
+            LogWriter("Found $($files.count) file(s) in directory")
+            if  ($files.count -eq 0) {
+                LogWriter("ERROR: No files found in $profilePathUser")
+            }
+            $files | Remove-Item -Force -Confirm:$false
+            LogWriter("Done")
+
         } catch {
             LogWriter("ERROR: An exception occurs: $_.Message")
         }
