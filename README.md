@@ -92,10 +92,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.8.8.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.8.9.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.0.8.90 | 2024-10-11 | Add: Querying hosts by REST will show the deployment state; Add: Sysprep monitoring for imaging will resolve more sysprep-errors as before (6)
 1.0.8.80 | 2024-10-04 | Add: Users with FullAdmin in a single tenant can see the log of all operations in this tenant (also from other users); Add: Support for Windows 24H2; Add: FSLogix profiles can now be removed for Cloud only identities
 1.0.8.70 | 2024-09-30 | Change: Hosts in "Need Assistance" mode (not failed) - VDI hosts in this state are also included in the scaling down
 1.0.8.60 | 2024-09-25 | Change: Hosts in "Need Assistance" mode (not failed) will count as "available" and to the host pool capacity. Additionally, hosts in "Need Assistance" mode are deallocated by autoscale (that is different from the last versions) - Note: If a host failed (e.g. during a non accessible AppAttach package), the host will stay running but no longer counting to the capacity. That can cause the start / creation of addition hosts and results into a loop starting all hosts or creating the max. number of new hosts. Always ensure not having a death loop with failed hosts. 

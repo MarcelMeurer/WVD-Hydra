@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.5
+# Current Version of this script: 9.6
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -50,25 +50,41 @@ function ShowPageFiles() {
 		LogWriter("Name: '$($pageFile.Name)', Maximum size: '$($pageFile.MaximumSize)'")
 	}
 }
-function RedirectPageFileToC() {
+function RedirectPageFileTo($drive) {
+	LogWriter("Redirecting pagefile to drive $($drive):")
 	$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
-	LogWriter("Pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
-	if ($CurrentPageFile) {$CurrentPageFile.delete()}
-	LogWriter("Pagefile deleted")
-	$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
-	if ($null -eq $CurrentPageFile) {
-		LogWriter("Pagefile deletion successful")
+	if ($CurrentPageFile -ne $null -and $CurrentPageFile.Name -ne "") {
+		LogWriter("Existing pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
+		if ($CurrentPageFile) {$CurrentPageFile.delete()}
+		LogWriter("Pagefile deleted")
+		$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
+		if ($null -eq $CurrentPageFile) {
+			LogWriter("Pagefile deletion successful")
+		}
+		else {
+			LogWriter("Pagefile deletion failed")
+		}
 	}
-	else {
-		LogWriter("Pagefile deletion failed")
-	}
-	Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name = 'c:\pagefile.sys'; InitialSize = 0; MaximumSize = 0 }
+	Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name = "$($drive):\pagefile.sys"; InitialSize = 0; MaximumSize = 0 }
 	$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
 	if ($null -eq $CurrentPageFile) {
 		LogWriter("Pagefile not found")
 	}
 	else {
 		LogWriter("New pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
+	}
+}
+function RedirectPageFileToLocalStorageIfExist() {
+	# configure page file on local storage if exist
+	$pageFileDrive=""
+	$disks = Get-WmiObject -Class win32_volume | Where-Object { $_.DriveLetter -ne $null -and $_.DriveType -eq 3 }
+	foreach ($disk in $disks) { if ($disk.Name -ne 'C:\' -and $disk.Name -ne '' -and $disk.Name -ne $null -and $disk.Label -eq 'Temporary Storage') {
+			$pageFileDrive=$disk.Name.Replace(":\","")
+		}
+	}
+	if ($pageFileDrive -ne "") {
+		LogWriter("Redirecting pagefile to local storage on $($pageFileDrive):")
+		RedirectPageFileTo($pageFileDrive)
 	}
 }
 function UnzipFile($zipfile, $outdir) {
@@ -391,7 +407,7 @@ function RunSysprepInternal($parameters) {
 	GetAccessToFolder $sysPrepLogPath
 
 	$errorReason = ""
-	$restrartSysprepOnce = 3
+	$restrartSysprepOnce = 6
 	do {
 		Remove-Item -Path $sysprepErrorLogFile -Force -ErrorAction Ignore
 		LogWriter("Resetting sysprep state")
@@ -764,7 +780,7 @@ if ($mode -eq "Generalize") {
 			LogWriter("Automatic manage pagefile size for all devices not activated")
 		}
 		# redirect pagefile to C: to rename data partition after deployment
-		RedirectPageFileToC
+		RedirectPageFileTo("c")
 	}
 
 	LogWriter("Preparing image to do one retry if the rollout of the VM failes (ADMINISTRATOR: Error Handler)")
@@ -995,12 +1011,9 @@ elseif ($mode -eq "JoinDomain") {
 
 						Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name = 'c:\pagefile.sys'; InitialSize = 0; MaximumSize = 0 }
 						LogWriter("Set pagefile to c:\pagefile.sys")
-						ShowPageFiles
 					}
 				}
-				ShowPageFiles
-			}
-			else { $modifyDrives = $false }
+			} else { $modifyDrives = $false }
 		}
 	}
 	
@@ -1024,8 +1037,13 @@ elseif ($mode -eq "JoinDomain") {
 
 	# check to move pagefile finally to C
 	if ($MovePagefileToC -eq "1") {
-		RedirectPageFileToC
+		LogWriter("Redirecting pagefile to C:")
+		RedirectPageFileTo("c")
+	} elseif (-not $modifyDrives) {
+		RedirectPageFileToLocalStorageIfExist
 	}
+	ShowPageFiles
+	
 	# install Hydra Agent (Hydra only)
 	if ($HydraAgentUri -ne "") {
 		$uri = $HydraAgentUri
@@ -1233,8 +1251,7 @@ elseif ($Mode -eq "DataPartition") {
 				}
 				ShowPageFiles
 
-				Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name = 'e:\pagefile.sys'; InitialSize = 0; MaximumSize = 0 }
-				LogWriter("set pagefile to e:\pagefile.sys")
+				RedirectPageFileToLocalStorageIfExist
 				ShowPageFiles
 
 				# reboot to activate pagefile
