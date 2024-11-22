@@ -92,10 +92,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.8.9.</summary>
+<details><summary>Open to see the release history. Current version is 1.0.1.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.00 | 2024-11-22 | Add: Improvements for the optional Hydra agent 3.0 (showing RTT, CPU, Memory, etc. for the last hour in realtime); Add: Admins can now select the availability zone from a list if needed; Add: Auto-managed pools (preview) are marked with a lock and deployments are disabled; Upgrade of some modules;
 1.0.8.90 | 2024-10-11 | Add: Querying hosts by REST will show the deployment state; Add: Sysprep monitoring for imaging will resolve more sysprep-errors as before (6)
 1.0.8.80 | 2024-10-04 | Add: Users with FullAdmin in a single tenant can see the log of all operations in this tenant (also from other users); Add: Support for Windows 24H2; Add: FSLogix profiles can now be removed for Cloud only identities
 1.0.8.70 | 2024-09-30 | Change: Hosts in "Need Assistance" mode (not failed) - VDI hosts in this state are also included in the scaling down

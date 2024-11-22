@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.6
+# Current Version of this script: 9.7
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -1049,34 +1049,40 @@ elseif ($mode -eq "JoinDomain") {
 		$uri = $HydraAgentUri
 		$secret = $HydraAgentSecret
 		$DownloadAdress = "https://$($uri)/Download/HydraAgent"
-		try {
-			if ((Test-Path ("$env:ProgramFiles\ITProCloud.de")) -eq $false) {
-				new-item "$env:ProgramFiles\ITProCloud.de" -ItemType Directory -ErrorAction Ignore
-			}
-			if ((Test-Path ("$env:ProgramFiles\ITProCloud.de\HydraAgent")) -eq $false) {
-				new-item "$env:ProgramFiles\ITProCloud.de\HydraAgent" -ItemType Directory -ErrorAction Ignore
-			}
-			Remove-Item -Path "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" -Force -ErrorAction Ignore
+        $retry=3
+        do {
+		    try {
+			    if ((Test-Path ("$env:ProgramFiles\ITProCloud.de")) -eq $false) {
+				    new-item "$env:ProgramFiles\ITProCloud.de" -ItemType Directory -ErrorAction Ignore
+			    }
+			    if ((Test-Path ("$env:ProgramFiles\ITProCloud.de\HydraAgent")) -eq $false) {
+				    new-item "$env:ProgramFiles\ITProCloud.de\HydraAgent" -ItemType Directory -ErrorAction Ignore
+			    }
+			    Remove-Item -Path "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" -Force -ErrorAction Ignore
 
 
-			LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
-			DownloadFile $DownloadAdress "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
+			    LogWriter("Downloading HydraAgent.zip from $DownloadAdress")
+			    DownloadFile $DownloadAdress "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
 
-			# Stop a running instance
-			LogWriter("Stop a running instance")
-			Stop-ScheduledTask -TaskName 'ITPC-AVD-Hydra-Helper' -ErrorAction Ignore
-			Stop-Process -Name HydraAgent -Force -ErrorAction Ignore
-			Start-Sleep -Seconds 6
-			UnzipFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" "$env:ProgramFiles\ITProCloud.de\HydraAgent"
+			    # Stop a running instance
+			    LogWriter("Stop a running instance")
+			    Stop-ScheduledTask -TaskName 'ITPC-AVD-Hydra-Helper' -ErrorAction Ignore
+			    Stop-Process -Name HydraAgent -Force -ErrorAction Ignore
+			    Start-Sleep -Seconds 6
+			    UnzipFile "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip" "$env:ProgramFiles\ITProCloud.de\HydraAgent"
+            
 
-			# Configuring the agent
-			LogWriter("Configuring the agent")
-			cd "$env:ProgramFiles\ITProCloud.de\HydraAgent"
-			. "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -i -u "wss://$($uri)/wsx" -s $secret
-		}
-		catch {
-			LogWriter("An error occurred while installing Hydra Agent: $_")
-		}
+			    # Configuring the agent
+			    LogWriter("Configuring the agent")
+			    cd "$env:ProgramFiles\ITProCloud.de\HydraAgent"
+			    . "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -i -u "wss://$($uri)/wsx" -s $secret
+                $retry=0
+		    }
+		    catch {
+			    LogWriter("An error occurred while installing Hydra Agent: $_")
+                $retry--
+		    }
+        } while ($retry -gt 0)
 	}
 
 	# install AVD Agent if a registration key given
