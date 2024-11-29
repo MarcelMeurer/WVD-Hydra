@@ -27,7 +27,7 @@ Today, the following features are available:
 - Get the secret for the Hydra agent in the Hydra portal: Endpoints -> Get the secret for the Hydra Agent
 - Bring the HydraAgent.exe into a folder on the endpoints (e.g.: C:\Program Files\ITProCloud GmbH\Hydra Agent for Endpoints)
 - Start the installation with admin permissions:
-  *HydraAgent.exe -u wss://<<your-hydra-instance>>.azurewebsites.net/wsx -s <<YourHydraAgentSecret>> --EndpointMode -i*
+  *HydraAgent.exe -u wss://<<<your-hydra-instance>>>.azurewebsites.net/wsx -s <<<YourHydraAgentSecret>>> --EndpointMode -i*
 
 *Tip:* Deploy the Hydra Agent with Intune, if available.
 
