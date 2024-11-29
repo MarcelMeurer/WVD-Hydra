@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.7
+# Current Version of this script: 9.8
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -584,11 +584,15 @@ if ($mode -eq "Generalize") {
 	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.bat"
 	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.ps1"
 
-	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
+	LogWriter("Removing existing Remote Desktop Agent Boot Loaders")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
-	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
+	LogWriter("Removing existing Remote Desktop Services Infrastructure Agents")
 	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+	LogWriter("Removing existing SxS Network Stack installations")
+	Uninstall-Package -Name "Remote Desktop Services SxS Network Stack" -AllVersions -Force -ErrorAction SilentlyContinue 
+	LogWriter("Removing existing Geneva Agents")
+	Get-Package | Where-Object {$_.Name -like "Remote Desktop Services Infrastructure Geneva Agent *"} | Uninstall-Package -AllVersions -Force -ErrorAction SilentlyContinue 
 
 	LogWriter("Disabling ITPC-LogAnalyticAgent and MySmartScale if exist") 
 	Disable-ScheduledTask  -TaskName "ITPC-LogAnalyticAgent for RDS and Citrix" -ErrorAction Ignore
@@ -741,8 +745,12 @@ if ($mode -eq "Generalize") {
 	AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "TimeZone.Origin" -Value $timeZone -force
 	
-	LogWriter("Removing existing Azure Monitoring Certificates")
+	LogWriter("Removing existing Azure Monitoring Certificates and configuration")
 	Get-ChildItem "Cert:\LocalMachine\Microsoft Monitoring Agent" -ErrorAction Ignore | Remove-Item
+	LogWriter("Uninstalling Monitoring Agent")
+	Uninstall-Package -Name "Microsoft Monitoring Agent" -AllVersions -Force  -ErrorAction Ignore
+	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\AzureMonitorAgent\Secrets" -Name "PersistenceKeyCreated" -ErrorAction Ignore
+
 
 	# Check, if the optimization script exist (Hydra: use a script inside Hydra)
 	if ([System.IO.File]::Exists("C:\ProgramData\Optimize\Win10_VirtualDesktop_Optimize.ps1")) {
@@ -1333,7 +1341,7 @@ elseif ($Mode -eq "RDAgentBootloader") {
 	$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Repairs the Azure Monitoring Agent in case of an issue"
 	Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -InputObject $taskM #-ErrorAction Ignore
 	Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -ErrorAction Ignore
-	LogWriter "Monitoring the agent state on the first start to handle the SXS-Stack issue"
+	LogWriter "Monitoring the agent state on the first start to handle the SXS-Stack issue or other health check issues"
 	$run = $true
 	$counter = 0
 	do {
@@ -1348,6 +1356,38 @@ elseif ($Mode -eq "RDAgentBootloader") {
 				$counter = $counter + 10
 			}
 		}
+
+
+		$allowedHealthChecks=@("MonitoringAgentCheck","UrlsAccessibleCheck")
+		try {
+			# $avdAgentStateJson = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -ErrorAction Ignore)."AgentHealthCheckReport"
+			$oldIssueExist=$false
+			if ($avdAgentStateJson -ne $null) {
+				$avdAgentState = $avdAgentStateJson | ConvertFrom-Json
+        
+				$avdAgentState | Get-Member -MemberType NoteProperty | ForEach-Object {
+					if ($_.Name -in $allowedHealthChecks) {
+						$item=$avdAgentState.$($_.Name)
+						if ($item.HealthCheckResult -eq 2) {
+							$errorTime=[datetime]::Parse($item.AdditionalFailureDetails.LastHealthCheckInUTC)
+							$errorLastMinutes=((Get-Date) -$errorTime).TotalMinutes
+                
+							if ($errorLastMinutes -gt 5) {
+								LogWriter("Found a long lasting issue for $($_.Name): Issue is $errorLastMinutes minutes old")
+								$oldIssueExist=$true
+							}
+						}
+					}
+				}
+				if ($oldIssueExist) {
+					LogWriter("Removing old error state from registry")
+					Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -Name "AgentHealthCheckReport" -ErrorAction Ignore
+				}
+			}
+		} catch {
+			LogWriter("Cannot evaluate old error health states in registry: $_")
+		}
+
 		$counter++
 		if ($counter -gt 60) { $run = $false }
 		Start-Sleep -Seconds 10

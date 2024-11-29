@@ -92,10 +92,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.0.1.0.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.1.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.01 | 2024-11-22 | Add: New action session host recreate (deletes a host and creat a new one with the old name; use carefully); Fix: Imaging will handle an Azure Monitoring Agent installation on the Golden Master; Fix: Image upload to HCI is now possible if Master VM is in another Azure region
 1.1.0.00 | 2024-11-22 | Add: Improvements for the optional Hydra agent 3.0 (showing RTT, CPU, Memory, etc. for the last hour in realtime); Add: Admins can now select the availability zone from a list if needed; Add: Auto-managed pools (preview) are marked with a lock and deployments are disabled; Upgrade of some modules;
 1.0.8.90 | 2024-10-11 | Add: Querying hosts by REST will show the deployment state; Add: Sysprep monitoring for imaging will resolve more sysprep-errors as before (6)
 1.0.8.80 | 2024-10-04 | Add: Users with FullAdmin in a single tenant can see the log of all operations in this tenant (also from other users); Add: Support for Windows 24H2; Add: FSLogix profiles can now be removed for Cloud only identities
@@ -322,17 +323,24 @@ If you are using Hydra in a small environment (a few pools with few hosts), you 
 
 ***Note:** If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)*
 
-Open your Project Hydra instance in a web browser by entering https://myhydrainstance.azurewebsites.net (myhydrainstance is the name of your deployment from the basic step).
+Open your Hydra instance in a web browser by entering https://myhydrainstance.azurewebsites.net (myhydrainstance is the name of your deployment from the basic step).
 
 Log in with the user you have entered in the administration step (Administrator(s) of the solution). Note: You can change this setting on the deployed app service -> Configuration -> Application settings -> "config:Administrators")
 
-Click "Tenants" and "Add" to add your first or a new tenant. Next, you need a service principal to give Project Hydra access to the WVD resources in the tenant. A service principal is like a functional account that is used for the Hydra engine to log in and access the resources.
+Click "Tenants" and "Add" to add your first or a new tenant. 
+
+The engine needs permission to access and manage Azure Virtual Desktop and Azure resources. Add at least one tenant to start working and managing AVD. You can use the Hydra engine's managed service identity (MSI) or one or more service principals (app registration). The MSI is limited to the tenant where Hydra is installed and focuses on smaller environments (up to 2000 users and 100 hosts). Service principals can be used for larger environments or to integrate multiple tenants. Follow one of the following configurations:
+
+*** Use Managed Service Identity (MSI) ***
+Tick the box "Use Managed Service Identity (MSI)" to use the managed service identity of the app service. 
 
 
+*** Use a Service Principal ***
+A service principal is like a functional account that is used for the Hydra engine to log in and access the resources.
 
 You can use **[WVDAdmin](https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/)** credentials if you have or create a new service principal:
 
-- Open [https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
+- Open [https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) in the target tenant
 
 - Click "New registration"
 
@@ -355,8 +363,8 @@ You can use **[WVDAdmin](https://blog.itprocloud.de/Windows-Virtual-Desktop-Admi
     - The secret from the previous step -> Secret
 
 
-
-Before you complete the configuration in Project Hydra, go to your Azure subscription and add the created service principal with contributor permissions to the subscription or all resource groups containing your WVD environment (VMs, host pools, images, v-net, ...). 
+*** Give permissions to the Service Principal or Managed Service Identity (MSI) ***
+Before you complete the configuration in Project Hydra, go to your Azure subscription and add the created service principal or MSI with contributor permissions to the subscription or all resource groups containing your WVD environment (VMs, host pools, images, v-net, ...). For the vnet, use network contributor on the vnet only. If you go for the MSI, you can find the indentity with the same name as the host name of your Hydra instance <<your-instance>>.azurewebsites.net.
 
 
 
