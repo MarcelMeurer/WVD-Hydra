@@ -331,11 +331,11 @@ Click "Tenants" and "Add" to add your first or a new tenant.
 
 The engine needs permission to access and manage Azure Virtual Desktop and Azure resources. Add at least one tenant to start working and managing AVD. You can use the Hydra engine's managed service identity (MSI) or one or more service principals (app registration). The MSI is limited to the tenant where Hydra is installed and focuses on smaller environments (up to 2000 users and 100 hosts). Service principals can be used for larger environments or to integrate multiple tenants. Follow one of the following configurations:
 
-**Use Managed Service Identity (MSI)**
+**Use Managed Service Identity (MSI)**<br/>
 Tick the box "Use Managed Service Identity (MSI)" to use the managed service identity of the app service. 
 
 
-**Use a Service Principal**
+**Use a Service Principal**<br/>
 A service principal is like a functional account that is used for the Hydra engine to log in and access the resources.
 
 You can use **[WVDAdmin](https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/)** credentials if you have or create a new service principal:
@@ -363,8 +363,8 @@ You can use **[WVDAdmin](https://blog.itprocloud.de/Windows-Virtual-Desktop-Admi
     - The secret from the previous step -> Secret
 
 
-**Give permissions to the Service Principal or Managed Service Identity (MSI)**
-Before you complete the configuration in Project Hydra, go to your Azure subscription and add the created service principal or MSI with contributor permissions to the subscription or all resource groups containing your WVD environment (VMs, host pools, images, v-net, ...). For the vnet, use network contributor on the vnet only. If you go for the MSI, you can find the indentity with the same name as the host name of your Hydra instance <<<your-instance>>>.azurewebsites.net.
+**Give permissions to the Service Principal or Managed Service Identity (MSI)**<br/>
+Before you complete the configuration in Project Hydra, go to your Azure subscription and add the created service principal or MSI with contributor permissions to the subscription or all resource groups containing your WVD environment (VMs, host pools, images, v-net, ...). For the vnet, use network contributor on the vnet only. If you go for the MSI, you can find the indentity with the same name as the host name of your Hydra instance &lt;your-instance&gt;.azurewebsites.net.
 
 
 
