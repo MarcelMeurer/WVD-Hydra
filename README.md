@@ -92,10 +92,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.1.0.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.0.2.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.02 | 2024-12-02 | Fix: Golden Master and HCI can now be in different subscriptions; Fix/workaround: The GPU driver is now automatically installed at the end of the deployment—we still recommend having the driver in the Golden Master while the drive installation causes a random reboot.
 1.1.0.01 | 2024-11-22 | Add: New action session host recreate (deletes a host and creat a new one with the old name; use carefully); Fix: Imaging will handle an Azure Monitoring Agent installation on the Golden Master; Fix: Image upload to HCI is now possible if Master VM is in another Azure region
 1.1.0.00 | 2024-11-22 | Add: Improvements for the optional Hydra agent 3.0 (showing RTT, CPU, Memory, etc. for the last hour in realtime); Add: Admins can now select the availability zone from a list if needed; Add: Auto-managed pools (preview) are marked with a lock and deployments are disabled; Upgrade of some modules;
 1.0.8.90 | 2024-10-11 | Add: Querying hosts by REST will show the deployment state; Add: Sysprep monitoring for imaging will resolve more sysprep-errors as before (6)
