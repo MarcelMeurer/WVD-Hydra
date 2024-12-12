@@ -21,7 +21,12 @@ Please make sure to send feedback and update the solution regularly.
 ## Get help
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
-## **IMPORTANT**: Random error messages from the AVD Agent and hosts are going into "Need Assistance"
+## **IMPORTANT**: Action required: Update to DesktopVirtualization API v. 2024-04-08-preview
+Microsoft started to inform customers to update applications unsing the DesktopVirtualization API. The Hydra version **1.1.0.3** (expected mid of December) will use only the updated APIs. **To avoid service disruptions, update Hydra to version 1.1.0.3 or newer before March 2025.**. [How to update Hydra](#updates-and-releases) 
+> *You're receiving this notice because you currently manage your Azure Virtual Desktop resources using Microsoft.DesktopVirtualization APIs that are being removed.* On 11 March 2025, the following DesktopVirtualization APIs will no longer be supported, and you'll need to update to either API v. 2024-04-08-preview or API v. 2024-04-03
+
+
+## Random error messages from the AVD Agent and hosts are going into "Need Assistance"
 Today, I got a lot of emails and team messages. Customers are seeing the following error message on session hosts in the Azure Portal and in Hydra:
 > NAT shape is Undetermined when probing [turn:20.202.248.2:3478?Udp] TURN relay health check failed for server [turn:20.202.248.2:3478?Udp] - One or more errors occurred.->Timed out waiting for Receive to complete - Code: -2147467259 - 2024-09-26T07:39:15.704086Z
 
@@ -92,10 +97,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.0.2.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.0.3.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.03 | 2024-12-12 | Change: Update of the VirtualDesktop APIs to prevent issues because of the deprectaion of older APIs starting March 2025; Add: Show the graph in the host pools for up to 72h (configurable in the global settings)
 1.1.0.02 | 2024-12-02 | Fix: Golden Master and HCI can now be in different subscriptions; Fix/workaround: The GPU driver is now automatically installed at the end of the deployment—we still recommend having the driver in the Golden Master while the drive installation causes a random reboot.
 1.1.0.01 | 2024-11-22 | Add: New action session host recreate (deletes a host and creat a new one with the old name; use carefully); Fix: Imaging will handle an Azure Monitoring Agent installation on the Golden Master; Fix: Image upload to HCI is now possible if Master VM is in another Azure region
 1.1.0.00 | 2024-11-22 | Add: Improvements for the optional Hydra agent 3.0 (showing RTT, CPU, Memory, etc. for the last hour in realtime); Add: Admins can now select the availability zone from a list if needed; Add: Auto-managed pools (preview) are marked with a lock and deployments are disabled; Upgrade of some modules;

@@ -49,6 +49,9 @@ https://licenses.nuget.org/MIT
 Azure.ResourceManager.Monitor 
 https://licenses.nuget.org/MIT
 
+Azure.ResourceManager.ResourceGraph
+https://licenses.nuget.org/MIT
+
 Microsoft.EntityFrameworkCore 
 https://licenses.nuget.org/MIT
 
