@@ -22,7 +22,7 @@ Please make sure to send feedback and update the solution regularly.
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
 
 ## **IMPORTANT**: Action required: Update to DesktopVirtualization API v. 2024-04-08-preview
-Microsoft started to inform customers to update applications unsing the DesktopVirtualization API. The Hydra version **1.1.0.3** (expected mid of December) will use only the updated APIs. **To avoid service disruptions, update Hydra to version 1.1.0.3 or newer before March 2025.**. [How to update Hydra](#updates-and-releases) 
+Microsoft started to inform customers to update applications unsing the DesktopVirtualization API. The Hydra version **1.1.0.3** (expected mid of December) will use only the updated APIs. **To avoid service disruptions, update Hydra to version 1.1.0.3 or newer before March 2025.** [How to update Hydra](#updates-and-releases) 
 > *You're receiving this notice because you currently manage your Azure Virtual Desktop resources using Microsoft.DesktopVirtualization APIs that are being removed.* On 11 March 2025, the following DesktopVirtualization APIs will no longer be supported, and you'll need to update to either API v. 2024-04-08-preview or API v. 2024-04-03
 
 
