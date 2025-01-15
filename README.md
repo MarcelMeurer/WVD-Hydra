@@ -101,6 +101,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.04 | 2025-01-15 | Add: Support to image NVMe Golden Master (note: to rollout a NVMe only VM use a prepared Image Gallery Definition with the NVMe option)
 1.1.0.03 | 2024-12-12 | Change: Update of the VirtualDesktop APIs to prevent issues because of the deprectaion of older APIs starting March 2025; Add: Show the graph in the host pools for up to 72h (configurable in the global settings)
 1.1.0.02 | 2024-12-02 | Fix: Golden Master and HCI can now be in different subscriptions; Fix/workaround: The GPU driver is now automatically installed at the end of the deployment—we still recommend having the driver in the Golden Master while the drive installation causes a random reboot.
 1.1.0.01 | 2024-11-22 | Add: New action session host recreate (deletes a host and creat a new one with the old name; use carefully); Fix: Imaging will handle an Azure Monitoring Agent installation on the Golden Master; Fix: Image upload to HCI is now possible if Master VM is in another Azure region

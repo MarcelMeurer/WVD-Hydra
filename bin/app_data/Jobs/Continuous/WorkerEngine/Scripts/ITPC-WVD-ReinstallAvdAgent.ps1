@@ -31,9 +31,6 @@ $LocalConfig="C:\ITPC-WVD-PostCustomizing"
 
 # Main
 LogWriter("Starting ITPC-WVD-ReinstallAvdAgent")
-OutputWriter("111 Key is $WvdRegistrationKey")
-LogWriter("Key is $WvdRegistrationKey")
-#exit
 
 # check for the existend of the helper scripts
 if ((Test-Path ($LocalConfig)) -eq $false) {
