@@ -97,10 +97,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.0.3.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.0.5.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.05 | 2025-03-13 | Add: Imaging and rollout will prevent Bitlocker from encrypting a disk during sysprep; The task "PM - Update App" accepts the Winget Id of application comma separated to only updated specific apps (no spaces in the list)
 1.1.0.04 | 2025-01-15 | Add: Support to image NVMe Golden Master (note: to rollout a NVMe only VM use a prepared Image Gallery Definition with the NVMe option)
 1.1.0.03 | 2024-12-12 | Change: Update of the VirtualDesktop APIs to prevent issues because of the deprectaion of older APIs starting March 2025; Add: Show the graph in the host pools for up to 72h (configurable in the global settings)
 1.1.0.02 | 2024-12-02 | Fix: Golden Master and HCI can now be in different subscriptions; Fix/workaround: The GPU driver is now automatically installed at the end of the deployment—we still recommend having the driver in the Golden Master while the drive installation causes a random reboot.

@@ -34,7 +34,7 @@
           "System.Text.Json": "9.0.0",
           "System.Text.RegularExpressions": "4.3.1",
           "HydraAgent": "3.0.0.0",
-          "HydraShared.Reference": "1.1.0.4"
+          "HydraShared.Reference": "1.1.0.5"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -83,6 +83,18 @@
           "lib/netstandard2.0/Azure.Identity.dll": {
             "assemblyVersion": "1.12.0.0",
             "fileVersion": "1.1200.24.31701"
+          }
+        }
+      },
+      "Azure.Monitor.Ingestion/1.1.2": {
+        "dependencies": {
+          "Azure.Core": "1.41.0",
+          "System.Text.Json": "9.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.Monitor.Ingestion.dll": {
+            "assemblyVersion": "1.1.2.0",
+            "fileVersion": "1.100.224.20307"
           }
         }
       },
@@ -191,6 +203,20 @@
           "lib/netstandard2.0/Azure.ResourceManager.Network.dll": {
             "assemblyVersion": "1.7.0.0",
             "fileVersion": "1.700.24.6502"
+          }
+        }
+      },
+      "Azure.ResourceManager.OperationalInsights/1.2.2": {
+        "dependencies": {
+          "Azure.Core": "1.41.0",
+          "Azure.ResourceManager": "1.11.1",
+          "System.ClientModel": "1.0.0",
+          "System.Text.Json": "9.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.OperationalInsights.dll": {
+            "assemblyVersion": "1.2.2.0",
+            "fileVersion": "1.200.224.25702"
           }
         }
       },
@@ -3017,11 +3043,14 @@
           "AutoMapper": "13.0.1",
           "Azure.Core": "1.41.0",
           "Azure.Identity": "1.12.0",
+          "Azure.Monitor.Ingestion": "1.1.2",
           "Azure.ResourceManager.AppService": "1.0.2",
           "Azure.ResourceManager.Compute": "1.5.0",
           "Azure.ResourceManager.Hci": "1.2.0-beta.1",
           "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
+          "Azure.ResourceManager.Monitor": "1.3.1",
           "Azure.ResourceManager.Network": "1.7.0",
+          "Azure.ResourceManager.OperationalInsights": "1.2.2",
           "Azure.ResourceManager.Quota": "1.0.0-beta.3",
           "Azure.ResourceManager.Storage": "1.2.3",
           "Azure.Security.KeyVault.Secrets": "4.6.0",
@@ -3059,11 +3088,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.1.0.4": {
+      "HydraShared.Reference/1.1.0.5": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.1.0.4",
-            "fileVersion": "1.1.0.4"
+            "assemblyVersion": "1.1.0.5",
+            "fileVersion": "1.1.0.5"
           }
         }
       }
@@ -3095,6 +3124,13 @@
       "sha512": "sha512-OBIM3aPz8n9oEO5fdnee+Vsc5Nl4W3FeslPpESyDiyByntQI5BAa76KD60eFXm9ulevnwxGZP9YXL8Y+paI5Uw==",
       "path": "azure.identity/1.12.0",
       "hashPath": "azure.identity.1.12.0.nupkg.sha512"
+    },
+    "Azure.Monitor.Ingestion/1.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZFAOxc7WdO0ceSdYzLvHhYoIo+oVNBgY2HeypurgPpvxZJJ0eZXSnekFnAF6bpfsYHqDkomX1JY6E6ExdwHKZg==",
+      "path": "azure.monitor.ingestion/1.1.2",
+      "hashPath": "azure.monitor.ingestion.1.1.2.nupkg.sha512"
     },
     "Azure.ResourceManager/1.11.1": {
       "type": "package",
@@ -3151,6 +3187,13 @@
       "sha512": "sha512-C18Fwpyffzdxkl7cSs3DsTETVzDy2fYMcdpOZhPT5YZIxcv628ffG5qCiHvgfAERtjXuYxU6Lv+P9ExMmTThsA==",
       "path": "azure.resourcemanager.network/1.7.0",
       "hashPath": "azure.resourcemanager.network.1.7.0.nupkg.sha512"
+    },
+    "Azure.ResourceManager.OperationalInsights/1.2.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2cGZUfCAGYpV2XkxW/XGVt+KpG5m36Jk6t2v9HDJU6YTGyaLHu2/9OvIjBCqchjmz5T1C1094sXjpz6vUzEt1g==",
+      "path": "azure.resourcemanager.operationalinsights/1.2.2",
+      "hashPath": "azure.resourcemanager.operationalinsights.1.2.2.nupkg.sha512"
     },
     "Azure.ResourceManager.Quota/1.0.0-beta.3": {
       "type": "package",
@@ -4917,7 +4960,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.1.0.4": {
+    "HydraShared.Reference/1.1.0.5": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

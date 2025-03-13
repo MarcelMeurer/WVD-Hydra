@@ -37,6 +37,9 @@ https://licenses.nuget.org/MIT
 Microsoft.Extensions.Hosting  
 https://licenses.nuget.org/MIT
 
+Azure.Monitor.Ingestion
+https://licenses.nuget.org/MIT
+
 Azure.ResourceManager.Authorization
 https://licenses.nuget.org/MIT
 
@@ -47,6 +50,9 @@ Azure.ResourceManager.Hci
 https://licenses.nuget.org/MIT
 
 Azure.ResourceManager.Monitor 
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.OperationalInsights
 https://licenses.nuget.org/MIT
 
 Azure.ResourceManager.ResourceGraph

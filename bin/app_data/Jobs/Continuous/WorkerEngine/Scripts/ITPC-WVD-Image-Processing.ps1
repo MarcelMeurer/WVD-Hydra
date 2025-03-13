@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.8
+# Current Version of this script: 9.9
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -201,6 +201,16 @@ function WaitForServiceExist ($serviceName,$timeOutSeconds,$repeat) {
 		Start-Sleep -Seconds $timeOutSeconds
 	}
     return $true
+}
+function StoreServiceConfiguration($serviceName) {
+    $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+    if ($service -ne $null)
+    {
+        LogWriter("Service exist with start type: $($service.StartType) - storing state to registry and set start type to disabled and service is stopped - will be reverted on the next rollout")
+        New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "Service.$($serviceName)" -Value ([int]$service.StartType) -force
+        Set-Service -Name $serviceName -StartupType ([System.ServiceProcess.ServiceStartMode]::Disabled)
+        Stop-Service -Name $serviceName -ErrorAction SilentlyContinue
+    } else {Remove-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "Service.$($serviceName)" -Force -ErrorAction SilentlyContinue}
 }
 function StopAndRemoveSchedTask($taskName) {
 	$task = Get-ScheduledTask -TaskName  $taskName -ErrorAction SilentlyContinue
@@ -666,7 +676,7 @@ if ($mode -eq "Generalize") {
 		$AadCerts | ForEach-Object {
 			$cn = $_.Subject.Split(",")
 
-			write-host("Found probaly a AAD/Intune certificate with name: $cn")
+			LogWriter("Found probaly a AAD/Intune certificate with name: $cn")
 			Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Subject -match "$($cn)*" } | ForEach-Object {
 				LogWriter("Deleting certificate from image with subject: $($_.Subject)")
 				Remove-Item -Path $_.PSPath
@@ -744,6 +754,12 @@ if ($mode -eq "Generalize") {
 	LogWriter("Current time zone is: " + $timeZone)
 	AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "TimeZone.Origin" -Value $timeZone -force
+
+	LogWriter("Saving BitLocker service state for re-deploy (BDESVC)")
+	StoreServiceConfiguration("BDESVC")
+
+	LogWriter("Saving MECM service state for re-deploy (ccmexec)")
+	StoreServiceConfiguration("ccmexec")
 	
 	LogWriter("Removing existing Azure Monitoring Certificates and configuration")
 	Get-ChildItem "Cert:\LocalMachine\Microsoft Monitoring Agent" -ErrorAction Ignore | Remove-Item
@@ -797,7 +813,7 @@ if ($mode -eq "Generalize") {
 		try {
 		LogWriter("Removing the old trigger file")
 		Remove-Item -Path "$($env:WinDir)\OEM\DoOnce.txt" -Force -ErrorAction SilentlyContinue	
-		write-host ("Checking file $patchFile")
+		LogWriter ("Checking file $patchFile")
 		if (-not (Get-Content $patchFile | Select-String -Pattern "ITPC")) {
 			LogWriter("Patching file")
 
@@ -1106,15 +1122,19 @@ elseif ($mode -eq "JoinDomain") {
 		}
 		if ([System.Environment]::OSVersion.Version.Major -gt 6) {
 			LogWriter("Installing AVD agent")
-			$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
-			LogWriter("Installing AVD agent completed with exit code: $($ret.ExitCode)")
+			$retryCount = 0
+			do {
 
-			if ($ret.ExitCode -ne 0) {
-				LogWriter("Exit code in not 0. Retrying one time the installion after 15 seconds") 
-				Start-Sleep -Seconds 15
 				$ret = Start-Process -wait -PassThru -FilePath "${LocalConfig}\Microsoft.RDInfra.RDAgent.msi" -ArgumentList "/quiet /qn /norestart /passive RegistrationToken=${WvdRegistrationKey}"
-				LogWriter("Installing AVD agent completed with exit code: $($ret.ExitCode)")
-			}
+
+				if ($ret.ExitCode -ne 0) {
+					LogWriter("Installation ($retryCount) failed with exit code $($ret.ExitCode)")
+					Start-Sleep -Seconds 15
+				} else {
+					LogWriter("Installation finished without an error")
+				}
+				$retryCount++
+			} while ($ret.ExitCode -ne 0 -and $retryCount -le 20)
 
 			if ($false) {
 				LogWriter("Installing AVD boot loader - current path is ${LocalConfig}")
@@ -1193,6 +1213,19 @@ elseif ($mode -eq "JoinDomain") {
 	if ($parameters -and $parameters -ne "") {
 		LogWriter("Running ApplyOsSettings")
 		ApplyOsSettings
+	}
+
+	# Restore deactivated services from the imaging process
+	LogWriter("Reconfiguring disabled services")
+	try {
+		(Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime").PSObject.Properties | Where-Object { $_.Name -like "Service.*" } | ForEach-Object {
+			$serviceName = $_.Name.split(".")[1]
+			LogWriter("Setting serice $($serviceName) to $([System.ServiceProcess.ServiceStartMode]($_.Value))")
+			Set-Service -Name $serviceName -StartupType ([System.ServiceProcess.ServiceStartMode]($_.Value)) -ErrorAction SilentlyContinue
+    
+		}
+	} catch {
+		LogWriterhost("Reconfiguring services failed: $_")
 	}
 	
 	# Final reboot
