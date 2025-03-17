@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 9.9
+# Current Version of this script: 10.0
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -29,6 +29,7 @@ param(
 	[string] $WaitForHybridJoin = '0',					#Awaits the completion of a hybrid join before joining the host pool
 	[string] $parameters								#Additional parameters, e.g.: used to configure sysprep
 )
+Add-Type -AssemblyName System.ServiceProcess -ErrorAction SilentlyContinue
 
 function LogWriter($message) {
 	$message = "$(Get-Date ([datetime]::UtcNow) -Format "o") $message"
@@ -106,6 +107,13 @@ function UnzipFile($zipfile, $outdir) {
 function DownloadFile($url, $outFile) {
 	$i = 6
 	$ok = $false;
+	$ignoreError = $false
+    # Rename target file if exist
+    Remove-Item -Path "$($outFile).itpc.bak" -Force -ErrorAction SilentlyContinue
+    if (Test-Path -Path $outFile) {
+        Copy-Item -Path $outFile -Destination "$($outFile).itpc.bak" -ErrorAction SilentlyContinue
+    }
+
 	do {
 		try {
 			LogWriter("Try to download file")
@@ -116,12 +124,22 @@ function DownloadFile($url, $outFile) {
 			$i--;
 			LogWriter("Download failed: $_")
 			if ($i -le 0) {
-				throw 
+                if (Test-Path -Path "$($outFile).itpc.bak") {
+                    Rename-Item -Path "$($outFile).itpc.bak" -NewName "$($outFile)"
+					$ignoreError = $true
+                }
+				if ($ignoreError) {
+                    LogWriter("Resuming and suppressing an exception while we still have an older file")
+                    return
+                } else {
+                    throw
+                }
 			}
 			LogWriter("Re-trying download after 5 seconds")
 			Start-Sleep -Seconds 5
 		}
 	} while (!$ok)
+    Remove-Item -Path "$($outFile).itpc.bak" -Force -ErrorAction SilentlyContinue
 	LogWriter("Download done")
 }
 function CopyFileWithRetry($source, $destination) {
@@ -515,6 +533,7 @@ $LogFile = $LogDir + "\AVD.Customizing.log"
 
 # Main
 LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
+AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 
 # Generating variables from Base64-coding
 if ($LocalAdminName64) { $LocalAdminName = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminName64)) }
@@ -565,8 +584,6 @@ if ("$($MyInvocation.MyCommand.Path)" -ne ($LocalConfig + "\ITPC-WVD-Image-Proce
 	LogWriter("Updating ITPC-WVD-Image-Processing.ps1")
 	CopyFileWithRetry "$($MyInvocation.MyCommand.Path)" ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1")
 }
-
-
 
 # check, if secure boot is enabled (used by the snapshot workaround)
 $isSecureBoot = $false
@@ -626,6 +643,12 @@ if ($mode -eq "Generalize") {
 	Remove-ItemProperty -Path $key -Name "DirtyShutdownTime" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "LastAliveStamp" -ErrorAction Ignore
 	Remove-ItemProperty -Path $key -Name "TimeStampInterval" -ErrorAction Ignore
+
+	LogWriter("Saving BitLocker service state for re-deploy (BDESVC)")
+	StoreServiceConfiguration("BDESVC")
+
+	LogWriter("Saving MECM service state for re-deploy (ccmexec)")
+	StoreServiceConfiguration("ccmexec")
 
 	# Disable Bitlocker, if needed
 	try {
@@ -752,15 +775,8 @@ if ($mode -eq "Generalize") {
 	LogWriter("Saving time zone info for re-deploy")
 	$timeZone = (Get-TimeZone).Id
 	LogWriter("Current time zone is: " + $timeZone)
-	AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 	New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "TimeZone.Origin" -Value $timeZone -force
 
-	LogWriter("Saving BitLocker service state for re-deploy (BDESVC)")
-	StoreServiceConfiguration("BDESVC")
-
-	LogWriter("Saving MECM service state for re-deploy (ccmexec)")
-	StoreServiceConfiguration("ccmexec")
-	
 	LogWriter("Removing existing Azure Monitoring Certificates and configuration")
 	Get-ChildItem "Cert:\LocalMachine\Microsoft Monitoring Agent" -ErrorAction Ignore | Remove-Item
 	LogWriter("Uninstalling Monitoring Agent")
@@ -865,8 +881,9 @@ elseif ($mode -eq "RenameComputer") {
 }
 elseif ($mode -eq "JoinDomain") {
 	# Stopping windows update service during the rollout process
-	LogWriter("Stopping windows update service during the rollout process")
+	LogWriter("Stopping windows update service and MECM (if exist) during the rollout process")
 	Stop-Service wuauserv -Force -NoWait -ErrorAction SilentlyContinue
+	Stop-Service ccmexec -Force -NoWait -ErrorAction SilentlyContinue
 
 	LogWriter("Check for PreJoin scripts")
 	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.exe"
@@ -1214,19 +1231,6 @@ elseif ($mode -eq "JoinDomain") {
 		LogWriter("Running ApplyOsSettings")
 		ApplyOsSettings
 	}
-
-	# Restore deactivated services from the imaging process
-	LogWriter("Reconfiguring disabled services")
-	try {
-		(Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime").PSObject.Properties | Where-Object { $_.Name -like "Service.*" } | ForEach-Object {
-			$serviceName = $_.Name.split(".")[1]
-			LogWriter("Setting serice $($serviceName) to $([System.ServiceProcess.ServiceStartMode]($_.Value))")
-			Set-Service -Name $serviceName -StartupType ([System.ServiceProcess.ServiceStartMode]($_.Value)) -ErrorAction SilentlyContinue
-    
-		}
-	} catch {
-		LogWriterhost("Reconfiguring services failed: $_")
-	}
 	
 	# Final reboot
 	LogWriter("Finally restarting session host")
@@ -1432,6 +1436,19 @@ elseif ($Mode -eq "ApplyOsSettings") {
 elseif ($Mode -eq "CleanFirstStart") {
 	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
 	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
+		
+	# Restore deactivated services from the imaging process
+	LogWriter("Reconfiguring disabled services")
+	try {
+		(Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime").PSObject.Properties | Where-Object { $_.Name -like "Service.*" } | ForEach-Object {
+			$serviceName = $_.Name.split(".")[1]
+			LogWriter("Setting serice $($serviceName) to $([System.ServiceProcess.ServiceStartMode]($_.Value))")
+			Set-Service -Name $serviceName -StartupType ([System.ServiceProcess.ServiceStartMode]($_.Value)) -ErrorAction SilentlyContinue
+		}
+	} catch {
+		LogWriter("Reconfiguring services failed: $_")
+	}
+
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
