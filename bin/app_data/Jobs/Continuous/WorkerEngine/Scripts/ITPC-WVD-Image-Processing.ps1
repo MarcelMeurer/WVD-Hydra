@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.0
+# Current Version of this script: 10.3
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -15,6 +15,8 @@ param(
 	[string] $LocalAdminPassword64 = '',
 	[string] $DomainJoinUserName64 = '',
 	[string] $DomainJoinUserPassword64 = '',
+	[string] $AltAvdAgentDownloadUrl64 = '',
+	[string] $AltAvdBootloaderDownloadUrl64 = '',
 	[string] $DomainJoinOU = '',
 	[string] $AadOnly = '0',
 	[string] $JoinMem = '0',
@@ -119,9 +121,8 @@ function DownloadFile($url, $outFile, $alternativeUrls) {
             } catch {
                 $err += "$_  ---  "
                 if ($i -lt $altIdx-1) {
-                    Logwriter("Stop $i $altIdx")
                 } else {
-                    throw "DonwloadFile: $err"
+                    throw "DownloadFile: $err"
                 }
             }
         }
@@ -565,7 +566,8 @@ if ($LocalAdminName64) { $LocalAdminName = [System.Text.Encoding]::UTF8.GetStrin
 if ($LocalAdminPassword64) { $LocalAdminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminPassword64)) }
 if ($DomainJoinUserName64) { $DomainJoinUserName = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserName64)) }
 if ($DomainJoinUserPassword64) { $DomainJoinUserPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserPassword64)) }
-
+if ($AltAvdAgentDownloadUrl64) { $AltAvdAgentDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdAgentDownloadUrl64)) }
+if ($AltAvdBootloaderDownloadUrl64) { $AltAvdBootloaderDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdBootloaderDownloadUrl64)) }
 
 # check for the existend of the helper scripts
 if ((Test-Path ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
@@ -591,14 +593,14 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDAgent")
-			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") ("https://itpcbusinessleads.blob.core.windows.net/avd/Microsoft.RDInfra.RDAgent.msi")
+			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
 	}
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDBootloader")
-			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") ("https://itpcbusinessleads.blob.core.windows.net/avd/Microsoft.RDInfra.RDAgentBootLoader.msi")
+			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
 	}

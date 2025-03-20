@@ -1,36 +1,89 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 4.9
+# Current Version of this script: 5.0
 
 param(
     [string] $WvdRegistrationKey = '',
-    [string] $DownloadNewestAgent = '1'					#Download the newes agent, event if a local agent exist
+    [string] $DownloadNewestAgent = '1',					#Download the newes agent, event if a local agent exist
+    [string] $AltAvdAgentDownloadUrl64 = '',
+	[string] $AltAvdBootloaderDownloadUrl64 = ''
 )
 
-function DownloadFile ( $url, $outFile) {
-    $i = 3
-    $ok = $false;
-    do {
-        try {
-            LogWriter("Try to download file")
-            Invoke-WebRequest -Uri $url -OutFile $outFile -UseBasicParsing
-            $ok = $true
-        }
-        catch {
-            $i--;
-            if ($i -le 0) {
-                throw 
+function DownloadFile($url, $outFile, $alternativeUrls) {
+    $altUrls = @($url)
+    $altIdx = -1
+    $err = ""
+    if ($alternativeUrls -ne $null -and $alternativeUrls -ne "") {
+        $altUrls += $alternativeUrls.Split("|")
+        $altIdx = $altUrls.Length
+        for ($i=0; $i -le $altIdx-1; $i++) {
+            $url=$altUrls[$i]
+            try {
+                DownloadFileIntern $url $outFile
+                return
+            } catch {
+                $err += "$_  ---  "
+                if ($i -lt $altIdx-1) {
+                } else {
+                    throw "DonwloadFile: $err"
+                }
             }
-            LogWriter("Re-trying download after 10 seconds")
-            Start-Sleep -Seconds 10
         }
-    } while (!$ok)
+    } else {
+        DownloadFileIntern $url $outFile
+    }
+}
+function DownloadFileIntern($url, $outFile) {
+	$i = 4
+	$ok = $false;
+	$ignoreError = $false
+    # Rename target file if exist
+    Remove-Item -Path "$($outFile).itpc.bak" -Force -ErrorAction SilentlyContinue
+    if (Test-Path -Path $outFile) {
+        Copy-Item -Path $outFile -Destination "$($outFile).itpc.bak" -ErrorAction SilentlyContinue
+    }
+    
+	do {
+		try {
+			LogWriter("Try to download file from $url")
+			(New-Object System.Net.WebClient).DownloadFile($url, $outFile)
+			$ok = $true
+		}
+		catch {
+			$i--;
+			LogWriter("Download failed: $_")
+			if ($i -le 0) {
+                if (Test-Path -Path "$($outFile).itpc.bak") {
+                    Rename-Item -Path "$($outFile).itpc.bak" -NewName "$($outFile)"
+					$ignoreError = $true
+                }
+				if ($ignoreError) {
+                    LogWriter("Resuming and suppressing an exception while we still have an older file")
+                    return
+                } else {
+                    throw
+                }
+			}
+			LogWriter("Re-trying download after 5 seconds")
+			Start-Sleep -Seconds 5
+		}
+	} while (!$ok)
+    Remove-Item -Path "$($outFile).itpc.bak" -Force -ErrorAction SilentlyContinue
+	LogWriter("Download done")
 }
 
 # Define static variables
 $LocalConfig="C:\ITPC-WVD-PostCustomizing"
 
+if ($AltAvdAgentDownloadUrl64) { $AltAvdAgentDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdAgentDownloadUrl64)) }
+if ($AltAvdBootloaderDownloadUrl64) { $AltAvdBootloaderDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdBootloaderDownloadUrl64)) }
+
 # Main
 LogWriter("Starting ITPC-WVD-ReinstallAvdAgent")
+
+# Stopping schedule tasks
+Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction SilentlyContinue
+Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-1" -ErrorAction SilentlyContinue
+Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-2" -ErrorAction SilentlyContinue
 
 # check for the existend of the helper scripts
 if ((Test-Path ($LocalConfig)) -eq $false) {
@@ -43,14 +96,14 @@ if ((Test-Path ($LocalConfig)) -eq $false) {
     if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
         if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
             LogWriter("Downloading RDAgent")
-            DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")
+            DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
         }
         else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
     }
     if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
         if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
             LogWriter("Downloading RDBootloader")
-            DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")
+            DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
         }
         else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
     }

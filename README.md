@@ -101,6 +101,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.08 | 2025-03-20 | Remove quick-fix; Add: An alternated download address can be configured via the Hydra backend and will take action if the regular URLs are not working (optional)
 1.1.0.07 | 2025-03-20 | Quick-Fix / Workaround: AVd Agent and bootloader download failed while the MS website is throwing a 502 error message. This version will use the existing binaries or download it from an alternative, temporary source
 1.1.0.06 | 2025-03-17 | Add: Keep up to 20 older images; Change: Improvement of the imaging script: Disabled services are restored on the first restart 
 1.1.0.05 | 2025-03-13 | Add: Imaging and rollout will prevent Bitlocker from encrypting a disk during sysprep; The task "PM - Update App" accepts the Winget Id of application comma separated to only updated specific apps (no spaces in the list)
