@@ -566,14 +566,16 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDAgent")
-			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")
+			DownloadFile "https://itpcbusinessleads.blob.core.windows.net/avd/Microsoft.RDInfra.RDAgent.msi?sv=2023-01-03&st=2025-03-20T06%3A48%3A35Z&se=2125-03-21T06%3A48%3A00Z&sr=b&sp=r&sig=oRvS1%2F1FoTWbD30qtkBE8g25CqvZfjcxwm6G1Avzg%2F4%3D" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")
+			#DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
 	}
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDBootloader")
-			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")
+			DownloadFile "https://itpcbusinessleads.blob.core.windows.net/avd/Microsoft.RDInfra.RDAgentBootLoader.msi?sv=2023-01-03&st=2025-03-20T06%3A49%3A36Z&se=2125-03-21T06%3A49%3A00Z&sr=b&sp=r&sig=v7ju4JrSFor%2FwknIbcQLq3JKoWDszHwMf7wdymsMeHU%3D" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")
+			#DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
 	}
