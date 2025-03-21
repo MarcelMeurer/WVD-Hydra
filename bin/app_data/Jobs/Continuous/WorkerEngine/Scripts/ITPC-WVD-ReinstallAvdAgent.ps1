@@ -4,8 +4,8 @@
 param(
     [string] $WvdRegistrationKey = '',
     [string] $DownloadNewestAgent = '1',					#Download the newes agent, event if a local agent exist
-    [string] $AltAvdAgentDownloadUrl64 = '',
-	[string] $AltAvdBootloaderDownloadUrl64 = ''
+	[string] $AltAvdAgentDownloadUrl64 = 'aHR0cHM6Ly9xdWVyeS5wcm9kLmNtcy5ydC5taWNyb3NvZnQuY29tL2Ntcy9hcGkvYW0vYmluYXJ5L1JXcm1Ydg==',
+	[string] $AltAvdBootloaderDownloadUrl64 = 'aHR0cHM6Ly9xdWVyeS5wcm9kLmNtcy5ydC5taWNyb3NvZnQuY29tL2Ntcy9hcGkvYW0vYmluYXJ5L1JXcnhySA=='
 )
 
 function DownloadFile($url, $outFile, $alternativeUrls) {
@@ -96,14 +96,14 @@ if ((Test-Path ($LocalConfig)) -eq $false) {
     if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
         if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
             LogWriter("Downloading RDAgent")
-            DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
+            DownloadFile "https://go.microsoft.com/fwlink/?linkid=2310011" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
         }
         else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
     }
     if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
         if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
             LogWriter("Downloading RDBootloader")
-            DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
+            DownloadFile "https://go.microsoft.com/fwlink/?linkid=2311028" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
         }
         else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
     }

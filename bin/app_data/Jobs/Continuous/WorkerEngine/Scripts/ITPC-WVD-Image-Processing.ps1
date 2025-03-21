@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.3
+# Current Version of this script: 10.4
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -15,8 +15,8 @@ param(
 	[string] $LocalAdminPassword64 = '',
 	[string] $DomainJoinUserName64 = '',
 	[string] $DomainJoinUserPassword64 = '',
-	[string] $AltAvdAgentDownloadUrl64 = '',
-	[string] $AltAvdBootloaderDownloadUrl64 = '',
+	[string] $AltAvdAgentDownloadUrl64 = 'aHR0cHM6Ly9xdWVyeS5wcm9kLmNtcy5ydC5taWNyb3NvZnQuY29tL2Ntcy9hcGkvYW0vYmluYXJ5L1JXcm1Ydg==',
+	[string] $AltAvdBootloaderDownloadUrl64 = 'aHR0cHM6Ly9xdWVyeS5wcm9kLmNtcy5ydC5taWNyb3NvZnQuY29tL2Ntcy9hcGkvYW0vYmluYXJ5L1JXcnhySA==',
 	[string] $DomainJoinOU = '',
 	[string] $AadOnly = '0',
 	[string] $JoinMem = '0',
@@ -593,14 +593,16 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDAgent")
-			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
+			DownloadFile "https://go.microsoft.com/fwlink/?linkid=2310011" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
+			# DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
 	}
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDBootloader")
-			DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
+			DownloadFile "https://go.microsoft.com/fwlink/?linkid=2311028" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
+			# DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
 	}
@@ -1486,11 +1488,17 @@ elseif ($Mode -eq "CleanFirstStart") {
 	}
 }
 elseif ($mode -eq "RestartBootloader") {
-	$LogFile = $LogDir + "\AVD.AgentBootloaderErrorHandling.log"
-	LogWriter "Stopping service"
-	Stop-Service -Name "RDAgentBootLoader"
-	LogWriter "Starting service"
-	Start-Service -Name "RDAgentBootLoader"
+	$lastTimestamp = Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "RestartBootloaderLastRun" -ErrorAction SilentlyContinue
+	$timeDiffSec = ([int][double]::Parse((Get-Date -UFormat %s))) - $lastTimestamp.RestartBootloaderLastRun
+
+	if ($LastTimestamp -eq $null -or $timeDiffSec -gt 120) {
+		$LogFile = $LogDir + "\AVD.AgentBootloaderErrorHandling.log"
+		LogWriter "Stopping service"
+		Stop-Service -Name "RDAgentBootLoader"
+		LogWriter "Starting service"
+		Start-Service -Name "RDAgentBootLoader"
+		New-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "RestartBootloaderLastRun" -Value ([int][double]::Parse((Get-Date -UFormat %s))) -force  -ErrorAction SilentlyContinue
+	}
 }
 elseif ($mode -eq "RepairMonitoringAgent") {
 	$LogFile = $LogDir + "\AVD.MonitorReinstall.log"
