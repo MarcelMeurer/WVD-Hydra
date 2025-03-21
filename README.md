@@ -101,6 +101,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.0.09 | 2025-03-21 | Add: Detection if a downloaded MSI realy a MSI and not a HTML error page (imaging and deployment script); Adding the new download URLs for the AVD agent and bootloader
 1.1.0.08 | 2025-03-20 | Remove quick-fix; Add: An alternated download address can be configured via the Hydra backend and will take action if the regular URLs are not working (optional)
 1.1.0.07 | 2025-03-20 | Quick-Fix / Workaround: AVd Agent and bootloader download failed while the MS website is throwing a 502 error message. This version will use the existing binaries or download it from an alternative, temporary source
 1.1.0.06 | 2025-03-17 | Add: Keep up to 20 older images; Change: Improvement of the imaging script: Disabled services are restored on the first restart 

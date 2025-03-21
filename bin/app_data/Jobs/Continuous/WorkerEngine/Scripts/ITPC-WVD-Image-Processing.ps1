@@ -106,6 +106,18 @@ function UnzipFile($zipfile, $outdir) {
 		}
 	}
 }
+function IsMsiFile($file) {
+    if (!(Test-Path $file -PathType Leaf)) {
+        return $false
+    }
+    try {
+        $wi = New-Object -ComObject WindowsInstaller.Installer
+        $db = $wi.OpenDatabase($file, 0)
+        return $true
+    } catch {
+        return $false
+    }
+}
 function DownloadFile($url, $outFile, $alternativeUrls) {
     $altUrls = @($url)
     $altIdx = -1
@@ -144,6 +156,10 @@ function DownloadFileIntern($url, $outFile) {
 		try {
 			LogWriter("Try to download file from $url")
 			(New-Object System.Net.WebClient).DownloadFile($url, $outFile)
+			# if MSI file, validate if the file is validate
+			if ([System.IO.Path]::GetExtension($outFile) -eq ".msi" -and (IsMsiFile $outFile) -eq $false) {
+				throw "An MSI file was expected but the file is not a valid MSI file"
+			}
 			$ok = $true
 		}
 		catch {
@@ -151,6 +167,7 @@ function DownloadFileIntern($url, $outFile) {
 			LogWriter("Download failed: $_")
 			if ($i -le 0) {
                 if (Test-Path -Path "$($outFile).itpc.bak") {
+					Remove-Item -Path "$($outFile)" -Force -ErrorAction SilentlyContinue
                     Rename-Item -Path "$($outFile).itpc.bak" -NewName "$($outFile)"
 					$ignoreError = $true
                 }
