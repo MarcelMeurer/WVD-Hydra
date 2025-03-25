@@ -36,8 +36,8 @@ Please update Hydra to the newest version to use the updated download URLs and a
 [How to update Hydra](#updates-and-releases)
 
 If you need to white-list the new URLs for the AVD Agent and Bootloader on your firewall or proxy, please whitelist these new URLs:
-https://go.microsoft.com/fwlink/?linkid=2310011
-https://go.microsoft.com/fwlink/?linkid=2311028
+- https://go.microsoft.com/fwlink/?linkid=2310011
+- https://go.microsoft.com/fwlink/?linkid=2311028
 
 
 ## **IMPORTANT**: Action required: Update to DesktopVirtualization API v. 2024-04-08-preview
