@@ -1,4 +1,4 @@
 {
-	"CurrentVersion" : "1.1.0.3",
-	"UpdateMessage" : "IMPORTANT UPDATE NEEDED to handle an upcoming change in AVD in March. Please upgrade soon: https://bit.ly/Hydra-Update-Doc"
+	"CurrentVersion" : "1.1.0.7",
+	"UpdateMessage" : "A Hydra update is available to workaround a 502 Bad Gateway Error: https://bit.ly/Hydra-Update-Doc"
 }
