@@ -907,7 +907,7 @@ if ($mode -eq "Generalize") {
 		RunSysprep "/generalize /oobe /shutdown"
 		#Start-Process -FilePath "$env:windir\System32\Sysprep\sysprep" -ArgumentList "/generalize /oobe /shutdown"
 	}
- else {
+	else {
 		if ($isSecureBoot) {
 			LogWriter("Secure boot is enabled")
 			write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($unattend))) | Out-File "$LocalConfig\unattend.xml" -Encoding ASCII
@@ -918,7 +918,6 @@ if ($mode -eq "Generalize") {
 			RunSysprep "/generalize /oobe /shutdown /mode:vm"
 		}
 	}
-
 }
 elseif ($mode -eq "RenameComputer") {
 	# Used for the snapshot workaround

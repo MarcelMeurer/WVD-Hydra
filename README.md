@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.0.9.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.1.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.1.00 | 2025-04-01 | Fix: The AVD API is reporting a non-defined value if you have a "MultiplePersistent" host pool (allowing to add a user to several hosts), the unexpected value caused an exception which is now resolved
 1.1.0.09 | 2025-03-21 | Add: Detection if a downloaded MSI realy a MSI and not a HTML error page (imaging and deployment script); Adding the new download URLs for the AVD agent and bootloader
 1.1.0.08 | 2025-03-20 | Remove quick-fix; Add: An alternated download address can be configured via the Hydra backend and will take action if the regular URLs are not working (optional)
 1.1.0.07 | 2025-03-20 | Quick-Fix / Workaround: AVd Agent and bootloader download failed while the MS website is throwing a 502 error message. This version will use the existing binaries or download it from an alternative, temporary source
