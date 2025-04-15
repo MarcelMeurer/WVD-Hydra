@@ -116,11 +116,12 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.1.2.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.1.3.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
-1.1.1.02 | 2025-04-09 | Fix: A new script cannot be selected in the rollout configuraiton, if the rolloutconfiguration was copied from another pool in another tenant containing a local script
+1.1.1.03 | 2025-04-15 | Change: Changing the validation of Domain FQDN in the rollout configuration to allow 2 characters domains
+1.1.1.02 | 2025-04-09 | Fix: A new script cannot be selected in the rollout configuration, if the rolloutconfiguration was copied from another pool in another tenant containing a local script
 1.1.1.01 | 2025-04-02 | Change: The timeout for the AVD Agent was increased from 34 to 60 minutes (after 60 minutes of an upgrading host, Hydra will tag the host as Upgrading Time Out). Reason: The current AVD Agent (SxS-Stack) took sometimes longer to finish the upgrading process
 1.1.1.00 | 2025-04-01 | Fix: The AVD API is reporting a non-defined value if you have a "MultiplePersistent" host pool (allowing to add a user to several hosts), the unexpected value caused an exception which is now resolved
 1.1.0.09 | 2025-03-21 | Add: Detection if a downloaded MSI realy a MSI and not a HTML error page (imaging and deployment script); Adding the new download URLs for the AVD agent and bootloader
