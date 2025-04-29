@@ -357,6 +357,8 @@ function ApplyOsSettings() {
 			New-ItemProperty -Path $regPath -Name "fEnableTimeZoneRedirection" -Value ([int]$osSettingsObj.Rds.fEnableTimeZoneRedirection) -force
 			LogWriter("Configuring RDS settings: fForceClientLptDef = $($osSettingsObj.Rds.fForceClientLptDef)")
 			New-ItemProperty -Path $regPath -Name "fForceClientLptDef" -Value ([int]$osSettingsObj.Rds.fForceClientLptDef) -force
+			LogWriter("Configuring RDS settings: HEVCHardwareEncodePreferred = $($osSettingsObj.Rds.HEVCHardwareEncodePreferred)")
+			New-ItemProperty -Path $regPath -Name "HEVCHardwareEncodePreferred" -Value ([int]$osSettingsObj.Rds.HEVCHardwareEncodePreferred) -force
 			LogWriter("Configuring RDS settings: AVC444ModePreferred = $($osSettingsObj.Rds.AVC444ModePreferred)")
 			New-ItemProperty -Path $regPath -Name "AVC444ModePreferred" -Value ([int]$osSettingsObj.Rds.AVC444ModePreferred) -force
 			LogWriter("Configuring RDS settings: bEnumerateHWBeforeSW = $($osSettingsObj.Rds.bEnumerateHWBeforeSW)")

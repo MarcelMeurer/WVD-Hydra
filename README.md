@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.1.3.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.1.4.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.1.04 | 2025-04-29 | Add: Configuration of H.265/HEVC is now possible using the Host configuration tab
 1.1.1.03 | 2025-04-15 | Change: Changing the validation of Domain FQDN in the rollout configuration to allow 2 characters domains
 1.1.1.02 | 2025-04-09 | Fix: A new script cannot be selected in the rollout configuration, if the rolloutconfiguration was copied from another pool in another tenant containing a local script
 1.1.1.01 | 2025-04-02 | Change: The timeout for the AVD Agent was increased from 34 to 60 minutes (after 60 minutes of an upgrading host, Hydra will tag the host as Upgrading Time Out). Reason: The current AVD Agent (SxS-Stack) took sometimes longer to finish the upgrading process
