@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.4
+# Current Version of this script: 10.5
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -913,7 +913,7 @@ if ($mode -eq "Generalize") {
 		if ($isSecureBoot) {
 			LogWriter("Secure boot is enabled")
 			write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($unattend))) | Out-File "$LocalConfig\unattend.xml" -Encoding ASCII
-			write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($unattend))) | Out-File "$env:windir\panther\unattend.xml" -Encoding ASCII
+			# write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($unattend))) | Out-File "$env:windir\panther\unattend.xml" -Encoding ASCII
 			RunSysprep 	"/generalize /oobe /shutdown /mode:vm /unattend:$LocalConfig\unattend.xml"
 		}
 		else {
