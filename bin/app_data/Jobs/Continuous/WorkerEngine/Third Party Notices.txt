@@ -28,6 +28,8 @@ https://licenses.nuget.org/MIT
 Azure.Security.KeyVault.Secrets    
 https://licenses.nuget.org/MIT
 
+
+
 Microsoft.Extensions.Configuration.UserSecrets    
 https://licenses.nuget.org/MIT
 
@@ -62,6 +64,9 @@ Microsoft.EntityFrameworkCore
 https://licenses.nuget.org/MIT
 
 Microsoft.Extensions.DependencyInjection
+https://licenses.nuget.org/MIT
+
+Microsoft.Extensions.Logging.AzureAppServices
 https://licenses.nuget.org/MIT
 
 Microsoft.EntityFrameworkCore.SqlServer 

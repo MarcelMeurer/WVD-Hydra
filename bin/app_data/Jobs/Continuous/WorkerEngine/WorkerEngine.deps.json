@@ -31,10 +31,10 @@
           "Newtonsoft.Json": "13.0.3",
           "System.Diagnostics.DiagnosticSource": "9.0.0",
           "System.Formats.Asn1": "9.0.0",
-          "System.Text.Json": "9.0.0",
+          "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1",
           "HydraAgent": "3.0.0.0",
-          "HydraShared.Reference": "1.1.1.6"
+          "HydraShared.Reference": "1.1.1.7"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -58,8 +58,8 @@
           "System.Diagnostics.DiagnosticSource": "9.0.0",
           "System.Memory.Data": "1.0.2",
           "System.Numerics.Vectors": "4.5.0",
-          "System.Text.Encodings.Web": "9.0.0",
-          "System.Text.Json": "9.0.0",
+          "System.Text.Encodings.Web": "9.0.5",
+          "System.Text.Json": "9.0.5",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -76,7 +76,7 @@
           "Microsoft.Identity.Client.Extensions.Msal": "4.61.3",
           "System.Memory": "4.5.4",
           "System.Security.Cryptography.ProtectedData": "8.0.0",
-          "System.Text.Json": "9.0.0",
+          "System.Text.Json": "9.0.5",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -89,7 +89,7 @@
       "Azure.Monitor.Ingestion/1.1.2": {
         "dependencies": {
           "Azure.Core": "1.41.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Monitor.Ingestion.dll": {
@@ -102,7 +102,7 @@
         "dependencies": {
           "Azure.Core": "1.41.0",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.dll": {
@@ -115,7 +115,7 @@
         "dependencies": {
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.AppService.dll": {
@@ -129,7 +129,7 @@
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Authorization.dll": {
@@ -143,7 +143,7 @@
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Compute.dll": {
@@ -156,7 +156,7 @@
         "dependencies": {
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Hci.dll": {
@@ -169,7 +169,7 @@
         "dependencies": {
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.HybridCompute.dll": {
@@ -183,7 +183,7 @@
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Monitor.dll": {
@@ -197,7 +197,7 @@
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Network.dll": {
@@ -211,7 +211,7 @@
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.OperationalInsights.dll": {
@@ -224,7 +224,7 @@
         "dependencies": {
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Quota.dll": {
@@ -238,7 +238,7 @@
           "Azure.Core": "1.41.0",
           "Azure.ResourceManager": "1.11.1",
           "System.ClientModel": "1.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.Storage.dll": {
@@ -251,7 +251,7 @@
         "dependencies": {
           "Azure.Core": "1.41.0",
           "System.Memory": "4.5.4",
-          "System.Text.Json": "9.0.0",
+          "System.Text.Json": "9.0.5",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -322,7 +322,7 @@
       "Microsoft.AspNetCore.Http.Abstractions/2.2.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Http.Features": "2.2.0",
-          "System.Text.Encodings.Web": "9.0.0"
+          "System.Text.Encodings.Web": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.Http.Abstractions.dll": {
@@ -345,7 +345,7 @@
       "Microsoft.AspNetCore.WebUtilities/2.2.0": {
         "dependencies": {
           "Microsoft.Net.Http.Headers": "2.2.0",
-          "System.Text.Encodings.Web": "9.0.0"
+          "System.Text.Encodings.Web": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.WebUtilities.dll": {
@@ -859,7 +859,7 @@
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "Microsoft.CodeAnalysis.Common": "4.5.0",
           "System.Composition": "6.0.0",
-          "System.IO.Pipelines": "9.0.0",
+          "System.IO.Pipelines": "9.0.5",
           "System.Threading.Channels": "6.0.0"
         }
       },
@@ -878,7 +878,7 @@
           "System.Security.Cryptography.Cng": "5.0.0",
           "System.Security.Principal.Windows": "5.0.0",
           "System.Text.Encoding.CodePages": "6.0.0",
-          "System.Text.Encodings.Web": "9.0.0"
+          "System.Text.Encodings.Web": "9.0.5"
         },
         "runtime": {
           "lib/net6.0/Microsoft.Data.SqlClient.dll": {
@@ -1105,7 +1105,7 @@
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
           "Microsoft.Extensions.Configuration.FileExtensions": "8.0.0",
           "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.Json.dll": {
@@ -1149,8 +1149,8 @@
       },
       "Microsoft.Extensions.DependencyModel/8.0.0": {
         "dependencies": {
-          "System.Text.Encodings.Web": "9.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Encodings.Web": "9.0.5",
+          "System.Text.Json": "9.0.5"
         }
       },
       "Microsoft.Extensions.Diagnostics/8.0.0": {
@@ -1324,7 +1324,7 @@
           "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
           "Microsoft.Extensions.Logging.Configuration": "8.0.0",
           "Microsoft.Extensions.Options": "9.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.Console.dll": {
@@ -1368,7 +1368,7 @@
           "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
           "Microsoft.Extensions.Options": "9.0.0",
           "Microsoft.Extensions.Primitives": "9.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.EventSource.dll": {
@@ -1901,7 +1901,7 @@
       "System.ClientModel/1.0.0": {
         "dependencies": {
           "System.Memory.Data": "1.0.2",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/net6.0/System.ClientModel.dll": {
@@ -2311,11 +2311,11 @@
           "System.Runtime": "4.3.1"
         }
       },
-      "System.IO.Pipelines/9.0.0": {
+      "System.IO.Pipelines/9.0.5": {
         "runtime": {
           "lib/net8.0/System.IO.Pipelines.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.24.52809"
+            "fileVersion": "9.0.525.21509"
           }
         }
       },
@@ -2371,8 +2371,8 @@
       "System.Memory/4.5.4": {},
       "System.Memory.Data/1.0.2": {
         "dependencies": {
-          "System.Text.Encodings.Web": "9.0.0",
-          "System.Text.Json": "9.0.0"
+          "System.Text.Encodings.Web": "9.0.5",
+          "System.Text.Json": "9.0.5"
         },
         "runtime": {
           "lib/netstandard2.0/System.Memory.Data.dll": {
@@ -2815,11 +2815,11 @@
           "System.Text.Encoding": "4.3.0"
         }
       },
-      "System.Text.Encodings.Web/9.0.0": {
+      "System.Text.Encodings.Web/9.0.5": {
         "runtime": {
           "lib/net8.0/System.Text.Encodings.Web.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.24.52809"
+            "fileVersion": "9.0.525.21509"
           }
         },
         "runtimeTargets": {
@@ -2827,19 +2827,19 @@
             "rid": "browser",
             "assetType": "runtime",
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.24.52809"
+            "fileVersion": "9.0.525.21509"
           }
         }
       },
-      "System.Text.Json/9.0.0": {
+      "System.Text.Json/9.0.5": {
         "dependencies": {
-          "System.IO.Pipelines": "9.0.0",
-          "System.Text.Encodings.Web": "9.0.0"
+          "System.IO.Pipelines": "9.0.5",
+          "System.Text.Encodings.Web": "9.0.5"
         },
         "runtime": {
           "lib/net8.0/System.Text.Json.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.24.52809"
+            "fileVersion": "9.0.525.21509"
           }
         }
       },
@@ -3027,7 +3027,7 @@
           "System.Diagnostics.PerformanceCounter": "8.0.0",
           "System.Management": "8.0.0",
           "System.Security.Cryptography.ProtectedData": "8.0.0",
-          "System.Text.Encodings.Web": "9.0.0",
+          "System.Text.Encodings.Web": "9.0.5",
           "TaskScheduler": "2.11.0"
         },
         "runtime": {
@@ -3069,7 +3069,7 @@
           "System.Data.SQLite": "1.0.118",
           "System.Data.SqlClient": "4.8.6",
           "System.Formats.Asn1": "9.0.0",
-          "System.Text.Json": "9.0.0",
+          "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1"
         },
         "runtime": {
@@ -3086,11 +3086,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.1.1.6": {
+      "HydraShared.Reference/1.1.1.7": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.1.1.6",
-            "fileVersion": "1.1.1.6"
+            "assemblyVersion": "1.1.1.7",
+            "fileVersion": "1.1.1.7"
           }
         }
       }
@@ -4488,12 +4488,12 @@
       "path": "system.io.filesystem.primitives/4.3.0",
       "hashPath": "system.io.filesystem.primitives.4.3.0.nupkg.sha512"
     },
-    "System.IO.Pipelines/9.0.0": {
+    "System.IO.Pipelines/9.0.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-eA3cinogwaNB4jdjQHOP3Z3EuyiDII7MT35jgtnsA4vkn0LUrrSHsU0nzHTzFzmaFYeKV7MYyMxOocFzsBHpTw==",
-      "path": "system.io.pipelines/9.0.0",
-      "hashPath": "system.io.pipelines.9.0.0.nupkg.sha512"
+      "sha512": "sha512-5WXo+3MGcnYn54+1ojf+kRzKq1Q6sDUnovujNJ2ky1nl1/kP3+PMil9LPbFvZ2mkhvAGmQcY07G2sfHat/v0Fw==",
+      "path": "system.io.pipelines/9.0.5",
+      "hashPath": "system.io.pipelines.9.0.5.nupkg.sha512"
     },
     "System.Linq/4.3.0": {
       "type": "package",
@@ -4824,19 +4824,19 @@
       "path": "system.text.encoding.extensions/4.3.0",
       "hashPath": "system.text.encoding.extensions.4.3.0.nupkg.sha512"
     },
-    "System.Text.Encodings.Web/9.0.0": {
+    "System.Text.Encodings.Web/9.0.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-e2hMgAErLbKyUUwt18qSBf9T5Y+SFAL3ZedM8fLupkVj8Rj2PZ9oxQ37XX2LF8fTO1wNIxvKpihD7Of7D/NxZw==",
-      "path": "system.text.encodings.web/9.0.0",
-      "hashPath": "system.text.encodings.web.9.0.0.nupkg.sha512"
+      "sha512": "sha512-HJPmqP2FsE+WVUUlTsZ4IFRSyzw40yz0ubiTnsaqm+Xo5fFZhVRvx6Zn8tLXj92/6pbre6OA4QL2A2vnCSKxJA==",
+      "path": "system.text.encodings.web/9.0.5",
+      "hashPath": "system.text.encodings.web.9.0.5.nupkg.sha512"
     },
-    "System.Text.Json/9.0.0": {
+    "System.Text.Json/9.0.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-js7+qAu/9mQvnhA4EfGMZNEzXtJCDxgkgj8ohuxq/Qxv+R56G+ljefhiJHOxTNiw54q8vmABCWUwkMulNdlZ4A==",
-      "path": "system.text.json/9.0.0",
-      "hashPath": "system.text.json.9.0.0.nupkg.sha512"
+      "sha512": "sha512-rnP61ZfloTgPQPe7ecr36loNiGX3g1PocxlKHdY/FUpDSsExKkTxpMAlB4X35wNEPr1X7mkYZuQvW3Lhxmu7KA==",
+      "path": "system.text.json/9.0.5",
+      "hashPath": "system.text.json.9.0.5.nupkg.sha512"
     },
     "System.Text.RegularExpressions/4.3.1": {
       "type": "package",
@@ -4958,7 +4958,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.1.1.6": {
+    "HydraShared.Reference/1.1.1.7": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

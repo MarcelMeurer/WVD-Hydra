@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.1.6.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.1.7.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.1.07 | 2025-05-28 | Change: Enabling auto-creation and deletion on request and for new deployments
 1.1.1.06 | 2025-05-04 | Fix: In some cases, a pre-start action was not executed while the VM start was to fast
 1.1.1.05 | 2025-05-01 | Fix: Due to a change of handling Patch and Post request to the AVD API (first seen on personal pools), a registration token couldn't recreated. That is fixed in this version; Add: Some more options in the sessionhost replacement wizard and for targets of schedules
 1.1.1.04 | 2025-04-29 | Add: Configuration of H.265/HEVC is now possible using the Host configuration tab
