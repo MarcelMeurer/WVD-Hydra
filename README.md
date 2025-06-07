@@ -780,7 +780,7 @@ If the Hydra Agent is installed on session hosts, the processes of a single user
 ![](media/HydraAgent-04.png)
 
 ### Database and Managed Service Identity
-Hydra connects to the database with a SQL user defined in the connection string stored in the Key Vault. Alternatively, Hydra can connect using its Azure AD identity.
+Hydra connects to the database with a SQL user defined in the connection string stored in the Key Vault. Alternatively, Hydra can connect using its Entra identity.
 
 Do the following changes in the maintenance windows:
 Open the SQL server resource in the Azure Portal -> Azure Active Directory  -> Set the managed identity of Hydra's web service as an administrator and check "Support only Azure Active Directory authentication for this server"
