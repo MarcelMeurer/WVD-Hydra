@@ -15,7 +15,7 @@ Open the SQL server resource in the Azure Portal -> Azure Active Directory  -> S
 
 Change the connection string in the Key Vault (not needed for Hydra version 1.1.1.8 or higher). Open the Key Vault and give yourself permission (Access Policy) to change secrets. In secrets, copy the existing connection string from Hydra-DbConnectionString and modify it to match the following string:
 
-Server=tcp:<my-database-server>.database.windows.net,1433;Initial Catalog=Hydra;Persist Security Info=False;Encrypt=True;Connection Timeout=90;
+Server=tcp:&lt;your-instance&gt;.database.windows.net,1433;Initial Catalog=Hydra;Persist Security Info=False;Encrypt=True;Connection Timeout=90;
 
 Remove the other parts of the string (like user id, ...). Add the new connection string as a new version. Optionally, remove your permission from the Key Vault.
 Restart the app service and verify that the engine runs with the new configuration
