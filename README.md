@@ -120,6 +120,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.1.08 | 2025-06-26 | Change: Replacing one preview API for the new preview detection; Add: If a custom image is used, Hydra will automatically select the standard security profile; Change: Caching for the monitoring of Azure fileshares; Add: Ability to renew crypto key and secret of the db; Add: Automatic detection if Hydra can access the DB by using the managed identity of Hydra
 1.1.1.07 | 2025-05-28 | Change: Enabling auto-creation and deletion on request and for new deployments
 1.1.1.06 | 2025-05-04 | Fix: In some cases, a pre-start action was not executed while the VM start was to fast
 1.1.1.05 | 2025-05-01 | Fix: Due to a change of handling Patch and Post request to the AVD API (first seen on personal pools), a registration token couldn't recreated. That is fixed in this version; Add: Some more options in the sessionhost replacement wizard and for targets of schedules
