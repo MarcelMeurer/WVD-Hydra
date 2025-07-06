@@ -28,7 +28,8 @@ https://licenses.nuget.org/MIT
 Azure.Security.KeyVault.Secrets    
 https://licenses.nuget.org/MIT
 
-
+Azure.Security.KeyVault.Keys
+https://licenses.nuget.org/MIT
 
 Microsoft.Extensions.Configuration.UserSecrets    
 https://licenses.nuget.org/MIT
@@ -58,6 +59,9 @@ Azure.ResourceManager.OperationalInsights
 https://licenses.nuget.org/MIT
 
 Azure.ResourceManager.ResourceGraph
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.GraphServices
 https://licenses.nuget.org/MIT
 
 Microsoft.EntityFrameworkCore 

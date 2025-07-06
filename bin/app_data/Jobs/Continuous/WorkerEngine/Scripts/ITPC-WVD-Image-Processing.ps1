@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.5
+# Current Version of this script: 10.6
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -52,6 +52,17 @@ function ShowPageFiles() {
 	foreach ($pageFile in $pageFiles) {
 		LogWriter("Name: '$($pageFile.Name)', Maximum size: '$($pageFile.MaximumSize)'")
 	}
+}
+function CleanPsLog() {
+	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /e:false' -Wait -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /e:false' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
+	try {Disable-PSTrace} catch {}
 }
 function RedirectPageFileTo($drive) {
 	LogWriter("Redirecting pagefile to drive $($drive):")
@@ -579,6 +590,7 @@ $LogFile = $LogDir + "\AVD.Customizing.log"
 # Main
 LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
 AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
+CleanPsLog
 
 # Generating variables from Base64-coding
 if ($LocalAdminName64) { $LocalAdminName = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminName64)) }
@@ -1623,3 +1635,4 @@ elseif ($mode -eq "JoinMEMFromHybrid") {
 		}
 	}
 }
+CleanPsLog

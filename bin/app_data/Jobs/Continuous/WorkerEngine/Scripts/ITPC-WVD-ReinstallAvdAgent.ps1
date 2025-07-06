@@ -20,6 +20,22 @@ function IsMsiFile($file) {
         return $false
     }
 }
+function AddRegistyKey($key) {
+	if (-not (Test-Path $key)) {
+		New-Item -Path $key -Force -ErrorAction SilentlyContinue
+	}
+}
+function CleanPsLog() {
+	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /e:false' -Wait -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /e:false' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
+	try {Disable-PSTrace} catch {}
+}
 function DownloadFile($url, $outFile, $alternativeUrls) {
     $altUrls = @($url)
     $altIdx = -1
@@ -96,6 +112,7 @@ if ($AltAvdBootloaderDownloadUrl64) { $AltAvdBootloaderDownloadUrl = [System.Tex
 
 # Main
 LogWriter("Starting ITPC-WVD-ReinstallAvdAgent")
+CleanPsLog
 
 # Stopping schedule tasks
 Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction SilentlyContinue
@@ -173,3 +190,4 @@ else {
     Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.WVDAgentManager.msi" -ArgumentList '/q'
 }
 
+CleanPsLog

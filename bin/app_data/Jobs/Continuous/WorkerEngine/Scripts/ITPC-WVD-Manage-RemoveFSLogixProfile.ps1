@@ -23,6 +23,22 @@ function LogWriter($message)
 	write-host($message)
 	if ([System.IO.Directory]::Exists($LogDir)) {write-output($message) | Out-File $LogFile -Append}
 }
+function AddRegistyKey($key) {
+	if (-not (Test-Path $key)) {
+		New-Item -Path $key -Force -ErrorAction SilentlyContinue
+	}
+}
+function CleanPsLog() {
+	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /e:false' -Wait -ErrorAction SilentlyContinue
+    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /e:false' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+	Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
+	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
+	try {Disable-PSTrace} catch {}
+}
 function ResolveEnvVariable($stringValue)
 {
     # based on https://jdhitsolutions.com/blog/powershell/2425/friday-fun-expand-environmental-variables-in-powershell-strings/
@@ -43,6 +59,7 @@ function ResolveEnvVariable($stringValue)
     return $stringValue
 }
 
+CleanPsLog
 LogWriter("Remove FSLogix profile script starts. Parameter: $($users)")
 
 $profilePath=Get-ItemPropertyValue -Path HKLM:\SOFTWARE\FSLogix\Profiles -Name VHDLocations
@@ -139,5 +156,6 @@ foreach ($user in $users.Split(";")) {
     }
 }
 
+CleanPsLog
 # use the next line to give a return message
 Write-host("ScriptReturnMessage:{$($global:messages)}:ScriptReturnMessage")

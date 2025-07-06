@@ -19,8 +19,8 @@
           "System.Formats.Asn1": "9.0.0",
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1",
-          "HydraAgent": "3.0.0.0",
-          "HydraShared.Reference": "1.1.1.9"
+          "HydraAgent": "3.0.0.1",
+          "HydraShared.Reference": "1.1.2.0"
         },
         "runtime": {
           "Portal.dll": {}
@@ -124,6 +124,19 @@
           }
         }
       },
+      "Azure.ResourceManager.GraphServices/1.1.1": {
+        "dependencies": {
+          "Azure.Core": "1.41.0",
+          "Azure.ResourceManager": "1.11.1",
+          "System.Text.Json": "9.0.5"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.GraphServices.dll": {
+            "assemblyVersion": "1.1.1.0",
+            "fileVersion": "1.100.123.58002"
+          }
+        }
+      },
       "Azure.ResourceManager.Hci/1.2.0-beta.1": {
         "dependencies": {
           "Azure.Core": "1.41.0",
@@ -202,6 +215,19 @@
           "lib/netstandard2.0/Azure.ResourceManager.Quota.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.23.28101"
+          }
+        }
+      },
+      "Azure.ResourceManager.ResourceGraph/1.0.1": {
+        "dependencies": {
+          "Azure.Core": "1.41.0",
+          "Azure.ResourceManager": "1.11.1",
+          "System.Text.Json": "9.0.5"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.ResourceManager.ResourceGraph.dll": {
+            "assemblyVersion": "1.0.1.0",
+            "fileVersion": "1.0.123.11502"
           }
         }
       },
@@ -3028,12 +3054,14 @@
           "Azure.Monitor.Ingestion": "1.1.2",
           "Azure.ResourceManager.AppService": "1.0.2",
           "Azure.ResourceManager.Compute": "1.5.0",
+          "Azure.ResourceManager.GraphServices": "1.1.1",
           "Azure.ResourceManager.Hci": "1.2.0-beta.1",
           "Azure.ResourceManager.HybridCompute": "1.0.0-beta.7",
           "Azure.ResourceManager.Monitor": "1.3.1",
           "Azure.ResourceManager.Network": "1.7.0",
           "Azure.ResourceManager.OperationalInsights": "1.2.2",
           "Azure.ResourceManager.Quota": "1.0.0-beta.3",
+          "Azure.ResourceManager.ResourceGraph": "1.0.1",
           "Azure.ResourceManager.Storage": "1.2.3",
           "Azure.Security.KeyVault.Secrets": "4.6.0",
           "MemoryPack": "1.21.1",
@@ -3061,19 +3089,19 @@
           }
         }
       },
-      "HydraAgent/3.0.0.0": {
+      "HydraAgent/3.0.0.1": {
         "runtime": {
           "HydraAgent.dll": {
-            "assemblyVersion": "3.0.0.0",
-            "fileVersion": "3.0.0.0"
+            "assemblyVersion": "3.0.0.1",
+            "fileVersion": "3.0.0.1"
           }
         }
       },
-      "HydraShared.Reference/1.1.1.9": {
+      "HydraShared.Reference/1.1.2.0": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.1.1.9",
-            "fileVersion": "1.1.1.9"
+            "assemblyVersion": "1.1.2.0",
+            "fileVersion": "1.1.2.0"
           }
         }
       }
@@ -3134,6 +3162,13 @@
       "path": "azure.resourcemanager.compute/1.5.0",
       "hashPath": "azure.resourcemanager.compute.1.5.0.nupkg.sha512"
     },
+    "Azure.ResourceManager.GraphServices/1.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-10lQA058/bGroyaV40WdrcqfoYUIlnjiJ2Ikr+27Ph7QLUYIIFxycvtG8kQLq+4xntqShcsAEjN/Gye7U5F8nA==",
+      "path": "azure.resourcemanager.graphservices/1.1.1",
+      "hashPath": "azure.resourcemanager.graphservices.1.1.1.nupkg.sha512"
+    },
     "Azure.ResourceManager.Hci/1.2.0-beta.1": {
       "type": "package",
       "serviceable": true,
@@ -3175,6 +3210,13 @@
       "sha512": "sha512-xfJROfbtG2Vr21CoQZjgFI/rDl0lnpmZDXOeL5viS6MDsUZldxX0AuqwI9z9+5iuOl9p4g/2OIa6ncOUorvuIQ==",
       "path": "azure.resourcemanager.quota/1.0.0-beta.3",
       "hashPath": "azure.resourcemanager.quota.1.0.0-beta.3.nupkg.sha512"
+    },
+    "Azure.ResourceManager.ResourceGraph/1.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-uvjDK5nXEd7xYWo9a0mrzhEOD8i/qmm8/svsLHIIFJKnxXMfU/PDdG/H1uKctpC9X3IC5BNsMkjiRiwSjcK6mA==",
+      "path": "azure.resourcemanager.resourcegraph/1.0.1",
+      "hashPath": "azure.resourcemanager.resourcegraph.1.0.1.nupkg.sha512"
     },
     "Azure.ResourceManager.Storage/1.2.3": {
       "type": "package",
@@ -4943,12 +4985,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraAgent/3.0.0.0": {
+    "HydraAgent/3.0.0.1": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.1.1.9": {
+    "HydraShared.Reference/1.1.2.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
