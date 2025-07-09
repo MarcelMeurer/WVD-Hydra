@@ -81,12 +81,12 @@ If you are running into this issue, perform the following steps:
     - Power-on-connect support
     - Schedules
     - Autopilot: Automatically scales up/down/create/remove based on the usage of a host pool
-    - Deploy hosts on demand - including ephemeral VMs based on a custom image*
+    - Deploy hosts on demand - including ephemeral VMs based on a custom image
     - Delete and rebuild hosts after logoff
   - VDI
     - Auto deallocate session hosts
     - Start spare-host to allow an assign on first connect for new users
-    - Create new VDIs if needed based on a custom image*
+    - Create new VDIs if needed based on a custom image
 - Session Timeouts
 - Session host definitions for rollouts
   - Per host pool
@@ -96,7 +96,7 @@ If you are running into this issue, perform the following steps:
   - Shows the storage usage (Azure files, FSLogix profile shares)
   - Realt-time performance of session hosts, including process list via the [Hydra Agent](#The-Hydra-Agent)
 - Auto Health
-  - Remove orphan sessions*
+  - Remove orphan sessions
 - Automatic disk change
   - Disk type can automatically be changed on start/deallocation/autoscaling to save storage costs (switch between HDD-Premium-HDD or HDD-SSD-HDD)
 - [Scripts and Script Collections](#Scripts-and-Script-Collections)
@@ -105,7 +105,7 @@ If you are running into this issue, perform the following steps:
   - Built-in scripts/collections for Windows Update, Windows 10 optimization, ...
 - ...
 
-<sup>* Currently not available in the US</sup>
+
 
 
 
@@ -311,7 +311,6 @@ Release | Date | Changes & Notes
 1.0.0.7 | 2021-06-17 | Bugfix: 'Auto-change disk type' can now be disabled
 1.0.0.6 | 2021-06-16 | 'Auto-change disk type' can be configured on the host pool level (base settings) to switch to disks to SSD/Premium on start and HDD after deallocating (saving money for the storage); Autoscale schedules can now include serving a minimum number of free sessions.
 1.0.0.5 | 2021-06-15 | Role-base access and mirroring of user sessions (click on the play icon in the user overview of an active session)
-<sup>* Currently not available in the US</sup>
 
 </details>
 
