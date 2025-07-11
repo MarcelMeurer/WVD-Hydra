@@ -28,6 +28,16 @@ function DownloadFile ($url, $outFile) {
         }
     } while (!$ok)
 }
+function RemoveReadOnlyFromScripts($path){
+    try {
+        $dir  = Split-Path $path -Parent
+        Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
+		    if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
+	    }
+    } catch {
+        LogWriter("Remove ReadOnly from scripts caused an issue: $_")
+    }
+}
 
 # Source: https://github.com/microsoft/winget-cli/blob/master/doc/windows/package-manager/winget/returnCodes.md
 $wgetErrorCodes = @{
@@ -228,6 +238,7 @@ $wgetErrorCodes = @{
 }
 
 LogWriter("Microsoft Package Manager Installer")
+RemoveReadOnlyFromScripts "$($MyInvocation.InvocationName)"
 
 $startTimeString=(Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHHmmss")
 

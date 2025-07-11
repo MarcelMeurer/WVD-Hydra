@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.6
+# Current Version of this script: 10.7
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -32,6 +32,7 @@ param(
 	[string] $parameters								#Additional parameters, e.g.: used to configure sysprep
 )
 Add-Type -AssemblyName System.ServiceProcess -ErrorAction SilentlyContinue
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function LogWriter($message) {
 	$message = "$(Get-Date ([datetime]::UtcNow) -Format "o") $message"
@@ -53,17 +54,92 @@ function ShowPageFiles() {
 		LogWriter("Name: '$($pageFile.Name)', Maximum size: '$($pageFile.MaximumSize)'")
 	}
 }
+function Decrypt-String ($encryptedString, $passPhrase) {
+    try {
+        $data = [Convert]::FromBase64String($encryptedString)
+        $key  = [Convert]::FromBase64String($passPhrase)
+        $iv   = $data[0..15]
+        $ct   = $data[16..($data.Length - 1)]
+        $aes = [System.Security.Cryptography.Aes]::Create()
+        $aes.Mode = 'CBC'; $aes.Key = $key; $aes.IV = $iv
+        $cs = New-Object System.Security.Cryptography.CryptoStream (([IO.MemoryStream]::new($ct)),$aes.CreateDecryptor(),'Read')
+        return ([IO.StreamReader]::new($cs)).ReadToEnd()
+    } catch {
+        return $encryptedString
+    }
+}
+function RemoveCryptoKey($path) {
+	LogWriter("Remove CryptoKey")
+    try {
+        (gc $path) | ForEach-Object {
+            if ($_ -like '*####CryptoKeySet####*' -and $_ -like '*$CryptoKey=*' -and ($_ -notlike '*-and*')) {
+                '#' * $_.Length
+            } else {
+                $_
+            }
+        } | sc $path -Encoding UTF8
+		# prevent overwrite from Azure
+		$name = Split-Path $path -Leaf
+		$dir  = Split-Path $path -Parent
+		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
+			RemoveReadOnlyFromScripts $path
+			$me = Get-Item $path
+			if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
+		}
+		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
+			$acl = Get-Acl $dir
+			$aclNew=New-Object Security.AccessControl.DirectorySecurity
+			$aclNew.SetSecurityDescriptorSddlForm("O:SY G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
+			$aclNew.SetAccessRuleProtection($true, $false)
+			Set-Acl -Path $dir -AclObject $aclNew
+		}
+    } catch {
+		LogWriter("Remove CryptoKey cause an exception: $_")
+	}
+} 
+function RemoveReadOnlyFromScripts($path){
+    try {
+        $dir  = Split-Path $path -Parent
+        Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
+		    if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
+	    }
+    } catch {
+        LogWriter("Remove ReadOnly from scripts caused an issue: $_")
+    }
+}
 function CleanPsLog() {
 	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
     try {Disable-PSTrace} catch {}
-    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /e:false' -Wait -ErrorAction SilentlyContinue
-    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /e:false' -Wait -ErrorAction SilentlyContinue
-	Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
-    Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
-	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:BAG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
-    Start-Process -FilePath PowerShell.exe -ArgumentList "-command & {Start-Sleep -Seconds 10; Clear-EventLog -LogName 'Windows PowerShell' -ErrorAction SilentlyContinue; wevtutil.exe cl 'Microsoft-Windows-PowerShell/Operational'}" -ErrorAction SilentlyContinue
+	try {
+		try {$l1 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Windows PowerShell"} catch {$l1=$null}
+		try {$l2 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Microsoft-Windows-PowerShell/Operational"} catch {$l2=$null}
+		Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
+		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
+		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {throw $_}
+		#Change permission
+		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
+		$cleanIt=$false
+		try {
+		if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or (Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction SilentlyContinue) -or (Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction SilentlyContinue)) {
+			$cleanIt=$true
+			LogWriter("CleanPsLog check is true")
+		}
+		} catch {
+			$cleanIt=$true
+			LogWriter("CleanPsLog caused an issue while checking the log configuration: $_")
+		}
+		if ($cleanIt){
+			LogWriter("CleanPsLog clean-up files")
+			Stop-Service -Name EventLog -Force -ErrorAction SilentlyContinue
+			Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
+			Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
+			Start-Service -Name EventLog -ErrorAction SilentlyContinue
+		}
+	} catch {
+			LogWriter("CleanPsLog caused an issue: $_")
+	}
 }
 function RedirectPageFileTo($drive) {
 	LogWriter("Redirecting pagefile to drive $($drive):")
@@ -104,7 +180,7 @@ function RedirectPageFileToLocalStorageIfExist() {
 }
 function UnzipFile($zipfile, $outdir) {
 	# Based on https://gist.github.com/nachivpn/3e53dd36120877d70aee
-	Add-Type -AssemblyName System.IO.Compression.FileSystem
+	# Add-Type -AssemblyName System.IO.Compression.FileSystem
 	$files = [System.IO.Compression.ZipFile]::OpenRead($zipfile)
 	foreach ($entry in $files.Entries) {
 		$targetPath = [System.IO.Path]::Combine($outdir, $entry.FullName)
@@ -130,6 +206,17 @@ function IsMsiFile($file) {
         return $false
     }
 }
+function IsZipFile($file) {
+    if (!(Test-Path $file -PathType Leaf)) {
+        return $false
+    }
+    try {
+        [System.IO.Compression.ZipFile]::OpenRead($file).Dispose()
+        return $true
+    } catch {
+        return $false
+    }
+}			
 function DownloadFile($url, $outFile, $alternativeUrls) {
     $altUrls = @($url)
     $altIdx = -1
@@ -155,7 +242,7 @@ function DownloadFile($url, $outFile, $alternativeUrls) {
     }
 }
 function DownloadFileIntern($url, $outFile) {
-	$i = 4
+	$i = 6
 	$ok = $false;
 	$ignoreError = $false
     # Rename target file if exist
@@ -171,6 +258,10 @@ function DownloadFileIntern($url, $outFile) {
 			# if MSI file, validate if the file is validate
 			if ([System.IO.Path]::GetExtension($outFile) -eq ".msi" -and (IsMsiFile $outFile) -eq $false) {
 				throw "An MSI file was expected but the file is not a valid MSI file"
+			}
+			# if ZIP file, validate if the file is valid
+			if ([System.IO.Path]::GetExtension($outFile) -eq ".zip" -and (IsZipFile $outFile) -eq $false) {
+				throw "A ZIP file was expected but the file is not a valid MSI file"
 			}
 			$ok = $true
 		}
@@ -455,6 +546,7 @@ function GetAccessToFolder($accessPath) {
             takeown /R /F "$accessPath"
         } catch {
             LogWriter("Unable to take ownership with takeown.exe")
+            LogWriter("Unable to take ownership with takeown.exe")
         }		
 		$ErrorActionPreference=$oea
         $acl = $accessPathItem.GetAccessControl()
@@ -587,17 +679,31 @@ $unattend = "PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnPz48dW5hdHRlbmQgeG1
 
 # Define logfile
 $LogFile = $LogDir + "\AVD.Customizing.log"
+LogWriter("invocation: $($MyInvocation.InvocationName)")
 
 # Main
 LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
-AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
-CleanPsLog
 
-# Generating variables from Base64-coding
+####CryptoKey####
+if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.InvocationName)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.InvocationName)"}
+CleanPsLog
+AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
+
+# Generating variables from Base64-coding / encryption
+if ($CryptoKey) {
+	LogWriter("Decrypting parameters")
+	if ($LocalAdminName64) { $LocalAdminName64 = Decrypt-String $LocalAdminName64 $CryptoKey }
+	if ($LocalAdminPassword64) { $LocalAdminPassword64 = Decrypt-String $LocalAdminPassword64 $CryptoKey }
+	if ($DomainJoinUserName64) { $DomainJoinUserName64 = Decrypt-String $DomainJoinUserName64 $CryptoKey }
+	if ($DomainJoinUserPassword64) { $DomainJoinUserPassword64 = Decrypt-String $DomainJoinUserPassword64 $CryptoKey }
+	if ($WvdRegistrationKey) { $WvdRegistrationKey = Decrypt-String $WvdRegistrationKey $CryptoKey }
+	if ($HydraAgentSecret) { $HydraAgentSecret = Decrypt-String $HydraAgentSecret $CryptoKey }
+}
 if ($LocalAdminName64) { $LocalAdminName = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminName64)) }
 if ($LocalAdminPassword64) { $LocalAdminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($LocalAdminPassword64)) }
 if ($DomainJoinUserName64) { $DomainJoinUserName = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserName64)) }
 if ($DomainJoinUserPassword64) { $DomainJoinUserPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($DomainJoinUserPassword64)) }
+
 if ($AltAvdAgentDownloadUrl64) { $AltAvdAgentDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdAgentDownloadUrl64)) }
 if ($AltAvdBootloaderDownloadUrl64) { $AltAvdBootloaderDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdBootloaderDownloadUrl64)) }
 
@@ -626,7 +732,6 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDAgent")
 			DownloadFile "https://go.microsoft.com/fwlink/?linkid=2310011" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
-			# DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
 	}
@@ -634,7 +739,6 @@ if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
 			LogWriter("Downloading RDBootloader")
 			DownloadFile "https://go.microsoft.com/fwlink/?linkid=2311028" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
-			# DownloadFile "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
 		}
 		else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
 	}
