@@ -15,7 +15,7 @@ function LogWriter($message)
     $global:Hydra_Log+="`r`n"+$message
     $message="$(Get-Date ([datetime]::UtcNow) -Format "o") $message"
 	write-host($message)
-	if ([System.IO.Directory]::Exists($LogDir)) {write-output($message) | Out-File $LogFile -Append}
+	if ([System.IO.Directory]::Exists($LogDir)) { try { write-output($message) | Out-File $LogFile -Append } catch {} }
 }
 function OutputWriter($message)
 {
@@ -25,17 +25,19 @@ function OutputWriter($message)
 }
 function RemoveReadOnlyFromScripts($path){
     try {
-        $dir  = Split-Path $path -Parent
-        Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
-		    if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
-	    }
+		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
+			$dir  = Split-Path $path -Parent
+			Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
+				if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
+			}
+		}
     } catch {
         LogWriter("Remove ReadOnly from scripts caused an issue: $_")
     }
 }
 
 LogWriter("Check C: partition for resizing")
-RemoveReadOnlyFromScripts "$($MyInvocation.InvocationName)"
+RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"
 
 try {
 	$defragSvc = Get-Service -Name defragsvc -ErrorAction SilentlyContinue

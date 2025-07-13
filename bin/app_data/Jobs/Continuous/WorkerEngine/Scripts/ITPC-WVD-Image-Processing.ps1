@@ -87,11 +87,10 @@ function RemoveCryptoKey($path) {
 			if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
 		}
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
-			$acl = Get-Acl $dir
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
 			$aclNew.SetSecurityDescriptorSddlForm("O:SY G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
 			$aclNew.SetAccessRuleProtection($true, $false)
-			Set-Acl -Path $dir -AclObject $aclNew
+			Set-Acl -Path $dir -AclObject $aclNew -ErrorAction Stop
 		}
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
@@ -99,10 +98,12 @@ function RemoveCryptoKey($path) {
 } 
 function RemoveReadOnlyFromScripts($path){
     try {
-        $dir  = Split-Path $path -Parent
-        Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
-		    if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
-	    }
+		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
+			$dir  = Split-Path $path -Parent
+			Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
+				if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
+			}
+		}
     } catch {
         LogWriter("Remove ReadOnly from scripts caused an issue: $_")
     }
@@ -679,13 +680,12 @@ $unattend = "PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnPz48dW5hdHRlbmQgeG1
 
 # Define logfile
 $LogFile = $LogDir + "\AVD.Customizing.log"
-LogWriter("invocation: $($MyInvocation.InvocationName)")
 
 # Main
 LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
 
 ####CryptoKey####
-if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.InvocationName)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.InvocationName)"}
+if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"}
 CleanPsLog
 AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 

@@ -30,10 +30,12 @@ function DownloadFile ($url, $outFile) {
 }
 function RemoveReadOnlyFromScripts($path){
     try {
-        $dir  = Split-Path $path -Parent
-        Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
-		    if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
-	    }
+		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
+			$dir  = Split-Path $path -Parent
+			Get-ChildItem $dir -Filter 'script*.ps1' -File | ForEach-Object {
+				if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
+			}
+		}
     } catch {
         LogWriter("Remove ReadOnly from scripts caused an issue: $_")
     }
@@ -238,7 +240,7 @@ $wgetErrorCodes = @{
 }
 
 LogWriter("Microsoft Package Manager Installer")
-RemoveReadOnlyFromScripts "$($MyInvocation.InvocationName)"
+RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"
 
 $startTimeString=(Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHHmmss")
 
