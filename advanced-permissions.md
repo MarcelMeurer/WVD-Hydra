@@ -78,9 +78,7 @@ To let Hydra also remove Intune devices, add the permission:
 |Type:|Application permissions|
 |Permission:|“DeviceManagementManagedDevices.ReadWrite.All”|
 
-![Intune device permission](./media/Hydra-AdvPermissions-12.png)
-
-Note: This permission is valid for all (!) devices in Intune and cannot be narrowed down like the Entra devices. Use it carefully and monitor your environment, probably. Use private endpoints for Hydra and disable public access to the Hydra app service.
+**Note:** This permission is valid for all (!) devices in Intune and cannot be narrowed down like the Entra devices. Use it carefully and monitor your environment, probably. Use private endpoints for Hydra and disable public access to the Hydra app service.
 
 **Allow Hydra to show users and groups**
 Hydra can display users and groups in the directory for various purposes, such as assigning a user or group to an application group in AVD. To allow that, add the following permission:
@@ -91,18 +89,16 @@ Hydra can display users and groups in the directory for various purposes, such a
 |Type:|Application permissions|
 |Permission:|“Group.Read.All” and “User.ReadBasic.All”|
 
-![Users and groups read permissions](./media/Hydra-AdvPermissions-13.png)
-
-Note: This permission is valid for all users and groups. Use it carefully and monitor your environment, probably. Use private endpoints for Hydra and disable public access to the Hydra app service.
+**Note:** This permission is valid for all users and groups. Use it carefully and monitor your environment, probably. Use private endpoints for Hydra and disable public access to the Hydra app service.
 
 **Giving admin consent**
 The added permissions need consent from a privileged administrator and shown as “not granted” in the status field:
 
-![Admin consent not given](./media/Hydra-AdvPermissions-14.png)
+![Admin consent not given](./media/Hydra-AdvPermissions-12.png)
 
 Clicking “Grant admin consent for company” starts the consent process. After the completion, the service principal has the permissions:
 
-![Admin consent given](./media/Hydra-AdvPermissions-15.png)
+![Admin consent given](./media/Hydra-AdvPermissions-13.png)
 
 **Additional service principals**
 Repeat this step for each service principal you are using in Hydra (listed in the tenant configuration of Hydra).
@@ -115,7 +111,7 @@ Go to the host pool configuration of a pool -> New session host rollout
 
 Enable the following checkbox or checkboxes to allow Hydra to remove devices on a delete event and on rollout (if devices with the same name exist).
 
-![Rollout configuration to enable Entra and Intune device deletion](./media/Hydra-AdvPermissions-16.png)
+![Rollout configuration to enable Entra and Intune device deletion](./media/Hydra-AdvPermissions-14.png)
  
 **Be careful:** 
 Please note that an administrator in Hydra could potentially specify the name of an existing Intune device, which is not an AVD device, thereby causing it to be deleted unintentionally.
@@ -123,7 +119,7 @@ Example for a deletion process with Entra and Intune devices:
  
 ## Example of a deletion with devices
 
-![Example of a device deletion](./media/Hydra-AdvPermissions-17.png)
+![Example of a device deletion](./media/Hydra-AdvPermissions-15.png)
 
 
 
