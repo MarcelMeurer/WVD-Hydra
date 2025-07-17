@@ -19,7 +19,7 @@ function LogWriter($message)
     $global:Hydra_Log+="`r`n"+$message
     $message="$(Get-Date ([datetime]::UtcNow) -Format "o") $message"
 	write-host($message)
-	if ([System.IO.Directory]::Exists($LogDir) { try { write-output($message) | Out-File $LogFile -Append } catch {} }
+	if ([System.IO.Directory]::Exists($LogDir)) { try { write-output($message) | Out-File $LogFile -Append } catch {} }
 }
 function OutputWriter($message)
 {
