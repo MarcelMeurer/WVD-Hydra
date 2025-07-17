@@ -12,28 +12,37 @@ The second method involves granting Hydra’s service accounts or managed identi
 An additional way to enhance security while still enabling automated device removal is to scope Hydra’s permissions more narrowly using Entra’s administrative units. Instead of granting directory-wide rights, you can assign Hydra the “Cloud Device Administrator” role specifically for an administrative unit that contains only the relevant devices. By organizing Entra devices into an administrative unit based on a naming convention - such as all devices with names starting with “AVD” - you ensure that Hydra’s elevated permissions apply solely to those matching devices. This targeted approach limits the impact of Hydra’s access, allowing it to manage only the intended subset of Entra devices while maintaining tighter overall security.
 
 Goto Entra in the Azure Portal -> Administrative units
+
 ![Administrative units](./media/Hydra-AdvPermissions-01.png)
  
 Click “Add” and enter a matching Name like “AU-Hydra-DeviceAccess” and a description.
+
 ![Add AU](./media/Hydra-AdvPermissions-02.png)
  
 Assign the role “Cloud Device Administrator” after clicking on “Next”.
+
 ![Select Cloud Device Administrator](./media/Hydra-AdvPermissions-03.png)
  
 Create the new administrative unit. The new unit shows up after a few minutes.
+
 ![AU view after a minute](./media/Hydra-AdvPermissions-04.png)
  
 Edit the unit by clicking on its name. Navigate to properties and select the “Membership type” “Dynamic Devices”:
+
 ![Change membership type](./media/Hydra-AdvPermissions-05.png) 
 
 Click “Add dynamic query” to narrow down the permission of the role to specific devices only. You can filter the devices by name starting with (e.g.) “AVD”. In this case, the administrative units narrow down the permissions to devices starting with the name “AVD....”.
+
 ![Add query](./media/Hydra-AdvPermissions-06.png)
  
 Click on “Roles and administrators” and then on “Cloud Device Administrators”.
+ 
  ![Select the role](./media/Hydra-AdvPermissions-07.png)
+ 
  ![Overview of the assignments](./media/Hydra-AdvPermissions-08.png)
 
 Click on “Add assignments”. The selected scope is the administrative unit focusing on the devices starting with AVD. Click “Select member(s)” and your Hydra service principal(s) (from the tenant menu in Hydra) or managed service identity if you are using this one.
+
 ![Select the service principal](./media/Hydra-AdvPermissions-09.png)
  
 Click “Select” and “Next”. In the following dialog, choose “Active” and “Permanently assigned” (not shown in all tenants). Enter a justification and select “Assign”.
@@ -46,6 +55,7 @@ The Hydra service principal(s) need additional permission to find the devices in
 Open the Azure Portal, navigate to Entra -> App registrations and search for the first service principal of Hydra in “All applications”. You can also search for the ID of the service principal. You can find the ID in the tenant configuration of Hydra.
 
 Select the service principal and select “API permissions” in “Manage”:
+
 ![API permissions tab](./media/Hydra-AdvPermissions-10.png)
 
 **Remove Entra devices**
@@ -87,9 +97,11 @@ Note: This permission is valid for all users and groups. Use it carefully and mo
 
 **Giving admin consent**
 The added permissions need consent from a privileged administrator and shown as “not granted” in the status field:
+
 ![Admin consent not given](./media/Hydra-AdvPermissions-14.png)
 
 Clicking “Grant admin consent for company” starts the consent process. After the completion, the service principal has the permissions:
+
 ![Admin consent given](./media/Hydra-AdvPermissions-15.png)
 
 **Additional service principals**
@@ -102,6 +114,7 @@ PowerShell is needed to give the MSI the API permission, like in the configurati
 Go to the host pool configuration of a pool -> New session host rollout
 
 Enable the following checkbox or checkboxes to allow Hydra to remove devices on a delete event and on rollout (if devices with the same name exist).
+
 ![Rollout configuration to enable Entra and Intune device deletion](./media/Hydra-AdvPermissions-16.png)
  
 **Be careful:** 
@@ -109,6 +122,7 @@ Please note that an administrator in Hydra could potentially specify the name of
 Example for a deletion process with Entra and Intune devices:
  
 ## Example of a deletion with devices
+
 ![Example of a device deletion](./media/Hydra-AdvPermissions-17.png)
 
 
