@@ -24,3 +24,7 @@ Restart the app service and verify that the engine runs with the new configurati
 ## Using Private Endpoints
 If you configure you Hydra installation to use private endpoints, you can avoid that the database and Key Vault is exposed to the internet. We strongly recommend doing this and it's already a "practice" for Azure applications using different resources, like SQL, KeyVault, etc.
 You can find a description including a video at the [ITProCloud Blog](https://blog.itprocloud.de/Securing-an-app-service,-a-key-vault,-and-a-database-with-private-endpoints/)
+
+
+## Using only Delegated Accounts for Automations
+For Active Directory integrated hosts use a service account with [delegated permissions to join](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/delegated-domainjoin.md) a host/computer into the right OU for your AVD hosts. Never, ever use admin credentials and never store admin credentials to Hydra - only delegated.

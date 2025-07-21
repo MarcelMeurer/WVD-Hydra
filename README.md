@@ -453,6 +453,7 @@ Configure the parameters for deployments, like:
 - Naming Schema (must end with several # to count up the computer names)
 - Network and Subnet
 - Image: Most important to rollout new hosts based on a custom image
+- For Active Directory integrated hosts: A [delegated domain-join](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/delegated-domainjoin.md) account (**never, ever an admin account!**)
 - Resource Group of the VM
 - VM size
 - Etc.
