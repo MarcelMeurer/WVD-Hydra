@@ -1,5 +1,5 @@
 # This powershell script is part of WVDAdmin and Project Hydra
-# Current Version of this script: 1.0
+# Current Version of this script: 1.1
 
 # The purpose is to overwrite an existing script on the Azure backend (to destroy the caching)
 

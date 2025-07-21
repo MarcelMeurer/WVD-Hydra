@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.7
+# Current Version of this script: 10.8
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -83,14 +83,14 @@ function RemoveCryptoKey($path) {
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
 			RemoveReadOnlyFromScripts $path
-			$me = Get-Item $path
-			if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
+			#$me = Get-Item $path
+			#if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
 		}
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
 			$aclNew.SetSecurityDescriptorSddlForm("O:SY G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
 			$aclNew.SetAccessRuleProtection($true, $false)
-			Set-Acl -Path $dir -AclObject $aclNew -ErrorAction Stop
+			Set-Acl -Path ([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName) -AclObject $aclNew -ErrorAction Stop
 		}
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
@@ -859,6 +859,7 @@ if ($mode -eq "Generalize") {
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\HandlerState\Microsoft.Azure.ActiveDirectory.AADLoginForWindows_*" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Azure\CurrentVersion\AADLoginForWindowsExtension" -Recurse -Force -ErrorAction Ignore
 	Remove-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin"  -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\GuestAgent"  -Recurse -Force -ErrorAction Ignore
 	$AadCerts = Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Issuer -match "CN=MS-Organization-P2P-Access*" -or $_.Issuer -match "CN=Microsoft Intune MDM Device CA" -or $_.Issuer -match "CN=MS-Organization-Access" -or $_.Issuer -match "DC=Windows Azure CRP Certificate Generator"}
 	if ($AadCerts -ne $null) {
 		$AadCerts | ForEach-Object {

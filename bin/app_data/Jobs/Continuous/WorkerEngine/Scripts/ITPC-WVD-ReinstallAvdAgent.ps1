@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 5.0
+# Current Version of this script: 5.2
 
 param(
     [string] $WvdRegistrationKey = '',
@@ -66,14 +66,14 @@ function RemoveCryptoKey($path) {
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
 			RemoveReadOnlyFromScripts $path
-			$me = Get-Item $path
-			if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
+			# $me = Get-Item $path
+			# if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
 		}
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
 			$aclNew.SetSecurityDescriptorSddlForm("O:SY G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
 			$aclNew.SetAccessRuleProtection($true, $false)
-			Set-Acl -Path $dir -AclObject $aclNew -ErrorAction Stop
+			Set-Acl -Path ([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName) -AclObject $aclNew -ErrorAction Stop
 		}
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")

@@ -57,7 +57,7 @@ function RemoveCryptoKey($path) {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
 			$aclNew.SetSecurityDescriptorSddlForm("G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
 			$aclNew.SetAccessRuleProtection($true, $false)
-			Set-Acl -Path $path -AclObject $aclNew -ErrorAction Stop
+			Set-Acl -Path $path -AclObject $aclNew -ErrorAction Stop # Set-Acl -Path ([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName) -AclObject $aclNew -ErrorAction Stop
 		}
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
