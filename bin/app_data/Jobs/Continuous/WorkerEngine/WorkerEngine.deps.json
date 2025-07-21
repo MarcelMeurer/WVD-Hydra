@@ -34,8 +34,8 @@
           "System.Formats.Asn1": "9.0.0",
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1",
-          "HydraAgent": "3.0.0.1",
-          "HydraShared.Reference": "1.1.2.1"
+          "HydraAgent": "3.0.0.2",
+          "HydraShared.Reference": "1.1.2.2"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -2775,6 +2775,25 @@
           "runtime.native.System.Security.Cryptography.OpenSsl": "4.3.2"
         }
       },
+      "System.Security.Cryptography.Pkcs/8.0.0": {
+        "dependencies": {
+          "System.Formats.Asn1": "9.0.0"
+        },
+        "runtime": {
+          "lib/net8.0/System.Security.Cryptography.Pkcs.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net8.0/System.Security.Cryptography.Pkcs.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
       "System.Security.Cryptography.Primitives/4.3.0": {
         "dependencies": {
           "System.Diagnostics.Debug": "4.3.0",
@@ -3112,6 +3131,7 @@
           "System.Data.SQLite": "1.0.118",
           "System.Data.SqlClient": "4.8.6",
           "System.Formats.Asn1": "9.0.0",
+          "System.Security.Cryptography.Pkcs": "8.0.0",
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1"
         },
@@ -3121,19 +3141,19 @@
           }
         }
       },
-      "HydraAgent/3.0.0.1": {
+      "HydraAgent/3.0.0.2": {
         "runtime": {
           "HydraAgent.dll": {
-            "assemblyVersion": "3.0.0.1",
-            "fileVersion": "3.0.0.1"
+            "assemblyVersion": "3.0.0.2",
+            "fileVersion": "3.0.0.2"
           }
         }
       },
-      "HydraShared.Reference/1.1.2.1": {
+      "HydraShared.Reference/1.1.2.2": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.1.2.1",
-            "fileVersion": "1.1.2.1"
+            "assemblyVersion": "1.1.2.2",
+            "fileVersion": "1.1.2.2"
           }
         }
       }
@@ -4832,6 +4852,13 @@
       "path": "system.security.cryptography.openssl/4.3.0",
       "hashPath": "system.security.cryptography.openssl.4.3.0.nupkg.sha512"
     },
+    "System.Security.Cryptography.Pkcs/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ULmp3xoOwNYjOYp4JZ2NK/6NdTgiN1GQXzVVN1njQ7LOZ0d0B9vyMnhyqbIi9Qw4JXj1JgCsitkTShboHRx7Eg==",
+      "path": "system.security.cryptography.pkcs/8.0.0",
+      "hashPath": "system.security.cryptography.pkcs.8.0.0.nupkg.sha512"
+    },
     "System.Security.Cryptography.Primitives/4.3.0": {
       "type": "package",
       "serviceable": true,
@@ -5017,12 +5044,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraAgent/3.0.0.1": {
+    "HydraAgent/3.0.0.2": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.1.2.1": {
+    "HydraShared.Reference/1.1.2.2": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

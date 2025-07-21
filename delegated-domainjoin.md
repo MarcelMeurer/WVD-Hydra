@@ -70,5 +70,6 @@ In Hydra, open the rollout configuration of a host pool and enter the data of th
 
 You are ready to go.
 
-PS: You can increase the security by not allowing interactive logins for this user. 
+PS: You can increase the security by not allowing interactive logins for this user.
+
 PPS: Never add this user into a group to extend permissions. The user is for the domain join only.

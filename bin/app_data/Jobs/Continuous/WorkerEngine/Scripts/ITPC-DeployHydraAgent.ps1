@@ -1,4 +1,6 @@
-﻿param(
+﻿# This powershell script is part of Hydra
+# Current Version of this script: 5.3
+param(
     [string]$paramLogFileName="AVD.Hydra.log",
     [string]$uri,
     [string]$secret
@@ -56,13 +58,12 @@ function RemoveCryptoKey($path) {
                 $_
             }
         } | sc $path -Encoding UTF8
-		# prevent overwrite from Azure
 		$name = Split-Path $path -Leaf
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
 			RemoveReadOnlyFromScripts $path
-			# $me = Get-Item $path
-			# if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
+			$settingsPath="$(([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName))\RuntimeSettings\$(($name -split '\.')[0] -replace '[^\d]', '').settings"
+			if (Test-Path -Path $settingsPath) {try {""|sc $settingsPath -Encoding UTF8 -ErrorAction stop} catch{}}
 		}
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
@@ -73,7 +74,7 @@ function RemoveCryptoKey($path) {
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
 	}
-} 
+}
 function RemoveReadOnlyFromScripts($path){
     try {
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {

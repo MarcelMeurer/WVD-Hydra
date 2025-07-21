@@ -27,4 +27,4 @@ You can find a description including a video at the [ITProCloud Blog](https://bl
 
 
 ## Using only Delegated Accounts for Automations
-For Active Directory integrated hosts use a service account with [delegated permissions to join](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/delegated-domainjoin.md) a host/computer into the right OU for your AVD hosts. Never, ever use admin credentials and never store admin credentials to Hydra - only delegated.
+For Active Directory integrated hosts use a service account with [delegated permissions to join](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/delegated-domainjoin.md) a host/computer into the right OU for your AVD hosts. **Never, ever use admin credentials** and never store admin credentials to Hydra - only delegated.

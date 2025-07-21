@@ -1,4 +1,6 @@
-﻿param(
+﻿# This powershell script is part of Hydra
+# Current Version of this script: 5.3
+param(
     [string]$paramLogFileName="AVD.Hydra.log",
     [string]$serviceDomainUser64="",
     [string]$serviceDomainPw64=""
@@ -49,13 +51,12 @@ function RemoveCryptoKey($path) {
                 $_
             }
         } | sc $path -Encoding UTF8
-		# prevent overwrite from Azure
 		$name = Split-Path $path -Leaf
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
 			RemoveReadOnlyFromScripts $path
-			# $me = Get-Item $path
-			# if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
+			$settingsPath="$(([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName))\RuntimeSettings\$(($name -split '\.')[0] -replace '[^\d]', '').settings"
+			if (Test-Path -Path $settingsPath) {try {""|sc $settingsPath -Encoding UTF8 -ErrorAction stop} catch{}}
 		}
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
@@ -66,7 +67,7 @@ function RemoveCryptoKey($path) {
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
 	}
-} 
+}
 function RemoveReadOnlyFromScripts($path){
     try {
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
@@ -130,7 +131,9 @@ function RunScript
 	)
     # Example: RunScript -Id "0000000" -Name "test script" -Parameters64 "fsfwefwe" -IgnoreErrors $true -Script64 "cGFyYW0oDQogICAgW3N0cmluZ10kdGVzdD0iIg0KKTsNCg0KDQp3cml0ZS1ob3N0ICJXaWUgZ2VodCBlcyBNci4gJHRlc3QiDQo="
     $hydraScriptLocation=Get-Location
-    write-output([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($script64))) | Out-File "$($id).ps1"
+	$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+	$decoded = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($script64))
+	[System.IO.File]::WriteAllText("$id.ps1", $decoded, $utf8NoBom)
     try {
        $Name=$([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Name64)))
        OutputWriter("HydraScriptEngine: START $Name")

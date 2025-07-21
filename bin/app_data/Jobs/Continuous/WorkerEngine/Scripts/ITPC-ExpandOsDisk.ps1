@@ -1,4 +1,6 @@
-﻿param(
+﻿# This powershell script is part of Hydra
+# Current Version of this script: 1.0
+param(
     [string]$paramLogFileName="AVD.Hydra.log"
 );
 

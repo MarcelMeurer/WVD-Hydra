@@ -62,7 +62,8 @@ function RemoveCryptoKey($path) {
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
 	}
-} 
+}
+
 
 # Define logfile
 $LogDir = "$env:windir\system32\LogFiles"

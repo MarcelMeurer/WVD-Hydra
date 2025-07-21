@@ -19,8 +19,8 @@
           "System.Formats.Asn1": "9.0.0",
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1",
-          "HydraAgent": "3.0.0.1",
-          "HydraShared.Reference": "1.1.2.1"
+          "HydraAgent": "3.0.0.2",
+          "HydraShared.Reference": "1.1.2.2"
         },
         "runtime": {
           "Portal.dll": {}
@@ -3080,6 +3080,7 @@
           "System.Data.SQLite": "1.0.118",
           "System.Data.SqlClient": "4.8.6",
           "System.Formats.Asn1": "9.0.0",
+          "System.Security.Cryptography.Pkcs": "8.0.0",
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1"
         },
@@ -3089,19 +3090,19 @@
           }
         }
       },
-      "HydraAgent/3.0.0.1": {
+      "HydraAgent/3.0.0.2": {
         "runtime": {
           "HydraAgent.dll": {
-            "assemblyVersion": "3.0.0.1",
-            "fileVersion": "3.0.0.1"
+            "assemblyVersion": "3.0.0.2",
+            "fileVersion": "3.0.0.2"
           }
         }
       },
-      "HydraShared.Reference/1.1.2.1": {
+      "HydraShared.Reference/1.1.2.2": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.1.2.1",
-            "fileVersion": "1.1.2.1"
+            "assemblyVersion": "1.1.2.2",
+            "fileVersion": "1.1.2.2"
           }
         }
       }
@@ -4985,12 +4986,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraAgent/3.0.0.1": {
+    "HydraAgent/3.0.0.2": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.1.2.1": {
+    "HydraShared.Reference/1.1.2.2": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

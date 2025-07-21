@@ -120,6 +120,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.2.02 | 2025-07-25 | Add: Info field close to the RBAC configuration; Add: Ability to remove devices from [Intune](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/advanced-permissions.md); Fix: Hydra log are now written to LogAnalytics again
 1.1.2.01 | 2025-07-06 | Add: Task for Script Collections "Host - Unassign User"; Change: Package updates
 1.1.1.09 | 2025-07-01 | Add: Support to rollout new hosts in edge locations
 1.1.1.08 | 2025-06-26 | Change: Replacing one preview API for the new preview detection; Add: If a custom image is used, Hydra will automatically select the standard security profile; Change: Caching for the monitoring of Azure fileshares; Add: Ability to renew crypto key and secret of the db; Add: Automatic detection if Hydra can access the DB by using the managed identity of Hydra

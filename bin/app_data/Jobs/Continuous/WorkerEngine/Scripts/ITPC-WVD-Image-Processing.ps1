@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.8
+# Current Version of this script: 10.9
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -29,6 +29,7 @@ param(
 	[string] $HydraAgentSecret = '', 					#Only used by Hydra
 	[string] $DownloadNewestAgent = '0', 				#Download the newes agent, event if a local agent exist
 	[string] $WaitForHybridJoin = '0',					#Awaits the completion of a hybrid join before joining the host pool
+	[string] $ForwardSignature64 = '',
 	[string] $parameters								#Additional parameters, e.g.: used to configure sysprep
 )
 Add-Type -AssemblyName System.ServiceProcess -ErrorAction SilentlyContinue
@@ -68,6 +69,22 @@ function Decrypt-String ($encryptedString, $passPhrase) {
         return $encryptedString
     }
 }
+function ChangeSignature($path)
+{
+	if (![string]::IsNullOrWhiteSpace($ForwardSignature64)) {
+		try {
+			$text = [System.IO.File]::ReadAllText($path)
+			$text = [regex]::Replace($text, '(?ms)# SIG # Begin'+' signature block.*?# SIG # End '+'signature block', '')
+			$sig = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($ForwardSignature64))
+			$text = $text.TrimEnd() + "`r`n`r`n" + $sig.TrimEnd() + "`r`n"
+			$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+			[IO.File]::WriteAllText($path, $text, $utf8NoBom)
+		}
+		catch {
+			LogWriter("Signature not changed: $_")
+		}
+	}
+}
 function RemoveCryptoKey($path) {
 	LogWriter("Remove CryptoKey")
     try {
@@ -78,13 +95,12 @@ function RemoveCryptoKey($path) {
                 $_
             }
         } | sc $path -Encoding UTF8
-		# prevent overwrite from Azure
 		$name = Split-Path $path -Leaf
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
 			RemoveReadOnlyFromScripts $path
-			#$me = Get-Item $path
-			#if (-not ($me.Attributes -band 'ReadOnly')) { $me.Attributes = $me.Attributes -bor 'ReadOnly' }
+			$settingsPath="$(([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName))\RuntimeSettings\$(($name -split '\.')[0] -replace '[^\d]', '').settings"
+			if (Test-Path -Path $settingsPath) {try {""|sc $settingsPath -Encoding UTF8 -ErrorAction stop} catch{}}
 		}
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
@@ -95,7 +111,7 @@ function RemoveCryptoKey($path) {
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
 	}
-} 
+}
 function RemoveReadOnlyFromScripts($path){
     try {
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*') {
@@ -685,7 +701,7 @@ $LogFile = $LogDir + "\AVD.Customizing.log"
 LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
 
 ####CryptoKey####
-if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"}
+if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"; ChangeSignature "$($MyInvocation.MyCommand.Path)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"}
 CleanPsLog
 AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 
@@ -1741,4 +1757,5 @@ elseif ($mode -eq "JoinMEMFromHybrid") {
 		}
 	}
 }
-CleanPsLog
+CleanPsLog 
+# Last line in this script to make signing possible
