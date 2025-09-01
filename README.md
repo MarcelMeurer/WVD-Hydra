@@ -70,7 +70,7 @@ If you are running into this issue, perform the following steps:
   - Deploy session hosts based on images
 - Management of user sessions
   - Logoff, messages, shadow user sessions, delete [FSLogix profiles](#Delete-FSLogix-profiles-from-the-user-sessions-menu)
-  - In preview: Show user processes, incl. CPU and memory usage; Terminate user processes ([requires an agent](#The-Hydra-Agent))
+  - Show user processes, incl. CPU and memory usage; Terminate user processes ([requires an agent](#The-Hydra-Agent))
 - Management of session hosts
   - Start, Stop, Delete, Restart, Automatically change disk types
   - Create new session hosts with a click (with classic disks or ephemeral)
@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.2.2.</summary>
+<details><summary>Open to see the release history. Current version is 1.1.2.3.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.1.2.03 | 2025-09-01 | Add: An option in the session host list to replace/recreate selected hosts with the same or different image; Fix: An issue if a tenant runs in split mode and used the wrong authentication; Change: Replacing one preview API for the new preview detection to 2025-03-01-preview (note: that will fix a rollout issue with multiple personal desktop where a user can have more then on host); Add: If configured, a hibernated host will also switch the disk type; Change: Optimization for the Log view (faster DB query)
 1.1.2.02 | 2025-07-21 | Add: Info field close to the RBAC configuration; Add: Ability to remove devices from [Intune](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/advanced-permissions.md); Fix: Hydra log are now written to LogAnalytics again
 1.1.2.01 | 2025-07-06 | Add: Task for Script Collections "Host - Unassign User"; Change: Package updates
 1.1.1.09 | 2025-07-01 | Add: Support to rollout new hosts in edge locations
@@ -177,7 +178,7 @@ Release | Date | Changes & Notes
 1.0.5.70 | 2024-02-04 | Add: The session host list of a personal pool shows if a user has configured a personal start time (icon close to the user name)<br/>Fix: The host pool image update could be interrupted if a host was manually removed during the update<br/>Change: Update of the API versions while accessing the AVD backend
 1.0.5.60 | 2024-02-04 | Fix: The value "0" in the configuration "Dynamically rollout new session hosts up to a max. number..." in Autoscale configuration was not handled correct (0 disabled the limitation)
 1.0.5.50 | 2024-01-28 | Change: Improvement of some description in the Web UI
-1.0.5.40 | 2024-01-23 | Add: Preview feature: Allowing special [REST calls](#External-REST-Calls) updated
+1.0.5.40 | 2024-01-23 | Add: Allowing special [REST calls](#External-REST-Calls) updated
 1.0.5.30 | 2024-01-22 | Fix: Full-Administrators wouldn't see the scripts if the global configuration the following option was not set "Read access for Host Pool Administrators of a tenant to the content of all tenants' scripts"<br/>Add: During the imaging process, a local file is executed shortly bevore running sysprep to do some last minute generalizations (C:\Windows\Temp\PreImageCustomizing.ps1 or bat or cmd or exe)
 1.0.5.20 | 2024-01-10 | Change: Script and collections - By default, only Full-Administrators can add and edit scripts and script collections. The Host Pool Administrators of full tenants can add and modify scripts by enabling "Allow Host Pool Administrators of a tenant access to scripts and collections" in the Global Settings. These scripts are only available to their tenant. With the updated concept, scripts and collections can be assigned to single or all tenants. All tenants' scripts and collections can only be assigned and modified by Full-Administrators.<br/>Change: Non Full-Administrators will no longer see some menu items where they don't have access (like roll base access, tenant configuration, etc.)<br/>Fix: Getting the newes version of an image gallery definition sometimes failed, if the version name includes 4-digit numbers (like: 2024.0001.1234)
 1.0.5.10 | 2023-12-21 | Add: Defender Onboarding scripts are triggered in front of a domain join if the onboarding script is placed in C:\Windows\Temp of the Golden Master (first Onboard-NonPersistentMachine.ps1 and if not exist WindowsDefenderATPOnboardingScript.cmd)<br/>Add: Support for ADE 2<br/>Change: Some configuration are moved into the detail section (like hibernation enabled for autoscaling - it's still in the session time outs for personal pools)
@@ -189,7 +190,7 @@ Release | Date | Changes & Notes
 1.0.4.40 | 2023-11-08 | Change: Important: Users in role "Host pool resource manager" can now create images (before: "Full Admin" role was needed)<br/>Add: New type of host pool configuration called "Hosts". Can be used to configure the hosts on a pool base with some basic settings: FSLogix profiles, OS settings, RDS settings, Teams optimization "on"<br/>Add: New tasks in script collections: "VM - Apply OS Settings" (see before); "Host - Drain mode revert" (brings the drain-mode into the state of starting a script collection)<br/>Add: Optional await a hybrid domain-join during the rollout<br/>Add: Marketplace images for Windows 11 23H1
 1.0.4.30 | 2023-10-19 | Add: Update of the rollout script to retry the installation of the AVD agent and bootloader
 1.0.4.20 | 2023-10-03 | Fix: In a view cases the global settings couldn't show up in the portal
-1.0.4.10 | 2023-09-28 | Add: Preview feature: Allowing special [REST calls](#External-REST-Calls) to start a rollout of hosts from external<br/>Add: Update of the imaging script to remove another dependency of an older intune deployment
+1.0.4.10 | 2023-09-28 | Add: Allowing special [REST calls](#External-REST-Calls) to start a rollout of hosts from external<br/>Add: Update of the imaging script to remove another dependency of an older intune deployment
 1.0.3.09 | 2023-09-23 | Fix: Resolved a typo in the imaging and rollout script (in some cases, the imaging process failed with an error about LogWrite not found (instead of LogWriter))
 1.0.3.08 | 2023-09-19 | Add: New option for generating images: Tag as 'TestImage' - Tags an image optionally as a 'TestImage'. Test images are ignored if the rollout configuration is set to use the newest image from a gallery definition or from a VM. Regardless, these images can be selected directly in the rollout configuration (e.g., in a test host pool). To untag, remove the tag 'AVD.TestImage' from an image or gallery version in the Azure Portal.<br/>Add: Dashboard shows the number of hosts and the number of running hosts (also in drain-mode)<br/>Add: The logs from the menu can now be downloaded (default retention time: 60 days)<br/>Add: New option in the global settings: "Add timestamps to script, imaging, and rollout logs"<br/>Add: New option in the global settings: "Try to adjust quota" - Hydra can try to increase the core quotas for non spot VMs automtically (handle with care)<br/>Change: The tag "AVD.Source" contains the resolved image resource id (e.g., the image version of a gallery definition, even if "newest" was selected)<br/>Removed: Strong generalization from the imaging menu: Is applied automatically if sysprep fails<br/>Fix: In some cases, a scheduled script was executed more then one time (again after 5 minutes)
 1.0.3.07 | 2023-09-04 | Add: Extending the imaging script to handle AADLoginForWindowsWithIntune issues (the installation doesn't continue after the deployment of the extension if an older extension version was installed on the master)<br/>Add: Extending the rollout script to bring an AAD-only VM faster online (shortens the error message that the host is not domain-joined)<br/>Add: Scripts and collection schedules for personal pools: The select script or collection will run on all hosts where the assigned user is a direct member of a given group. The group object ID is expected; only direct memberships<br/>Add: New task for script collections: VmStartIfNoSchedule - Starts a VM if no personal start configuration of an assigned host exists<br/>Add: My Sessions and Hosts: Users can configure the start time of the personal hosts.<br/>Add: New option for pooled host pools: Autoscaling & Shutdown -> Advanced Settings -> Details -> Don't create temporary hosts - Create persistent hosts
@@ -279,9 +280,9 @@ Release | Date | Changes & Notes
 1.0.1.31 | 2022-01-07 | Fix: In some cases the script engine has not started after a hosts shows an error from the AVD backend
 1.0.1.30 | 2022-01-04 | Fix: The process list of a user was sometimes not shown (error message about the JSON data) correctly if the user had a long process list
 1.0.1.29 | 2021-12-16 | Fix: Image reference "Windows 10 EVD - Gen2 - 21h2" corrected; Add: New images for 21h2 + Office
-1.0.1.28 | 2021-12-15 | Fix: Preview feature "Show process list" doesn't show processes for disconnected users
-1.0.1.27 | 2021-12-07 | Preview Feature: Show user processes ([requires an agent](#The-Hydra-Agent))<br/>Add: A fix to handle that sometimes the Azure API returns an empty resource id to the VM for a session host
-1.0.1.25 | 2021-11-12 | Add: Improvement of the imaging process to avoid that the Azure Agent shows older logs after the rollout of new VMs<br/>Add: For the rollout configuration: You can now select the source VM (Golden Master) instead of an image. Hydra will care that always the newest image of the source VM is used for the next rollout<br/>Add: Preparation to have unassigned hosts available in a personal host pool  (private preview)<br/>Change: Deleting an FSLogix profile from the GUI will no longer remove all files in the profile folder. Only VHD* files will be removed<br/>Fix: Remove a typo in the log analytics data column for host pool statistics
+1.0.1.28 | 2021-12-15 | Fix: "Show process list" doesn't show processes for disconnected users
+1.0.1.27 | 2021-12-07 | Add: Show user processes ([requires an agent](#The-Hydra-Agent))<br/>Add: A fix to handle that sometimes the Azure API returns an empty resource id to the VM for a session host
+1.0.1.25 | 2021-11-12 | Add: Improvement of the imaging process to avoid that the Azure Agent shows older logs after the rollout of new VMs<br/>Add: For the rollout configuration: You can now select the source VM (Golden Master) instead of an image. Hydra will care that always the newest image of the source VM is used for the next rollout<br/>Add: Preparation to have unassigned hosts available in a personal host pool<br/>Change: Deleting an FSLogix profile from the GUI will no longer remove all files in the profile folder. Only VHD* files will be removed<br/>Fix: Remove a typo in the log analytics data column for host pool statistics
 1.0.1.24 | 2021-11-04 | Hydra now has the imaging capabilities from WVDAdmin. You can create images based on existing VMs / Golden Masters without destroying them. The VMs / Golden Masters can be updated in the future and captured again<br/>Hydra has now a Logging menu item to show the latest operations<br/>Concurrent user count is now logged into the log analytics workspace in log Hydra_ConcurrentUserUsage_CL
 1.0.1.23 | 2021-10-22 | Add: In some cases, Azure cannot provide specific VM sizes because of insufficient resources. This prevents session hosts from starting or deploying. You can configure now on a host pool level -> New session host rollout -> Advanced setting an alternative VM size. This VM size is then used to deploy new hosts for a specific time. Additionally, if a host cannot start with insufficient resources, the VM size will be changed to the alternative configuration. This will not be undone automatically right now. This function should prevent running into temporary issues. Make sure that the alternative VM size fits the other configuration properties (like disk type). A mapping table to select an alternative VM size in case of an issue automatically is on the roadmap.
 1.0.1.22 | 2021-10-19 | Add: Make the rollout of new hosts more reliable (typical download error of the SXS stack files should be handled with a retry)
@@ -489,7 +490,7 @@ Hydra can scale pooled session hosts (multi-session) and persistent (VDI) host p
 
 A pooled host pool should have always had enough running session host to provide capacity to host the upcoming users (but not more) or should use Power-on-Connect to start the first session host while a user begins the connection.
 
-While hydra autoscaling and autoshutdown works perfectly with Power-on-Connect, I recommend [enabling this feature](https://blog.itprocloud.de/Custom-Role-for-Power-On-Connect-Preview/). Additionally, Power-on-Connect allows deallocating all session hosts if no user is connected.
+While hydra autoscaling and autoshutdown works perfectly with Power-on-Connect, I recommend [enabling this feature](https://blog.itprocloud.de/Custom-Role-for-Power-On-Connect-Preview/). Additionally, Power-on-Connect allows deallocating all session hosts if no user is connected. Power-on-connect is public available and no longer in preview.
 
 
 
@@ -499,7 +500,7 @@ While hydra autoscaling and autoshutdown works perfectly with Power-on-Connect, 
 
 Enable the configuration and configure the basic settings:
 
-- Use Power-On-Connect (preview feature):
+- Use Power-On-Connect:
   Check this (and configure Power-on-Connect) to bring the host pool down to zero session hosts
 - Session hosts running 24/7:
   With Power-on-Connect you can go down to 0. If you have reserved instanced, it is a good option to let some session hosts running permanently (users don't have to wait for the start of a session host)
@@ -727,7 +728,7 @@ This example runs Windows Update on all session hosts Sunday, 1:00 am. Including
 
 ### The Hydra Agent
 
-The Hydra Agent is currently in preview and is needed for an optional feature set. Today, it's required to show user processes in the user session or in the session host list and maybe to terminate processes in case of an issue. Additionally, the agent is needed to show CPU, memory, CPU and disk queue length in the session host list.
+The Hydra Agent is optional and adds an additional feature set. Today, it's required to show user processes in the user session or in the session host list and maybe to terminate processes in case of an issue. Additionally, the agent is needed to show CPU, memory, CPU and disk queue length in the session host list.
 
 How does it work: The Hydra Agent connects to the Hydra app service via secure WebSocket and a secret to allow real-time communication. The communication flow is from the Hydra instance to the agent: The Hydra instance asks for information (e.g., process list), and the agent responds with the requested data. The agent cannot trigger a function on the Hydra instance.
 

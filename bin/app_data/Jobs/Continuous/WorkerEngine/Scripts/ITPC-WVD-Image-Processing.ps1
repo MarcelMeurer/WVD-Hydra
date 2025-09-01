@@ -1,9 +1,9 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 10.9
+# Current Version of this script: 11.1
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid')]
+	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid', 'WaitForReboot')]
 	[string] $Mode,
 	[string] $StrongGeneralize = '0',
 	[string] $ComputerNewname = '', 					#Only for SecureBoot process (workaround, normaly not used)
@@ -20,6 +20,7 @@ param(
 	[string] $DomainJoinOU = '',
 	[string] $AadOnly = '0',
 	[string] $JoinMem = '0',
+	[string] $IsHydra = '0',
 	[string] $MovePagefileToC = '0',
 	[string] $ExpandPartition = '0',
 	[string] $DomainFqdn = '',
@@ -122,6 +123,25 @@ function RemoveReadOnlyFromScripts($path){
 		}
     } catch {
         LogWriter("Remove ReadOnly from scripts caused an issue: $_")
+    }
+}
+function Wait-ForFileRelease ($filePath,$timeOutInSeconds) {
+    try {
+        if ((Test-Path -Path $FilePath) -and ((Get-Date) - (Get-Item -Path $FilePath).CreationTime).TotalSeconds -le 600) {
+			LogWriter("Waiting for file release - Started.")
+            $startTime = Get-Date
+            while (Test-Path -Path $FilePath) {
+                if (((Get-Date) - $startTime).TotalSeconds -gt $timeOutInSeconds) {
+                    break
+                }
+                Start-Sleep -Seconds 1
+            }
+			LogWriter("Waiting for file release - Finished.")
+        }
+        if (Test-Path -Path $FilePath) {Remove-Item -Path $FilePath -Force -ErrorAction SilentlyContinue}
+    }
+    catch {
+        LogWriter("Couldn't validate flag-file: $_")
     }
 }
 function CleanPsLog() {
@@ -372,7 +392,7 @@ function WaitForServiceExist ($serviceName,$timeOutSeconds,$repeat) {
 	while ( -not (Get-Service $serviceName -ErrorAction SilentlyContinue)) {
 		$retry = ($retryCount -lt $repeat)
 		if ($retry) { 
-			LogWriter("Service $serviceName was not found - Retrying again in $timeOutSeconds seconds, this will be retry $retryCount")
+			LogWriter("Service $serviceName was not found - Retrying again in $timeOutSeconds seconds, this will be retryed $retryCount")
 		} 
 		else {
 			LogWriter("Service $serviceName was not found - Retry limit exceeded: $serviceName didn't become available after $retry retries")
@@ -786,11 +806,14 @@ catch {}
 
 # Start script by mode
 if ($mode -eq "Generalize") {
+	#Clean-up old logfiles
+	Remove-Item -Path "$($LogDir)\AVD.*.log" -Force -ErrorAction Ignore
+
 	LogWriter("Check for PreImageCustomizing scripts")
-	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.exe"
-	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.cmd"
-	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.bat"
-	ExecuteFileAndAwait "$env:windir\Temp\PreImageCustomizing.ps1"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreImageCustomizing.exe"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreImageCustomizing.cmd"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreImageCustomizing.bat"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreImageCustomizing.ps1"
 
 	LogWriter("Removing existing Remote Desktop Agent Boot Loaders")
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
@@ -965,13 +988,6 @@ if ($mode -eq "Generalize") {
 	Uninstall-Package -Name "Microsoft Monitoring Agent" -AllVersions -Force  -ErrorAction Ignore
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\AzureMonitorAgent\Secrets" -Name "PersistenceKeyCreated" -ErrorAction Ignore
 
-
-	# Check, if the optimization script exist (Hydra: use a script inside Hydra)
-	if ([System.IO.File]::Exists("C:\ProgramData\Optimize\Win10_VirtualDesktop_Optimize.ps1")) {
-		LogWriter("Running VDI Optimization script")
-		Start-Process -wait -FilePath PowerShell.exe -WorkingDirectory "C:\ProgramData\Optimize" -ArgumentList '-ExecutionPolicy Bypass -File "C:\ProgramData\Optimize\Win10_VirtualDesktop_Optimize.ps1 -AcceptEULA -Optimizations WindowsMediaPlayer,AppxPackages,ScheduledTasks,DefaultUserSettings,Autologgers,Services,NetworkOptimizations"' -RedirectStandardOutput "$($LogDir)\VirtualDesktop_Optimize.Stage1.Out.txt" -RedirectStandardError "$($LogDir)\VirtualDesktop_Optimize.Stage1.Warning.txt"
-	}
-
 	# prepare cleanup task for new deployed VMs - solve an issue with the runcommand api giving older log data
 	LogWriter("Preparing CleanFirstStart task")
 	$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"CleanFirstStart`""
@@ -980,7 +996,7 @@ if ($mode -eq "Generalize") {
 	$settingsSet = New-ScheduledTaskSettingsSet
 	$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
 	Register-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper' -InputObject $task -ErrorAction Ignore
-	Enable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper'
+	Enable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper' -ErrorAction Ignore
 	LogWriter("Added new startup task to run the CleanFirstStart")
 
 	# check if D:-drive not the temporary storage and having three drives 
@@ -1067,16 +1083,21 @@ elseif ($mode -eq "JoinDomain") {
 	Stop-Service ccmexec -Force -NoWait -ErrorAction SilentlyContinue
 
 	LogWriter("Check for PreJoin scripts")
-	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.exe"
-	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.cmd"
-	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.bat"
-	ExecuteFileAndAwait "$env:windir\Temp\PreJoin.ps1"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreJoin.exe"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreJoin.cmd"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreJoin.bat"
+	ExecuteFileAndAwait "$env:windir\System32\Hydra\PreJoin.ps1"
 
 	# Removing existing agent if exist
-	LogWriter("Removing existing Remote Desktop Agent Boot Loader")
-	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
-	LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
-	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
+	try {
+		LogWriter("Removing existing Remote Desktop Agent Boot Loader")
+		Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ProviderName msi -ErrorAction SilentlyContinue 
+		LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
+		Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ProviderName msi -ErrorAction SilentlyContinue 
+	}
+	catch {
+		LogWriter("Uninstalling or searching for an already installed AVD Agent and Bootloader failed: $_")
+	}
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
 
 	# Prevent removing language packs
@@ -1100,18 +1121,18 @@ elseif ($mode -eq "JoinDomain") {
 	if (Test-Path -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime") {
 		$timeZone = (Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -ErrorAction Ignore)."TimeZone.Origin"
 		if ($timeZone -ne "" -and $timeZone -ne $null) {
-			LogWriter("Setting time zone to: " + $timeZone)
+			LogWriter("Setting system time zone to: " + $timeZone)
 			Set-TimeZone -Id $timeZone
 		}
 	}
 	
 	# Check for defender onboarding script
-	if (Test-Path -Path "$env:windir\Temp\Onboard-NonPersistentMachine.ps1") {
+	if (Test-Path -Path "$env:windir\System32\Hydra\Onboard-NonPersistentMachine.ps1") {
 		LogWriter("Onboarding to Defender for Endpoints (non-persistent)")
-		ExecuteFileAndAwait "$env:windir\Temp\Onboard-NonPersistentMachine.ps1"
-	} elseif (Test-Path -Path "$env:windir\Temp\WindowsDefenderATPOnboardingScript.cmd") {
+		ExecuteFileAndAwait "$env:windir\System32\Hydra\Onboard-NonPersistentMachine.ps1"
+	} elseif (Test-Path -Path "$env:windir\System32\Hydra\WindowsDefenderATPOnboardingScript.cmd") {
 		LogWriter("Onboarding to Defender for Endpoints (persistent)")
-		ExecuteFileAndAwait "$env:windir\Temp\WindowsDefenderATPOnboardingScript.cmd"
+		ExecuteFileAndAwait "$env:windir\System32\Hydra\WindowsDefenderATPOnboardingScript.cmd"
 	}
 
 	# Handling workaround for Windows 11 22H2
@@ -1217,7 +1238,7 @@ elseif ($mode -eq "JoinDomain") {
 				$settingsSet = New-ScheduledTaskSettingsSet
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet
 				Register-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper' -InputObject $task -ErrorAction Ignore
-				Enable-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper'
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper' -ErrorAction Ignore
 				LogWriter("Added new startup task for the disk handling")
 
 				# change c:\pagefile.sys to e:\pagefile.sys
@@ -1287,7 +1308,7 @@ elseif ($mode -eq "JoinDomain") {
 			    DownloadFile $DownloadAdress "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.zip"
 
 			    # Stop a running instance
-			    LogWriter("Stop a running instance")
+			    LogWriter("Stop a running Hydra agent if it exists")
 			    Stop-ScheduledTask -TaskName 'ITPC-AVD-Hydra-Helper' -ErrorAction Ignore
 			    Stop-Process -Name HydraAgent -Force -ErrorAction Ignore
 			    Start-Sleep -Seconds 6
@@ -1295,9 +1316,13 @@ elseif ($mode -eq "JoinDomain") {
             
 
 			    # Configuring the agent
-			    LogWriter("Configuring the agent")
+			    LogWriter("Configuring and installing the Hydra agent")
 			    cd "$env:ProgramFiles\ITProCloud.de\HydraAgent"
-			    . "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -i -u "wss://$($uri)/wsx" -s $secret
+			    #. "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -i -u "wss://$($uri)/wsx" -s $secret
+				$proc=Start-Process -FilePath "$env:ProgramFiles\ITProCloud.de\HydraAgent\HydraAgent.exe" -ArgumentList "-i -u `"wss://$($uri)/wsx`" -s $secret" -PassThru -Wait -RedirectStandardError "$LogDir\AVD.HydraAgent.log"
+				if ($proc.ExitCode -ne 0) {
+					throw "Installation of the HydraAgent throw an error"
+				}
                 $retry=0
 		    }
 		    catch {
@@ -1362,13 +1387,13 @@ elseif ($mode -eq "JoinDomain") {
 				$settingsSet = New-ScheduledTaskSettingsSet
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
 				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -InputObject $task -ErrorAction Ignore
-				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -ErrorAction Ignore
 				LogWriter("Added new startup task to run the RDAgentBootloader")
 
 				$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloaderIfNotRunning`""
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
 				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $task -ErrorAction Ignore
-				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2'
+				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -ErrorAction Ignore
 				LogWriter("Added new startup task to monitor the RDAgentBootloader")
 
 					
@@ -1415,8 +1440,25 @@ elseif ($mode -eq "JoinDomain") {
 	
 	# Final reboot
 	LogWriter("Finally restarting session host")
-	Start-Process -FilePath PowerShell.exe -ArgumentList "-noexit -command & {Start-Sleep -Seconds 20; Restart-Computer -Force -ErrorAction SilentlyContinue}"
-	#Restart-Computer -Force -ErrorAction SilentlyContinue
+	if ($IsHydra -eq "1") {
+		Set-Content -Path "$env:temp\RolloutCustomization-Finsihed.flag" -Value "" -ErrorAction SilentlyContinue
+		# A longer delayed restart while Hydra should do the last restart
+		#Start-Process -FilePath PowerShell.exe -ArgumentList "-noexit -command & {Start-Sleep -Seconds 200; Restart-Computer -Force -ErrorAction SilentlyContinue}"
+
+		Start-Process -FilePath PowerShell.exe -WorkingDirectory $LocalConfig -ArgumentList "-noexit -ExecutionPolicy Bypass -File `"$($LocalConfig)\ITPC-WVD-Image-Processing.ps1`" -Mode WaitForReboot"
+
+
+
+
+	} else {
+		Start-Process -FilePath PowerShell.exe -ArgumentList "-noexit -command & {Start-Sleep -Seconds 20; Restart-Computer -Force -ErrorAction SilentlyContinue}"
+	}
+}
+elseif ($Mode -eq "WaitForReboot") {
+	Wait-ForFileRelease "$env:temp\RolloutCustomization-Finsihed.flag" 150
+	LogWriter("Finally restarting session host now")
+	Start-Sleep -Seconds 5
+	Restart-Computer -Force -ErrorAction SilentlyContinue
 }
 elseif ($Mode -eq "RunSysprep") {
 	RunSysprepInternal $parameters
@@ -1496,13 +1538,14 @@ elseif ($Mode -eq "DataPartition") {
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
-		Disable-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper'
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-Disk-Mover-Helper' -ErrorAction Ignore
 	}
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
 	}
 }
 elseif ($Mode -eq "RDAgentBootloader") {
+	$LogFile = $LogDir + "\AVD.RDAgentBootloader-Helper.log"
 	$WaitForHybridJoin = (Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -ErrorAction Ignore)."WaitForHybridJoin"
 
 	if ($WaitForHybridJoin -and $WaitForHybridJoin -eq "1") {
@@ -1542,7 +1585,7 @@ elseif ($Mode -eq "RDAgentBootloader") {
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
-		Disable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper'
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -ErrorAction Ignore
 	}
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
@@ -1578,7 +1621,6 @@ elseif ($Mode -eq "RDAgentBootloader") {
 
 		$allowedHealthChecks=@("MonitoringAgentCheck","UrlsAccessibleCheck")
 		try {
-			# $avdAgentStateJson = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent\HealthCheckReport" -ErrorAction Ignore)."AgentHealthCheckReport"
 			$oldIssueExist=$false
 			if ($avdAgentStateJson -ne $null) {
 				$avdAgentState = $avdAgentStateJson | ConvertFrom-Json
@@ -1615,6 +1657,7 @@ elseif ($Mode -eq "ApplyOsSettings") {
 	ApplyOsSettings
 }
 elseif ($Mode -eq "CleanFirstStart") {
+	$LogFile = $LogDir + "\AVD.CleanFirstStart-Helper.log"
 	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
 	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
 		
@@ -1633,18 +1676,18 @@ elseif ($Mode -eq "CleanFirstStart") {
 	LogWriter("Disable scheduled task")
 	try {
 		# disable startup scheduled task
-		Disable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper'
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper' -ErrorAction Ignore
 	}
 	catch {
 		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
 	}
 }
 elseif ($mode -eq "RestartBootloader") {
+	$LogFile = $LogDir + "\AVD.RDAgentBootloader-Monitor-1.log"
 	$lastTimestamp = Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "RestartBootloaderLastRun" -ErrorAction SilentlyContinue
 	$timeDiffSec = ([int][double]::Parse((Get-Date -UFormat %s))) - $lastTimestamp.RestartBootloaderLastRun
 
 	if ($LastTimestamp -eq $null -or $timeDiffSec -gt 120) {
-		$LogFile = $LogDir + "\AVD.AgentBootloaderErrorHandling.log"
 		LogWriter "Stopping service"
 		Stop-Service -Name "RDAgentBootLoader"
 		LogWriter "Starting service"
@@ -1653,7 +1696,7 @@ elseif ($mode -eq "RestartBootloader") {
 	}
 }
 elseif ($mode -eq "RepairMonitoringAgent") {
-	$LogFile = $LogDir + "\AVD.MonitorReinstall.log"
+	$LogFile = $LogDir + "\AVD.RDAgentBootloader-Monitor.log"
 	$files = @(Get-ChildItem -Path "$($env:ProgramFiles)\Microsoft RDInfra\Microsoft.RDInfra.Geneva.Installer*.msi")
 	if ($files.Length -eq 0) {
 		LogWriter "Couldn't find binaries"
@@ -1666,6 +1709,7 @@ elseif ($mode -eq "RepairMonitoringAgent") {
 }
 elseif ($mode -eq "StartBootloader") {
 	$LogFile = $LogDir + "\AVD.AgentBootloaderErrorHandling.log"
+
 	if (WaitForServiceExist "RDAgentBootLoader" 5 480) {
 		LogWriter "Start service was triggered by an event"
 		LogWriter "Waiting for 5 seconds"
@@ -1685,6 +1729,8 @@ elseif ($mode -eq "StartBootloader") {
 	}
 }
 elseif ($mode -eq "StartBootloaderIfNotRunning") {
+	$LogFile = $LogDir + "\AVD.RDAgentBootloader-Monitor-2.log"
+
 	# Workaround for a hidden system file
 	RemoveHiddenIfExist "$env:windir\system32\VMAgentDisabler.dll"
 	# Monitor service
@@ -1736,6 +1782,7 @@ elseif ($mode -eq "StartBootloaderIfNotRunning") {
 	}
 }
 elseif ($mode -eq "JoinMEMFromHybrid") {
+	$LogFile = $LogDir + "\AVD.Enroll-To-Intune.log"
 	# Check, if registry key exist
 	if ($null -ne (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*" -ErrorAction SilentlyContinue)) {
 		LogWriter("Device is AAD joined")

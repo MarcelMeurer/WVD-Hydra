@@ -11,6 +11,7 @@ function LogWriter($message) {
 
 LogWriter("Postprocessing script started.")
 try {
+	if (Test-Path -Path "$env:temp\RolloutCustomization-Finsihed.flag") {Remove-Item "$env:temp\RolloutCustomization-Finsihed.flag" -Force -ErrorAction SilentlyContinue}
 	$path = $MyInvocation.MyCommand.Definition
 	$name = Split-Path $path -Leaf
 	$dir  = Split-Path $path -Parent

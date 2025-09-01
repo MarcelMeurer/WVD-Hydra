@@ -1,6 +1,9 @@
 Third Party Legal Notice
 -----------------------------------------------------------------
 
+Azure.Data.Tables
+https://licenses.nuget.org/MIT
+
 Azure.Identity, MicrosoftMicrosoft.AspNetCore.Http
 https://raw.githubusercontent.com/aspnet/AspNetCore/2.0.0/LICENSE.txt
 
@@ -23,6 +26,9 @@ CommandLineParser
 https://aka.ms/deprecateLicenseUrl
 
 Azure.Identity 
+https://licenses.nuget.org/MIT
+
+Azure.Extensions.AspNetCore.Configuration.Secrets
 https://licenses.nuget.org/MIT
 
 Azure.Security.KeyVault.Secrets    
@@ -139,6 +145,8 @@ https://licenses.nuget.org/MIT
 MemoryPack, Cysharp, Inc.
 https://github.com/Cysharp/MemoryPack/blob/main/LICENSE.md
 
+WindowsAzure.Storage
+hhttps://github.com/Azure/azure-storage-net/blob/master/LICENSE.txt
 
 Angular Frontend
 -----------------------------------------------------------------
