@@ -1,0 +1,143 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/roleDefinitions",
+      "apiVersion": "2022-04-01",
+      "name": "18d3bc05-cf12-446b-8aa2-1ecd3064aee9",
+      "properties": {
+        "roleName": "Hydra - Resource Access Role",
+        "description": "A fine-tuned role to allow the SP or managed identity of Hydra to operate the resources of Azure Virtual Desktop.",
+        "type": "customRole",
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Authorization/*/read",
+                    "Microsoft.AzureStackHCI/Clusters/ArcSettings/Read",
+                    "Microsoft.AzureStackHCI/Clusters/Read",
+                    "Microsoft.AzureStackHCI/GalleryImages/*",
+                    "Microsoft.AzureStackHCI/LogicalNetworks/join/action",
+                    "Microsoft.AzureStackHCI/LogicalNetworks/Read",
+                    "Microsoft.AzureStackHCI/MarketplaceGalleryImages/*",
+                    "Microsoft.AzureStackHCI/NetworkInterfaces/*",
+                    "Microsoft.AzureStackHCI/NetworkSecurityGroups/Read",
+                    "Microsoft.AzureStackHCI/NetworkSecurityGroups/SecurityRules/Read",
+                    "Microsoft.AzureStackHCI/VirtualHardDisks/*",
+                    "Microsoft.AzureStackHCI/virtualMachineInstances/*",
+                    "Microsoft.AzureStackHCI/VirtualMachines/*",
+                    "Microsoft.AzureStackHCI/VirtualNetworks/join/action",
+                    "Microsoft.AzureStackHCI/VirtualNetworks/Read",
+                    "Microsoft.Compute/availabilitySets/*",
+                    "Microsoft.Compute/cloudServices/*",
+                    "Microsoft.Compute/diskAccesses/*",
+                    "Microsoft.Compute/diskEncryptionSets/read",
+                    "Microsoft.Compute/diskEncryptionSets/write",
+                    "Microsoft.Compute/disks/*",
+                    "Microsoft.Compute/galleries/applications/*",
+                    "Microsoft.Compute/galleries/images/*",
+                    "Microsoft.Compute/galleries/read",
+                    "Microsoft.Compute/galleries/share/action",
+                    "Microsoft.Compute/galleries/write",
+                    "Microsoft.Compute/images/*",
+                    "Microsoft.Compute/locations/*",
+                    "Microsoft.Compute/operations/read",
+                    "Microsoft.Compute/restorePointCollections/*",
+                    "Microsoft.Compute/sharedVMExtensions/*",
+                    "Microsoft.Compute/sharedVMImages/*",
+                    "Microsoft.Compute/skus/read",
+                    "Microsoft.Compute/snapshots/*",
+                    "Microsoft.Compute/virtualMachines/*",
+                    "Microsoft.Compute/virtualMachineScaleSets/*",
+                    "Microsoft.DesktopVirtualization/*",
+                    "Microsoft.ExtendedLocation/customLocations/deploy/action",
+                    "Microsoft.ExtendedLocation/customLocations/Read",
+                    "Microsoft.HybridCompute/licenses/*",
+                    "Microsoft.HybridCompute/locations/*",
+                    "Microsoft.HybridCompute/machines/*",
+                    "Microsoft.HybridCompute/operations/*",
+                    "Microsoft.HybridCompute/osType/*",
+                    "Microsoft.Insights/alertRules/*",
+                    "Microsoft.Insights/DataCollectionEndpoints/*",
+                    "Microsoft.Insights/DataCollectionRules/*",
+                    "Microsoft.Insights/DataCollectionRuleAssociations/*",
+                    "Microsoft.KeyVault/vaults/read",
+                    "Microsoft.KeyVault/vaults/deploy/*",
+                    "Microsoft.Network/applicationGateways/backendAddressPools/join/action",
+                    "Microsoft.Network/applicationSecurityGroups/*",
+                    "Microsoft.Network/loadBalancers/backendAddressPools/join/action",
+                    "Microsoft.Network/loadBalancers/inboundNatPools/join/action",
+                    "Microsoft.Network/loadBalancers/inboundNatRules/join/action",
+                    "Microsoft.Network/loadBalancers/probes/join/action",
+                    "Microsoft.Network/loadBalancers/read",
+                    "Microsoft.Network/locations/*",
+                    "Microsoft.Network/networkInterfaces/*",
+                    "Microsoft.Network/networkSecurityGroups/join/action",
+                    "Microsoft.Network/networkSecurityGroups/read",
+                    "Microsoft.Network/virtualNetworks/read",
+                    "Microsoft.Network/virtualNetworks/subnets/join/action",
+                    "Microsoft.Network/virtualNetworks/subnets/read",
+                    "Microsoft.Network/virtualNetworks/subnets/virtualMachines/read",
+                    "Microsoft.OperationalInsights/*",
+                    "Microsoft.RecoveryServices/locations/*",
+                    "Microsoft.Resources/*/read",
+                    "Microsoft.ResourceGraph/*",
+                    "Microsoft.ResourceHealth/availabilityStatuses/read",
+                    "Microsoft.Resources/deployments/*",
+                    "Microsoft.Resources/subscriptions/operationresults/read",
+                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/*",
+                    "Microsoft.Resources/subscriptions/resourceGroups/read",
+                    "Microsoft.SerialConsole/serialPorts/connect/action",
+                    "Microsoft.Storage/storageAccounts/fileServices/read",
+                    "Microsoft.Storage/storageAccounts/fileServices/shares/write",
+                    "Microsoft.Storage/storageAccounts/fileServices/shares/read",
+                    "Microsoft.Storage/storageAccounts/listKeys/action",
+                    "Microsoft.Storage/storageAccounts/read",
+                    "Microsoft.Insights/diagnosticSettings/*"
+                ],
+                "notActions": [],
+                "dataActions": [
+                    "Microsoft.KeyVault/vaults/keys/wrap/action",
+                    "Microsoft.KeyVault/vaults/keys/encrypt/action",
+                    "Microsoft.KeyVault/vaults/keys/read",
+                    "Microsoft.KeyVault/vaults/secrets/setSecret/action",
+                    "Microsoft.Insights/Metrics/Write",
+                    "Microsoft.Insights/Telemetry/Write"
+				],
+                "notDataActions": []
+            }
+        ],
+        "assignableScopes": [
+          "[subscription().id]"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleDefinitions",
+      "apiVersion": "2022-04-01",
+      "name": "54cb361e-1b01-49f8-982d-a02b6b1c9ff6",
+      "properties": {
+        "roleName": "Hydra - Change Permissions Role",
+        "description": "This role is used by Hydra to change the permissions on Azure Resources. E.g., to give/remove access to application groups, to assign users to virtual machines (Virtual Machine Role), or to allow Microsoft Power-on-Connect.\n\nWe recommend assigning this role only to the necessary resources (such as application groups or defined resource groups), as it is powerful and can also be used to grant other identities any permission.",
+        "type": "customRole",
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Authorization/roleAssignments/*"
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ],
+        "assignableScopes": [
+          "[subscription().id]"
+        ]
+      }
+    }
+  ]
+}
