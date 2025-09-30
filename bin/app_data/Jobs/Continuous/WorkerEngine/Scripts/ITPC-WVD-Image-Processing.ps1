@@ -793,14 +793,17 @@ try {
 }
 catch {}
 
-# try to get windows full version to do some workarounds
+# try to get Windows full version to do some workarounds
 $is1122H2 = $false
 try {
-	$ci = Get-ComputerInfo
-	if ($ci.OsName -match "Windows 11" -and $ci.OSDisplayVersion -match "22h2") {
-		$is1122H2 = $true
-		LogWriter("Windows 11 22H2 detected")
-	}
+    $cv = Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -ErrorAction SilentlyContinue 
+    $major = $cv.CurrentMajorVersionNumber
+    $build = [int]$cv.CurrentBuildNumber
+    $display = $cv.DisplayVersion
+    if ($major -eq 10 -and $build -ge 22000 -and $display -eq "22H2") {
+        $is1122H2 = $true
+        LogWriter "Windows 11 22H2 detected"
+    }
 }
 catch {}
 
