@@ -120,6 +120,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+1.2.0.01 | 2025-10-10 | Fix: Modifying an imaging definition was not possible; Add: A selector for a storage path for Azure Local
 1.2.0.00 | 2025-09-30 | Add: Host Pools Create/Edit/Delete; Add: Run scripts against powered-on hosts only; Add: Enable Boot diagnostics in the rollout configuration; Add: Option to tag hosts scheduled for Power Up/Power Down; Fix: Some typos
 1.1.2.03 | 2025-09-01 | Add: An option in the session host list to replace/recreate selected hosts with the same or different image; Fix: An issue if a tenant runs in split mode and used the wrong authentication; Change: Replacing one preview API for the new preview detection to 2025-03-01-preview (note: that will fix a rollout issue with multiple personal desktop where a user can have more then on host); Add: If configured, a hibernated host will also switch the disk type; Change: Optimization for the Log view (faster DB query)
 1.1.2.02 | 2025-07-21 | Add: Info field close to the RBAC configuration; Add: Ability to remove devices from [Intune](https://github.com/MarcelMeurer/WVD-Hydra/blob/main/advanced-permissions.md); Fix: Hydra log are now written to LogAnalytics again

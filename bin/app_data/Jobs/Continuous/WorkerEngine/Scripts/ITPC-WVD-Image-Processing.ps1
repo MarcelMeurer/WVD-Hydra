@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 11.1
+# Current Version of this script: 11.2
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -89,13 +89,13 @@ function ChangeSignature($path)
 function RemoveCryptoKey($path) {
 	LogWriter("Remove CryptoKey")
     try {
-        (gc $path) | ForEach-Object {
+        (gc $path -ErrorAction Stop) | ForEach-Object {
             if ($_ -like '*####CryptoKeySet####*' -and $_ -like '*$CryptoKey=*' -and ($_ -notlike '*-and*')) {
                 '#' * $_.Length
             } else {
                 $_
             }
-        } | sc $path -Encoding UTF8
+        } | sc $path -Encoding UTF8 -ErrorAction Stop
 		$name = Split-Path $path -Leaf
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
@@ -183,8 +183,14 @@ function RedirectPageFileTo($drive) {
 	$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
 	if ($CurrentPageFile -ne $null -and $CurrentPageFile.Name -ne "") {
 		LogWriter("Existing pagefile name: '$($CurrentPageFile.Name)', max size: $($CurrentPageFile.MaximumSize)")
-		if ($CurrentPageFile) {$CurrentPageFile.delete()}
-		LogWriter("Pagefile deleted")
+		if ($CurrentPageFile) {
+			try {
+				$CurrentPageFile.delete()
+				LogWriter("Pagefile deleted")
+			} catch {
+				LogWriter("Pagefile deletion error: $_")
+			}
+		}
 		$CurrentPageFile = Get-WmiObject -Query 'select * from Win32_PageFileSetting'
 		if ($null -eq $CurrentPageFile) {
 			LogWriter("Pagefile deletion successful")
@@ -1252,8 +1258,14 @@ elseif ($mode -eq "JoinDomain") {
 				}
 				else {
 					if ($CurrentPageFile.Name.tolower().contains('d:')) {
-						$CurrentPageFile.delete()
-						LogWriter("Old pagefile deleted")	
+						if ($CurrentPageFile) {
+							try {
+								$CurrentPageFile.delete()
+								LogWriter("Pagefile deleted")
+							} catch {
+								LogWriter("Pagefile deletion error: $_")
+							}
+						}
 
 						Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name = 'c:\pagefile.sys'; InitialSize = 0; MaximumSize = 0 }
 						LogWriter("Set pagefile to c:\pagefile.sys")
@@ -1523,8 +1535,14 @@ elseif ($Mode -eq "DataPartition") {
 					LogWriter("No pagefile found")
 				}
 				else {
-					$CurrentPageFile.delete()
-					LogWriter("Old pagefile deleted")	
+					if ($CurrentPageFile) {
+						try {
+							$CurrentPageFile.delete()
+							LogWriter("Pagefile deleted")
+						} catch {
+							LogWriter("Pagefile deletion error: $_")
+						}
+					}
 				}
 				ShowPageFiles
 
