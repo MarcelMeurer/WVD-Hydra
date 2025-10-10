@@ -116,7 +116,7 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.1.2.3.</summary>
+<details><summary>Open to see the release history. Current version is 1.2.0.1.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
