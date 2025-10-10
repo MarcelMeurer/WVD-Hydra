@@ -46,13 +46,13 @@ function CleanPsLog() {
 function RemoveCryptoKey($path) {
 	LogWriter("Remove ZIP")
     try {
-        (gc $path) | ForEach-Object {
+        (gc $path -ErrorAction Stop) | ForEach-Object {
             if ($_ -like '*$CompressedIncludeScript=*') {
                 '#' * $_.Length
             } else {
                 $_
             }
-        } | sc $path -Encoding UTF8
+        } | sc $path -Encoding UTF8 -ErrorAction Stop
 		if (!($path -like 'C:\Users\*')) {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
 			$aclNew.SetSecurityDescriptorSddlForm("G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")

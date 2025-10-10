@@ -54,13 +54,13 @@ function Decrypt-String ($encryptedString, $passPhrase) {
 function RemoveCryptoKey($path) {
 	LogWriter("Remove CryptoKey")
     try {
-        (gc $path) | ForEach-Object {
+        (gc $path -ErrorAction Stop) | ForEach-Object {
             if ($_ -like '*####CryptoKeySet####*' -and $_ -like '*$CryptoKey=*' -and ($_ -notlike '*-and*')) {
                 '#' * $_.Length
             } else {
                 $_
             }
-        } | sc $path -Encoding UTF8
+        } | sc $path -Encoding UTF8 -ErrorAction Stop
 		$name = Split-Path $path -Leaf
 		$dir  = Split-Path $path -Parent
 		if ($path -like 'C:\Packages\Plugins\*\Downloads\*' -and $name -like 'script*.ps1') {
