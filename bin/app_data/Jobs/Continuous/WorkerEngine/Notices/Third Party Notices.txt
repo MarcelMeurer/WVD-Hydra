@@ -31,6 +31,9 @@ https://licenses.nuget.org/MIT
 Azure.Extensions.AspNetCore.Configuration.Secrets
 https://licenses.nuget.org/MIT
 
+Azure.Storage.Blobs
+https://licenses.nuget.org/MIT
+
 Azure.Security.KeyVault.Secrets    
 https://licenses.nuget.org/MIT
 

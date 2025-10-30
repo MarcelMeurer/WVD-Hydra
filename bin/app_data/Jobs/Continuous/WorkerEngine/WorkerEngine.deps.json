@@ -34,7 +34,7 @@
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1",
           "HydraAgent": "3.0.0.3",
-          "HydraShared.Reference": "1.2.0.1"
+          "HydraShared.Reference": "1.2.1.0"
         },
         "runtime": {
           "WorkerEngine.dll": {}
@@ -311,6 +311,30 @@
           "lib/netstandard2.0/Azure.Security.KeyVault.Secrets.dll": {
             "assemblyVersion": "4.6.0.0",
             "fileVersion": "4.600.24.11403"
+          }
+        }
+      },
+      "Azure.Storage.Blobs/12.21.2": {
+        "dependencies": {
+          "Azure.Storage.Common": "12.20.1",
+          "System.Text.Json": "9.0.5"
+        },
+        "runtime": {
+          "lib/net6.0/Azure.Storage.Blobs.dll": {
+            "assemblyVersion": "12.21.2.0",
+            "fileVersion": "12.2100.224.40807"
+          }
+        }
+      },
+      "Azure.Storage.Common/12.20.1": {
+        "dependencies": {
+          "Azure.Core": "1.41.0",
+          "System.IO.Hashing": "6.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/Azure.Storage.Common.dll": {
+            "assemblyVersion": "12.20.1.0",
+            "fileVersion": "12.2000.124.37501"
           }
         }
       },
@@ -1928,6 +1952,14 @@
           "System.Runtime": "4.3.1"
         }
       },
+      "System.IO.Hashing/6.0.0": {
+        "runtime": {
+          "lib/net6.0/System.IO.Hashing.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        }
+      },
       "System.IO.Pipelines/9.0.5": {
         "runtime": {
           "lib/net8.0/System.IO.Pipelines.dll": {
@@ -2657,6 +2689,7 @@
           "Azure.ResourceManager.ResourceGraph": "1.0.1",
           "Azure.ResourceManager.Storage": "1.2.3",
           "Azure.Security.KeyVault.Secrets": "4.6.0",
+          "Azure.Storage.Blobs": "12.21.2",
           "MemoryPack": "1.21.1",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
           "Microsoft.EntityFrameworkCore": "8.0.7",
@@ -2690,11 +2723,11 @@
           }
         }
       },
-      "HydraShared.Reference/1.2.0.1": {
+      "HydraShared.Reference/1.2.1.0": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "1.2.0.1",
-            "fileVersion": "1.2.0.1"
+            "assemblyVersion": "1.2.1.0",
+            "fileVersion": "1.2.1.0"
           }
         }
       }
@@ -2845,6 +2878,20 @@
       "sha512": "sha512-vwPceoznuT6glvirZcXlaCQrh1uzTSxpZUi2hRFNumHiS3hVyqIXI5fgWiLtlBzwqPJMTr0flUoSvGKjXXQlfg==",
       "path": "azure.security.keyvault.secrets/4.6.0",
       "hashPath": "azure.security.keyvault.secrets.4.6.0.nupkg.sha512"
+    },
+    "Azure.Storage.Blobs/12.21.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2J+sMgNbj2DJ+ydRSqYYADDd2AajFLfPzLGxASOxcoGx4iVxyF6jscHw2IY+8QyMPWA09wN3lCtYJ5S4zIsJkA==",
+      "path": "azure.storage.blobs/12.21.2",
+      "hashPath": "azure.storage.blobs.12.21.2.nupkg.sha512"
+    },
+    "Azure.Storage.Common/12.20.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KKBFnc4WZ6m9HgsKgwfO1cIxd154b8cAnP3uWhuelvFkzxqBXQQgIsHF0n3DYBG2AoTJCZDXwJpKuVC7CsKJWg==",
+      "path": "azure.storage.common/12.20.1",
+      "hashPath": "azure.storage.common.12.20.1.nupkg.sha512"
     },
     "CommandLineParser/2.9.1": {
       "type": "package",
@@ -3938,6 +3985,13 @@
       "path": "system.io.filesystem.primitives/4.3.0",
       "hashPath": "system.io.filesystem.primitives.4.3.0.nupkg.sha512"
     },
+    "System.IO.Hashing/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Rfm2jYCaUeGysFEZjDe7j1R4x6Z6BzumS/vUT5a1AA/AWJuGX71PoGB0RmpyX3VmrGqVnAwtfMn39OHR8Y/5+g==",
+      "path": "system.io.hashing/6.0.0",
+      "hashPath": "system.io.hashing.6.0.0.nupkg.sha512"
+    },
     "System.IO.Pipelines/9.0.5": {
       "type": "package",
       "serviceable": true,
@@ -4401,7 +4455,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/1.2.0.1": {
+    "HydraShared.Reference/1.2.1.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
