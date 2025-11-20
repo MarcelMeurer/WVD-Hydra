@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 1.2.1.0.</summary>
+<details><summary>Open to see the release history. Current version is 2.0.0.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+2.0.0.00 | 2025-11-20 | Add: First support for Windows 365 (will be extended); Add: Migrate personal hosts to Windows 365 using the migration APIs and snapshots; Change: Option in the consolidation mode to force a logoff of users; Add: Hydra Agent for Cloud PCs
 1.2.1.00 | 2025-10-30 | Fix: Windows of changing pool settings are now responsible to the screen size; Add: Option to use a storage account to improve image download to Azure Local; Add: Option to run scripts and coolections on running hosts only
 1.2.0.01 | 2025-10-10 | Fix: Modifying an imaging definition was not possible; Add: A selector for a storage path for Azure Local
 1.2.0.00 | 2025-09-30 | Add: Host Pools Create/Edit/Delete; Add: Run scripts against powered-on hosts only; Add: Enable Boot diagnostics in the rollout configuration; Add: Option to tag hosts scheduled for Power Up/Power Down; Fix: Some typos

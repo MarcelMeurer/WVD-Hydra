@@ -150,6 +150,9 @@ function RunScript
         } else {
             OutputWriter("HydraScriptEngine: FAILED-CONT Script failed but runtime will continue: $_")
         }
+    } finally {
+        Remove-Item -Path ".\$($id).ps1" -ErrorAction SilentlyContinue
+		CleanPsLog
     }
 }
 

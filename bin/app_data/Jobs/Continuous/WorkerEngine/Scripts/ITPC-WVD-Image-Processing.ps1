@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 11.2
+# Current Version of this script: 11.3
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -304,7 +304,7 @@ function DownloadFileIntern($url, $outFile) {
 			}
 			# if ZIP file, validate if the file is valid
 			if ([System.IO.Path]::GetExtension($outFile) -eq ".zip" -and (IsZipFile $outFile) -eq $false) {
-				throw "A ZIP file was expected but the file is not a valid MSI file"
+				throw "A ZIP file was expected but the file is not a valid ZIP file"
 			}
 			$ok = $true
 		}
@@ -334,6 +334,19 @@ function DownloadFileIntern($url, $outFile) {
 function CopyFileWithRetry($source, $destination) {
 	$i = 5
 	$ok = $false;
+	try {
+		$targetFile = Get-ChildItem -Path $destination -ErrorAction SilentlyContinue
+		if ($null -ne $targetFile -and ($targetFile.Attributes -band [System.IO.FileAttributes]::ReadOnly)) {
+			LogWriter("Removing ReadOnly flag from file $destination")
+			try {
+				$targetFile.Attributes = $targetFile.Attributes -bxor [System.IO.FileAttributes]::ReadOnly
+			}
+			catch {
+				LogWriter("Failed to remove ReadOnly flag from $($destination): $($_.Exception.Message)")
+			}
+		}
+	}
+	catch {}
 	do {
 		try {
 			Copy-Item $source -Destination $destination -ErrorAction Stop
@@ -476,7 +489,7 @@ function ApplyOsSettings() {
 		            Remove-Item -Path "$($env:temp)\FSLogixInstall" -Recurse -Force -ErrorAction SilentlyContinue
 		            DownloadFile "https://aka.ms/fslogix_download" "$($env:temp)\FSLogix.zip"
 		            UnzipFile "$($env:temp)\FSLogix.zip" "$($env:temp)\FSLogixInstall"
-		            Start-Process -FilePath "$($env:temp)\FSLogixInstall\*\x64\Release\FSLogixAppsSetup.exe" -ArgumentList "/install /quiet /norestart"
+		            Start-Process -FilePath "$($env:temp)\FSLogixInstall\x64\Release\FSLogixAppsSetup.exe" -ArgumentList "/install /quiet /norestart"
 				} catch {
 					LogWriter("Configuring FSLogix profile settings: Update Binaries from Microsoft website failed: $_")
 				}
@@ -1273,8 +1286,7 @@ elseif ($mode -eq "JoinDomain") {
 				}
 			} else { $modifyDrives = $false }
 		}
-	}
-	
+	}	
 	# resize C: partition to fill up the disk if ExpandPartition!="0""
 	if ($ExpandPartition -ne "0" -and $modifyDrives -eq $false) {
 		LogWriter("Check C: partition for resizing")

@@ -97,9 +97,6 @@ https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE
 System.Diagnostics.DiagnosticSource
 https://licenses.nuget.org/MIT
 
-AutoMapper 
-https://licenses.nuget.org/MIT
-
 Azure.ResourceManager.HybridCompute
 https://licenses.nuget.org/MIT
 
@@ -129,6 +126,9 @@ https://www.sqlite.org/copyright.html
 
 Microsoft.Graph
 https://aka.ms/deprecateLicenseUrl
+
+Microsoft.Graph.Beta
+https://www.nuget.org/packages/Microsoft.Graph.Beta/5.122.0-preview/License
 
 Microsoft.Azure.Services.AppAuthentication   
 https://raw.githubusercontent.com/Microsoft/dotnet/master/LICENSE    

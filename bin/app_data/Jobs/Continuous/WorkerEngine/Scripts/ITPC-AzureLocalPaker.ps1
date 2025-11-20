@@ -44,7 +44,7 @@ function CleanPsLog() {
 	}
 }
 function RemoveCryptoKey($path) {
-	LogWriter("Remove ZIP")
+	LogWriter("Remove CryptoKey")
     try {
         (gc $path -ErrorAction Stop) | ForEach-Object {
             if ($_ -like '*$CompressedIncludeScript=*') {
@@ -65,6 +65,7 @@ function RemoveCryptoKey($path) {
 }
 
 
+
 # Define logfile
 $LogDir = "$env:windir\system32\LogFiles"
 $LogFile = $LogDir + "\AVD.Hydra-HCI-ScriptEngine.log"
@@ -74,17 +75,18 @@ CleanPsLog
 RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"
 
 $guid=(New-Guid).Guid
-Remove-Item -Path "$($env:temp)\Hydra-ScriptInclude.$($guid).zip" -Force -ErrorAction SilentlyContinue
-Remove-Item -Path "$($env:temp)\Hydra-ScriptInclude.$($guid).ps1" -Force -Recurse -Confirm:$false -ErrorAction SilentlyContinue
+$executionPath=Split-Path $MyInvocation.MyCommand.Path
+Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1" -Force -Recurse -Confirm:$false -ErrorAction SilentlyContinue
 
-Set-Content -Path "$($env:temp)\Hydra-ScriptInclude.$($guid).zip" -Value ([System.Convert]::FromBase64String($CompressedIncludeScript)) -Encoding Byte
-UnzipFile "$($env:temp)\Hydra-ScriptInclude.$($guid).zip" "$($env:temp)\Hydra-ScriptInclude.$($guid).ps1" 
+Set-Content -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" -Value ([System.Convert]::FromBase64String($CompressedIncludeScript)) -Encoding Byte
+UnzipFile "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1" 
 
-$CallScript="$($env:temp)\Hydra-ScriptInclude.$($guid).ps1\Hydra-ScriptInclude.ps1"
-try {. "$($env:temp)\Hydra-ScriptInclude.$($guid).ps1\Hydra-ScriptInclude.ps1" @Args} catch {
+$CallScript="$($executionPath)\Hydra-ScriptInclude.$($guid).ps1\Hydra-ScriptInclude.ps1"
+try {. "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1\Hydra-ScriptInclude.ps1" @Args} catch {
     LogWriter "Error in running script: $_"
     throw $_
 } finally {
-    Remove-Item -Path "$($env:temp)\Hydra-ScriptInclude.$($guid).zip" -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "$($env:temp)\Hydra-ScriptInclude.$($guid).ps1" -Force -Recurse -Confirm:$false -ErrorAction SilentlyContinue
+    Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1" -Force -Recurse -Confirm:$false -ErrorAction SilentlyContinue
 }
