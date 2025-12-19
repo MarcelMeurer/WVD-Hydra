@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 5.3
+# Current Version of this script: 5.4
 param(
     [string]$paramLogFileName="AVD.Hydra.log",
     [string]$installHydraAgent="1",
@@ -198,6 +198,9 @@ LogWriter("Removing existing SxS Network Stack installations")
 Uninstall-Package -Name "Remote Desktop Services SxS Network Stack" -AllVersions -Force -ErrorAction SilentlyContinue 
 LogWriter("Removing existing Geneva Agents")
 Get-Package | Where-Object {$_.Name -like "Remote Desktop Services Infrastructure Geneva Agent *"} | Uninstall-Package -AllVersions -Force -ErrorAction SilentlyContinue 
+Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\RDInfraAgent' -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\RDAgentBootLoader' -Recurse -Force -ErrorAction SilentlyContinue
 
 LogWriter("Disabling ITPC-LogAnalyticAgent and MySmartScale if exist") 
 Disable-ScheduledTask  -TaskName "ITPC-LogAnalyticAgent for RDS and Citrix" -ErrorAction Ignore
@@ -211,7 +214,8 @@ StopAndRemoveSchedTask "ITPC-AVD-RDAgentMonitoring-Monitor"
 StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Monitor-1"
 StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Monitor-2"
 
-Remove-Item "C:\Packages\Plugins\Microsoft.Powershell.DSC" -Recurse -Force -ErrorAction SilentlyContinue
+# Removing an existing DSC Extension
+Remove-Item -Path "C:\Packages\Plugins\Microsoft.Powershell.DSC" -Recurse -Force -ErrorAction SilentlyContinue
 
 
 # Install Hydra Agent if selected

@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 5.3
+# Current Version of this script: 5.4
 
 param(
     [string] $WvdRegistrationKey = '',
@@ -243,8 +243,13 @@ LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
 Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
+LogWriter("Removing existing Remote Desktop Services SxS Network Stack")
+Uninstall-Package -Name "Remote Desktop Services SxS Network Stack" -AllVersions -Force -ErrorAction SilentlyContinue
+LogWriter("Removing existing Geneva Agents")
+Get-Package | Where-Object {$_.Name -like "Remote Desktop Services Infrastructure Geneva Agent*"} | Uninstall-Package  -AllVersions -Force -ErrorAction SilentlyContinue
 Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
-
+Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\RDInfraAgent' -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\RDAgentBootLoader' -Recurse -Force -ErrorAction SilentlyContinue
 
 
 if ([System.Environment]::OSVersion.Version.Major -gt 6) {

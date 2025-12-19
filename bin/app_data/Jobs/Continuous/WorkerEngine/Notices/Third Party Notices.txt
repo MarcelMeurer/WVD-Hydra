@@ -49,7 +49,19 @@ https://licenses.nuget.org/MIT
 Microsoft.Extensions.Hosting  
 https://licenses.nuget.org/MIT
 
+System.Management.Automation
+https://licenses.nuget.org/MIT
+
+Microsoft.PowerShell.SDK
+https://licenses.nuget.org/MIT
+
 Azure.Monitor.Ingestion
+https://licenses.nuget.org/MIT
+
+Azure.Monitor.Query.Logs
+https://licenses.nuget.org/MIT
+
+Azure.Monitor.Query.Metrics
 https://licenses.nuget.org/MIT
 
 Azure.ResourceManager.Authorization
@@ -110,6 +122,9 @@ Azure.ResourceManager.Compute
 https://licenses.nuget.org/MIT
 
 Azure.ResourceManager.Quota   
+https://licenses.nuget.org/MIT
+
+Azure.ResourceManager.NetApp
 https://licenses.nuget.org/MIT
 
 Azure.ResourceManager.Network 

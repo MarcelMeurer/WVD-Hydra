@@ -1,9 +1,9 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 11.3
+# Current Version of this script: 11.6
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
-	[ValidateSet('Generalize', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid', 'WaitForReboot')]
+	[ValidateSet('Generalize', 'GeneralizeAfterRestart', 'JoinDomain', 'DataPartition', 'RDAgentBootloader', 'RestartBootloader', 'StartBootloader', 'StartBootloaderIfNotRunning', 'ApplyOsSettings', 'CleanFirstStart', 'RenameComputer', 'RepairMonitoringAgent', 'RunSysprep', 'JoinMEMFromHybrid', 'WaitForReboot')]
 	[string] $Mode,
 	[string] $StrongGeneralize = '0',
 	[string] $ComputerNewname = '', 					#Only for SecureBoot process (workaround, normaly not used)
@@ -28,7 +28,7 @@ param(
 	[string] $LogDir = "$env:windir\system32\logfiles",
 	[string] $HydraAgentUri = '', 						#Only used by Hydra
 	[string] $HydraAgentSecret = '', 					#Only used by Hydra
-	[string] $DownloadNewestAgent = '0', 				#Download the newes agent, event if a local agent exist
+	[string] $DownloadNewestAgent = '0', 				#Download the newest agent, event if a local agent exist
 	[string] $WaitForHybridJoin = '0',					#Awaits the completion of a hybrid join before joining the host pool
 	[string] $ForwardSignature64 = '',
 	[string] $parameters								#Additional parameters, e.g.: used to configure sysprep
@@ -87,7 +87,6 @@ function ChangeSignature($path)
 	}
 }
 function RemoveCryptoKey($path) {
-	LogWriter("Remove CryptoKey")
     try {
         (gc $path -ErrorAction Stop) | ForEach-Object {
             if ($_ -like '*####CryptoKeySet####*' -and $_ -like '*$CryptoKey=*' -and ($_ -notlike '*-and*')) {
@@ -161,14 +160,12 @@ function CleanPsLog() {
 		try {
 		if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or (Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction SilentlyContinue) -or (Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction SilentlyContinue)) {
 			$cleanIt=$true
-			LogWriter("CleanPsLog check is true")
 		}
 		} catch {
 			$cleanIt=$true
 			LogWriter("CleanPsLog caused an issue while checking the log configuration: $_")
 		}
 		if ($cleanIt){
-			LogWriter("CleanPsLog clean-up files")
 			Stop-Service -Name EventLog -Force -ErrorAction SilentlyContinue
 			Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
 			Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
@@ -826,8 +823,22 @@ try {
 }
 catch {}
 
+
 # Start script by mode
-if ($mode -eq "Generalize") {
+if ($mode -eq "GeneralizeAfterRestart") {
+	LogWriter("Preparing GeneralizeAfterRestart")
+	$action = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"Generalize`""
+	$trigger = New-ScheduledTaskTrigger	-AtStartup
+	$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
+	$settingsSet = New-ScheduledTaskSettingsSet
+	$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
+	try {
+		Register-ScheduledTask -TaskName 'ITPC-AVD-GeneralizeAfterRestart' -InputObject $task
+		LogWriter("Added new startup task to run the GeneralizeAfterRestart after the next restart")
+	} catch {
+		LogWriter("Added new startup task to run the GeneralizeAfterRestart after the next restart caused an error: $_")
+	}
+} elseif ($mode -eq "Generalize") {
 	#Clean-up old logfiles
 	Remove-Item -Path "$($LogDir)\AVD.*.log" -Force -ErrorAction Ignore
 
@@ -841,17 +852,24 @@ if ($mode -eq "Generalize") {
 	Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Remote Desktop Services Infrastructure Agents")
 	Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
-	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
 	LogWriter("Removing existing SxS Network Stack installations")
 	Uninstall-Package -Name "Remote Desktop Services SxS Network Stack" -AllVersions -Force -ErrorAction SilentlyContinue 
 	LogWriter("Removing existing Geneva Agents")
 	Get-Package | Where-Object {$_.Name -like "Remote Desktop Services Infrastructure Geneva Agent *"} | Uninstall-Package -AllVersions -Force -ErrorAction SilentlyContinue 
+	LogWriter("Removing existing Azure Connected Machine Agent")
+	Uninstall-Package -Name "Azure Connected Machine Agent" -AllVersions -Force -ErrorAction SilentlyContinue 
+
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent" -Recurse -Force -ErrorAction SilentlyContinue
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDAgentBootLoader" -Recurse -Force -ErrorAction SilentlyContinue
+	Remove-Item -Path "$env:ProgramData\AzureConnectedMachineAgent" -Recurse -Force -ErrorAction SilentlyContinue
 
 	LogWriter("Disabling ITPC-LogAnalyticAgent and MySmartScale if exist") 
 	Disable-ScheduledTask  -TaskName "ITPC-LogAnalyticAgent for RDS and Citrix" -ErrorAction Ignore
 	Disable-ScheduledTask  -TaskName "ITPC-MySmartScaleAgent" -ErrorAction Ignore
 
 	LogWriter("Removing schedule tasks maybe created by this script on an existing host")
+	Unregister-ScheduledTask -TaskName "ITPC-AVD-GeneralizeAfterRestart" -Confirm:$false -ErrorAction Ignore
 	StopAndRemoveSchedTask "ITPC-AVD-CleanFirstStart-Helper"
 	StopAndRemoveSchedTask "ITPC-AVD-Enroll-To-Intune"
 	StopAndRemoveSchedTask "ITPC-AVD-RDAgentBootloader-Helper"
@@ -913,6 +931,9 @@ if ($mode -eq "Generalize") {
 	if ($force) {
 		SysprepPreClean	
 	}
+
+	# Removing an existing DSC Extension
+	Remove-Item -Path "c:\Packages\Plugins\Microsoft.Powershell.DSC" -Recurse -Force -ErrorAction Ignore
 	
 	# Removing the state of an olde AAD Join
 	LogWriter("Cleaning up previous AADLoginExtension / AAD join")
@@ -1012,7 +1033,7 @@ if ($mode -eq "Generalize") {
 
 	# prepare cleanup task for new deployed VMs - solve an issue with the runcommand api giving older log data
 	LogWriter("Preparing CleanFirstStart task")
-	$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"CleanFirstStart`""
+	$action = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"CleanFirstStart`""
 	$trigger = New-ScheduledTaskTrigger	-AtStartup
 	$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
 	$settingsSet = New-ScheduledTaskSettingsSet
@@ -1115,12 +1136,15 @@ elseif ($mode -eq "JoinDomain") {
 		LogWriter("Removing existing Remote Desktop Agent Boot Loader")
 		Uninstall-Package -Name "Remote Desktop Agent Boot Loader" -AllVersions -Force -ProviderName msi -ErrorAction SilentlyContinue 
 		LogWriter("Removing existing Remote Desktop Services Infrastructure Agent")
-		Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ProviderName msi -ErrorAction SilentlyContinue 
+		Uninstall-Package -Name "Remote Desktop Services Infrastructure Agent" -AllVersions -Force -ProviderName msi -ErrorAction SilentlyContinue
 	}
 	catch {
 		LogWriter("Uninstalling or searching for an already installed AVD Agent and Bootloader failed: $_")
 	}
 	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDMonitoringAgent" -Force -ErrorAction Ignore
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDInfraAgent" -Recurse -Force -ErrorAction SilentlyContinue
+	Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\RDAgentBootLoader" -Recurse -Force -ErrorAction SilentlyContinue
+
 
 	# Prevent removing language packs
 	LogWriter("Prevent removing language packs")
@@ -1193,7 +1217,7 @@ elseif ($mode -eq "JoinDomain") {
 		} while ($ok -ne $true)
 		if ($JoinMem -eq "1") {
 			LogWriter("Joining Microsoft Endpoint Management is selected. Create a scheduled task to enroll in Intune after completing the hybrid join")
-			$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"JoinMEMFromHybrid`""
+			$action = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"JoinMEMFromHybrid`""
 			$trigger = @(
 				$(New-ScheduledTaskTrigger -AtStartup),
 				$(New-ScheduledTaskTrigger -At (Get-Date).AddMinutes(2) -Once -RepetitionInterval (New-TimeSpan -Minutes 1))
@@ -1254,7 +1278,7 @@ elseif ($mode -eq "JoinDomain") {
 				LogWriter("VM with 3 drives so delete old pagefile and install runonce key")
 
 				# create scheduled task executed at startup for next phase
-				$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"DataPartition`""
+				$action = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"DataPartition`""
 				$trigger = New-ScheduledTaskTrigger	-AtStartup
 				$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
 				$settingsSet = New-ScheduledTaskSettingsSet
@@ -1408,7 +1432,7 @@ elseif ($mode -eq "JoinDomain") {
 			}
 			else {
 				LogWriter("Preparing AVD boot loader task")
-				$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RDAgentBootloader`""
+				$action = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RDAgentBootloader`""
 				$trigger = New-ScheduledTaskTrigger	-AtStartup
 				$principal = New-ScheduledTaskPrincipal 'NT Authority\SYSTEM' -RunLevel Highest
 				$settingsSet = New-ScheduledTaskSettingsSet
@@ -1417,7 +1441,7 @@ elseif ($mode -eq "JoinDomain") {
 				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Helper' -ErrorAction Ignore
 				LogWriter("Added new startup task to run the RDAgentBootloader")
 
-				$action = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloaderIfNotRunning`""
+				$action = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"StartBootloaderIfNotRunning`""
 				$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settingsSet 
 				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -InputObject $task -ErrorAction Ignore
 				Enable-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-2' -ErrorAction Ignore
@@ -1428,7 +1452,7 @@ elseif ($mode -eq "JoinDomain") {
 				$triggerM = $class | New-CimInstance -ClientOnly
 				$triggerM.Enabled = $true
 				$triggerM.Subscription = '<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''WVD-Agent'']] and System[(Level=2) and (EventID=3277)]]</Select></Query></QueryList>' # and EventID=3019: '<QueryList><Query Id="0" Path="Application"><Select Path="Application">*[System[Provider[@Name=''WVD-Agent'']] and System[(Level=2) and ((EventID=3277) or (EventID=3277))]]</Select></Query></QueryList>'
-				$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RestartBootloader`""
+				$actionM = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RestartBootloader`""
 				$settingsM = New-ScheduledTaskSettingsSet
 				$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Restarts the bootloader in case of an known issue (timeout, download error) while installing the RDagent"
 				Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentBootloader-Monitor-1' -InputObject $taskM -ErrorAction Ignore
@@ -1630,7 +1654,7 @@ elseif ($Mode -eq "RDAgentBootloader") {
 	$triggerM = $class | New-CimInstance -ClientOnly
 	$triggerM.Enabled = $true
 	$triggerM.Subscription = '<QueryList><Query Id="0" Path="RemoteDesktopServices"><Select Path="RemoteDesktopServices">*[System[Provider[@Name=''Microsoft.RDInfra.RDAgent.Service.MonitoringAgentCheck'']] and System[(Level=3) and (Task=0) and (EventID=0)]]</Select></Query></QueryList>'
-	$actionM = New-ScheduledTaskAction -Execute "$env:windir\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RepairMonitoringAgent`""
+	$actionM = New-ScheduledTaskAction -Execute Powershell.exe -Argument "-executionPolicy Unrestricted -File `"$LocalConfig\ITPC-WVD-Image-Processing.ps1`" -Mode `"RepairMonitoringAgent`""
 	$settingsM = New-ScheduledTaskSettingsSet
 	$taskM = New-ScheduledTask -Action $actionM -Principal $principal -Trigger $triggerM -Settings $settingsM -Description "Repairs the Azure Monitoring Agent in case of an issue"
 	Register-ScheduledTask -TaskName 'ITPC-AVD-RDAgentMonitoring-Monitor' -InputObject $taskM #-ErrorAction Ignore

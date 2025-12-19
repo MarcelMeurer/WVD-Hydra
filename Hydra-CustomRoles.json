@@ -98,7 +98,15 @@
                 "Microsoft.Storage/storageAccounts/listKeys/action",
                 "Microsoft.Storage/storageAccounts/read",
                 "Microsoft.Storage/storageAccounts/write",
-                "Microsoft.Insights/diagnosticSettings/*"
+                "Microsoft.Insights/diagnosticSettings/*",
+                "Microsoft.NetApp/netAppAccounts/read",
+                "Microsoft.NetApp/netAppAccounts/providers/Microsoft.Insights/metricDefinitions/read",
+                "Microsoft.NetApp/netAppAccounts/capacityPools/providers/Microsoft.Insights/metricDefinitions/read",
+                "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/providers/Microsoft.Insights/metricDefinitions/read",
+                "Microsoft.NetApp/netAppAccounts/capacityPools/read",
+                "Microsoft.NetApp/netAppAccounts/capacityPools/write",
+                "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/read",
+                "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/write"
               ],
                 "notActions": [],
               "dataActions": [
