@@ -11,7 +11,7 @@
 ## Terms
 "Hydra" is a solution to manage Azure Virtual Desktop (Azure Virtual Desktop) for one or more tenants. It's a working solution and can be installed in any subscription. The solution can be used at your own risk and without the right of indemnity. However, I am trying to publish the preview releases in high quality.
 
-The project is available as a **free community edition, even for commercial use** (up to 5 session hosts per host pool and a single tenant) and as a supported licensable product ($5 per concurrent user/month - high-water mark of simultaneously connected user in the subscription month). Hydra will generally work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or license your Hydra instance through the Azure Subscription ([Billing subscription to Hydra](https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-pay-c1)).
+The project is available as a **free community edition, even for commercial use** (up to 5 session hosts per host pool, 5 pools, 100 users, and a single tenant) and as a supported licensable product ($5 per concurrent user/month - high-water mark of simultaneously connected user in the subscription month). Hydra will generally work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or license your Hydra instance through the Azure Subscription ([Billing subscription to Hydra](https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-pay-c1)).
 
 The owner of this solution is [ITProCloud GmbH](https://www.itprocloud.com/), [info@itprocloud.com](mailto:info@itprocloud.com).
 
@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 2.1.0.1.</summary>
+<details><summary>Open to see the release history. Current version is 2.1.0.2.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+2.1.0.02 | 2026-01-14 | Change: HydraProxy download URL; Fix: Issue while showing WinGet Apps in the UI
 2.1.0.01 | 2025-12-28 | Fix: Hostpool friendly name was not shown on the dashboard after enabling it in the Global Settings
 2.1.0.00 | 2025-12-19 | Add: User settings for Windows 365; Add: Hydra Proxy to manage Azure Local / AVD Hybrid, incl. Azure Local local image creation; Add: Several Improvements
 2.0.0.00 | 2025-11-20 | Add: First support for Windows 365 (will be extended); Add: Migrate personal hosts to Windows 365 using the migration APIs and snapshots; Change: Option in the consolidation mode to force a logoff of users; Add: Hydra Agent for Cloud PCs
