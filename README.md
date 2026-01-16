@@ -116,10 +116,11 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 2.1.0.2.</summary>
+<details><summary>Open to see the release history. Current version is 2.1.0.3.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+2.1.0.03 | 2026-01-16 | Fix: Compute Gallery menu item was missing in some cases if an imaging definition should be reconfigured
 2.1.0.02 | 2026-01-14 | Change: HydraProxy download URL; Fix: Issue while showing WinGet Apps in the UI
 2.1.0.01 | 2025-12-28 | Fix: Hostpool friendly name was not shown on the dashboard after enabling it in the Global Settings
 2.1.0.00 | 2025-12-19 | Add: User settings for Windows 365; Add: Hydra Proxy to manage Azure Local / AVD Hybrid, incl. Azure Local local image creation; Add: Several Improvements
