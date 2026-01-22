@@ -19,8 +19,8 @@
           "System.Formats.Asn1": "9.0.0",
           "System.Text.Json": "9.0.5",
           "System.Text.RegularExpressions": "4.3.1",
-          "HydraAgent": "4.2.0.1",
-          "HydraShared.Reference": "2.1.0.3"
+          "HydraAgent": "4.2.0.2",
+          "HydraShared.Reference": "2.1.0.4"
         },
         "runtime": {
           "Portal.dll": {}
@@ -3769,19 +3769,19 @@
           }
         }
       },
-      "HydraAgent/4.2.0.1": {
+      "HydraAgent/4.2.0.2": {
         "runtime": {
           "HydraAgent.dll": {
-            "assemblyVersion": "4.2.0.1",
-            "fileVersion": "4.2.0.1"
+            "assemblyVersion": "4.2.0.2",
+            "fileVersion": "4.2.0.2"
           }
         }
       },
-      "HydraShared.Reference/2.1.0.3": {
+      "HydraShared.Reference/2.1.0.4": {
         "runtime": {
           "HydraShared.dll": {
-            "assemblyVersion": "2.1.0.3",
-            "fileVersion": "2.1.0.3"
+            "assemblyVersion": "2.1.0.4",
+            "fileVersion": "2.1.0.4"
           }
         }
       }
@@ -5819,12 +5819,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "HydraAgent/4.2.0.1": {
+    "HydraAgent/4.2.0.2": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "HydraShared.Reference/2.1.0.3": {
+    "HydraShared.Reference/2.1.0.4": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

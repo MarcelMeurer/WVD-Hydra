@@ -120,6 +120,7 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Release | Date | Changes & Notes
 --- | --- | ---
+2.1.0.04 | 2026-01-22 | Add: Allowing an "*" at the end of a naming schema for session hosts to over-count (e.g.: A-*= -8, -9, -10, -11, ...) ;Fix: UI hasn't shown the storage container selector for Azure Local (default/last setting was used) 
 2.1.0.03 | 2026-01-16 | Fix: Compute Gallery menu item was missing in some cases if an imaging definition should be reconfigured
 2.1.0.02 | 2026-01-14 | Change: HydraProxy download URL; Fix: Issue while showing WinGet Apps in the UI
 2.1.0.01 | 2025-12-28 | Fix: Hostpool friendly name was not shown on the dashboard after enabling it in the Global Settings
