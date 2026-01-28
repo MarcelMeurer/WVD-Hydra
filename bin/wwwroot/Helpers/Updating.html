@@ -1,0 +1,256 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>Updating Hydra Instance</title>
+
+    <style>
+        * {
+            transition: all 0.6s;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            color: #888;
+            margin: 0;
+        }
+
+        #main {
+            display: table;
+            width: 100%;
+            height: 100vh;
+            text-align: center;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .fof {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+            .fof h1,
+            .fof button {
+                font-size: 50px;
+                display: inline-block;
+                padding-right: 12px;
+                animation: type .5s alternate infinite;
+            }
+
+        @keyframes type {
+            from {
+                box-shadow: inset -3px 0px 0px #888;
+            }
+
+            to {
+                box-shadow: inset -3px 0px 0px transparent;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div class="fof">
+            <button id="updateBtn" hidden onclick="confirmUpdate()">Start Update Process</button>
+            <h1 id="statusText">Update is initializing</h1>
+            <p id="statusSubText"></p>
+            <p><a href="/">Return</a></p>
+        </div>
+    </div>
+
+    <script>
+
+
+        const statusEl = document.getElementById("statusText");
+        const statusElSub = document.getElementById("statusSubText");
+        const updateBtn = document.getElementById("updateBtn");
+
+        const params = new URLSearchParams(window.location.search);
+        const version = params.get("version");
+
+
+        const STATUS_URL = "/data/engine/updates/status";
+        const READY_URL = "/Download/HydraMessageLogo.png";
+
+        const POLL_INTERVAL = 5000;
+        let phase = "INIT";
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function startUpdate() {
+            try {
+                statusEl.textContent = "Initializing update";
+
+                const response = await fetchWithTimeout("/data/engine/updates", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: "{\"UpdateToVersion\" : \"" + version + "\"}"
+                }, 1000);
+
+                if (!response.ok) {
+                    let message = await response.text();
+                    console.log(response.status, message);
+                    if (response.status == 400) { throw new Error(message); }
+                }
+
+                console.log("Update initialized");
+                if (version.toLowerCase() === "github") {
+                    await sleep(15000);
+                }
+
+            } catch (err) {
+                statusEl.textContent = "Failed to start update";
+                statusElSub.textContent = err;
+                throw err;
+            }
+        };
+
+
+
+        async function pollUpdateStatus() {
+            try {
+                const response = await fetch(STATUS_URL, { cache: "no-store", redirect: "manual" });
+                if (!response.ok || response.status === 302 || response.status === 0) {
+                    switchToApplying();
+                } else {
+                    const text = await response.text();
+                    if (text.trim() !== "RUNNING") {
+                        switchToApplying();
+                    }
+                }
+            } catch {
+                switchToApplying();
+            }
+        }
+
+
+        function switchToApplying() {
+            console.log("Current phase: ", phase);
+            if (phase !== "INIT") return;
+
+            console.log("Switching to applying phase");
+            phase = "APPLYING";
+            statusEl.textContent = "Applying updates";
+
+            //clearInterval(statusInterval);
+            readyInterval = setInterval(checkIfReady, POLL_INTERVAL);
+        }
+
+
+        async function checkIfReady() {
+            try {
+                const response = await fetch(READY_URL, {
+                    method: "GET",
+                    cache: "no-store"
+                });
+
+                if (response.ok) {
+                    finishUpdate();
+                }
+            } catch {
+
+            }
+        }
+
+        function finishUpdate() {
+            clearInterval(readyInterval);
+            statusEl.textContent = "Update completed";
+
+            setTimeout(() => {
+                navigateBack();
+            }, 10000);
+        }
+
+        function navigateBack() {
+            const REENTER_URL = "/account/reenter";
+            const FALLBACK_URL = "/Account/Signin";
+
+            sessionStorage.clear();
+
+            fetch(REENTER_URL, {
+                method: "GET",
+                cache: "no-store",
+                redirect: "manual"
+            })
+                .then(response => {
+                    if (response.status >= 200 && response.status < 400) {
+                        window.location.replace(REENTER_URL);
+                        return;
+                    }
+                    if (response.status === 404 || response.status === 405) {
+                        window.location.replace(FALLBACK_URL);
+                        return;
+                    }
+                    if (response.status >= 500) {
+                        window.location.replace(FALLBACK_URL);
+                        return;
+                    }
+                    window.location.replace(FALLBACK_URL);
+                })
+                .catch(() => {
+                    window.location.replace(FALLBACK_URL);
+                });
+        }
+
+        async function fetchWithTimeout(url, options = {}, timeout = 1000) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                return response;
+            } catch {
+                return new Response("Accepted (mock)", {
+                    status: 202,
+                    statusText: "Accepted",
+                    headers: { "Content-Type": "text/plain" }
+                });
+            }
+            finally {
+                clearTimeout(id);
+            }
+        }
+
+        async function init() {
+            await startUpdate();
+            const statusInterval = setInterval(pollUpdateStatus, POLL_INTERVAL);
+            let readyInterval;
+        };
+
+        (async function Autostart() {
+            if (!(document.referrer === "")) {
+                await init();
+            } else {
+                statusElSub.textContent = "Start the update only, if nor rollout, imaging process or automation is running to avoid orphan resources.";
+                statusEl.hidden = true;
+                updateBtn.hidden = false;
+            }
+        })();
+
+        async function confirmUpdate() {
+            statusElSub.textContent = "";
+            statusEl.hidden = false;
+            updateBtn.hidden = true;
+            await init();
+        }
+
+
+
+
+    </script>
+</body>
+</html>
