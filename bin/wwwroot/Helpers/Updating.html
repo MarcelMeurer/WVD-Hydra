@@ -106,7 +106,7 @@
 
                 console.log("Update initialized");
                 if (version.toLowerCase() === "github") {
-                    await sleep(15000);
+                    await sleep(90000);
                 }
 
             } catch (err) {
@@ -125,6 +125,13 @@
                     switchToApplying();
                 } else {
                     const text = await response.text();
+                    if (text.trim() == "FAILED") {
+                        statusEl.textContent = "Failed to start update. Try again soon.";
+                        $("#spinner").hide();
+                        $('#update').prop('disabled', false);
+                        statusElSub.textContent = err;
+                        return;
+                    }
                     if (text.trim() !== "RUNNING") {
                         switchToApplying();
                     }

@@ -57,7 +57,7 @@ function RemoveCryptoKey($path) {
 			$aclNew=New-Object Security.AccessControl.DirectorySecurity
 			$aclNew.SetSecurityDescriptorSddlForm("G:SY D:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
 			$aclNew.SetAccessRuleProtection($true, $false)
-			Set-Acl -Path $path -AclObject $aclNew -ErrorAction Stop # Set-Acl -Path ([System.IO.DirectoryInfo]::new($path).Parent.Parent.FullName) -AclObject $aclNew -ErrorAction Stop
+			Set-Acl -Path $path -AclObject $aclNew -ErrorAction Stop
 		}
     } catch {
 		LogWriter("Remove CryptoKey cause an exception: $_")
@@ -79,8 +79,40 @@ $executionPath=Split-Path $MyInvocation.MyCommand.Path
 Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" -Force -ErrorAction SilentlyContinue
 Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1" -Force -Recurse -Confirm:$false -ErrorAction SilentlyContinue
 
+
+if ($CompressedIncludeScript.Contains(";")) {
+    LogWriter("Remote script detected")
+    $rsplit=$CompressedIncludeScript.Split(";")
+    try {
+        for ($i=0; $i -lt 3; $i++) { 
+            try { 
+                $response = Invoke-RestMethod -Uri "https://$($rsplit[1])/SocketDownload/script" -Method POST -Body "`"$($rsplit[2])`"" -ContentType "application/json"
+                break 
+            } 
+            catch { 
+                if ($i -lt 2) { LogWriter("Repeating remote script download because of an error: $_"); Start-Sleep -Seconds 15 } else { throw $_ } 
+            } 
+        }
+    } catch {
+        throw "Cannot get the remote script from the endpoint $($rsplit[1]): $_"
+    }
+    try {
+        $data = [Convert]::FromBase64String($response.script)
+        $key  = [Convert]::FromBase64String($rsplit[0])
+        $iv   = $data[0..15]
+        $ct   = $data[16..($data.Length - 1)]
+        $aes = [System.Security.Cryptography.Aes]::Create()
+        $aes.Mode = 'CBC'; $aes.Key = $key; $aes.IV = $iv
+        $cs = New-Object System.Security.Cryptography.CryptoStream (([IO.MemoryStream]::new($ct)),$aes.CreateDecryptor(),'Read')
+        $CompressedIncludeScript=([IO.StreamReader]::new($cs)).ReadToEnd()
+    } catch {
+        throw "Error while decrypting remote script: $_"
+    }
+}
+
 Set-Content -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" -Value ([System.Convert]::FromBase64String($CompressedIncludeScript)) -Encoding Byte
-UnzipFile "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1" 
+UnzipFile "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1"
+Remove-Item -Path "$($executionPath)\Hydra-ScriptInclude.$($guid).zip" -Force -ErrorAction SilentlyContinue
 
 $CallScript="$($executionPath)\Hydra-ScriptInclude.$($guid).ps1\Hydra-ScriptInclude.ps1"
 try {. "$($executionPath)\Hydra-ScriptInclude.$($guid).ps1\Hydra-ScriptInclude.ps1" @Args} catch {
