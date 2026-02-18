@@ -106,7 +106,10 @@
                 "Microsoft.NetApp/netAppAccounts/capacityPools/read",
                 "Microsoft.NetApp/netAppAccounts/capacityPools/write",
                 "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/read",
-                "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/write"
+                "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/write",
+                "Microsoft.Storage/storageAccounts/blobServices/containers/*",
+                "Microsoft.Storage/storageAccounts/blobServices/containers/*",
+                "Microsoft.Storage/storageAccounts/blobServices/*"
               ],
                 "notActions": [],
               "dataActions": [
@@ -116,7 +119,9 @@
                 "Microsoft.KeyVault/vaults/secrets/setSecret/action",
                 "Microsoft.Insights/Metrics/Write",
                 "Microsoft.Insights/Telemetry/Write",
-                "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*"
+                "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*",
+                "Microsoft.Storage/storageAccounts/blobServices/containers/*",
+                "Microsoft.Storage/storageAccounts/blobServices/*"
               ],
                 "notDataActions": []
             }
