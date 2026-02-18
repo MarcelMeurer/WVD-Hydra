@@ -116,10 +116,13 @@ Hydra can be easily updated from the portal (full administrator permissions are 
 If the icon is not shown or working in your installation, update Hydra once on the deployed app service in the Azure Portal: App Service (name of your installation) -> Deployment Center -> click on "Sync"
 ![](media/UpdateHydra-In-Hydra.png)
 
-<details><summary>Open to see the release history. Current version is 2.1.1.0.</summary>
+Note: Version 2.2.0.0 and higher are now only available in the Update Center in Hydra (Update Engine). 
+
+<details><summary>Open to see the release history. Current version is 2.2.0.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+2.2.0.00 | 2026-02-18 | Add: Community Mode limits for existing installations (1 Tenant, 5 Host Pools, 5 Session Hosts per Pool); Add: Windows 365 Updates (Azure Networking); Add: Remote Scripts Resiliency (In some cases the RuncommandAPI can throw an HRPC500 error related to script size. Now a customer can configure for the size of scripts, as needed);Add: UI Improvements
 2.1.1.00 | 2026-01-28 | Add: New action: Others - Quit on hosts with sessions; Windows 365 user and device setting configuration; Change: New limitation for the community edition for new deployments
 2.1.0.04 | 2026-01-22 | Add: Allowing an "*" at the end of a naming schema for session hosts to over-count (e.g.: A-*= -8, -9, -10, -11, ...) ;Fix: UI hasn't shown the storage container selector for Azure Local (default/last setting was used) 
 2.1.0.03 | 2026-01-16 | Fix: Compute Gallery menu item was missing in some cases if an imaging definition should be reconfigured
