@@ -32,6 +32,8 @@
                 "Microsoft.AzureStackHCI/VirtualMachines/*",
                 "Microsoft.AzureStackHCI/VirtualNetworks/join/action",
                 "Microsoft.AzureStackHCI/VirtualNetworks/Read",
+                "Microsoft.azurestackhci/storagecontainers/Read",
+                "Microsoft.AzureStackHCI/storageContainers/deploy/action",
                 "Microsoft.Compute/availabilitySets/*",
                 "Microsoft.Compute/cloudServices/*",
                 "Microsoft.Compute/diskAccesses/*",
