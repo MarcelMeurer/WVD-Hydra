@@ -26,7 +26,7 @@ Please make sure to send feedback and update the solution regularly.
 
 
 ## Get help
-If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
+If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [support@loginvsi.com](mailto:support@loginvsi.com)
 
 ## Features
 - Multi-tenancy
@@ -349,7 +349,7 @@ If you are using Hydra in a small environment (a few pools with few hosts), you 
 
 ## Adding a tenant
 
-**Note:** If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)*
+**Note:** If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [support@loginvsi.com](mailto:support@loginvsi.com)*
 
 Open your Hydra instance in a web browser by entering https://myhydrainstance.azurewebsites.net (myhydrainstance is the name of your deployment from the basic step).
 
