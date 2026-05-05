@@ -1,4 +1,6 @@
-﻿Add-Type -AssemblyName System.IO.Compression.FileSystem
+﻿# This powershell script is part of Hydra
+# Current Version of this script: 5.5
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function LogWriter($message) {
 	$message = "$(Get-Date ([datetime]::UtcNow) -Format "o") $message"
@@ -10,37 +12,35 @@ function UnzipFile
     param([string]$zipfile, [string]$out)
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $out)
 }
-function CleanPsLog() {
+function CleanUp() {
 	#NO AddRegistyKey
     try {Disable-PSTrace} catch {}
 	try {
 		try {$l1 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Windows PowerShell"} catch {$l1=$null}
 		try {$l2 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Microsoft-Windows-PowerShell/Operational"} catch {$l2=$null}
-		Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
-		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {throw $_}
-		#Change permission
+		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {}
+		#Correct permission
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		$cleanIt=$false
 		try {
-		if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or (Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction SilentlyContinue) -or (Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction SilentlyContinue)) {
-			$cleanIt=$true
-			LogWriter("CleanPsLog check is true")
-		}
+			try {$x1=Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x1=$null}
+			try {$x2=Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x2=$null}
+			if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or $x1 -or $x2) {
+				$cleanIt=$true
+			}
 		} catch {
 			$cleanIt=$true
-			LogWriter("CleanPsLog caused an issue while checking the log configuration: $_")
+			LogWriter("CleanUp caused an issue while checking the log configuration: $_")
 		}
 		if ($cleanIt){
-			LogWriter("CleanPsLog clean-up files")
 			Stop-Service -Name EventLog -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
+			if ($l1 -and $l1.LogFilePath) {Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
+			if ($l2 -and $l2.LogFilePath) {Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
 			Start-Service -Name EventLog -ErrorAction SilentlyContinue
 		}
 	} catch {
-			LogWriter("CleanPsLog caused an issue: $_")
+			LogWriter("CleanUp caused an issue: $_")
 	}
 }
 function RemoveCryptoKey($path) {
@@ -69,10 +69,24 @@ function RemoveCryptoKey($path) {
 # Define logfile
 $LogDir = "$env:windir\system32\LogFiles"
 $LogFile = $LogDir + "\AVD.Hydra-HCI-ScriptEngine.log"
-CleanPsLog
+CleanUp
 
 ###CompressedIncludeScript###
 RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"
+
+$LocalConfig = "C:\ITPC-WVD-PostCustomizing"
+if (Test-Path ($LocalConfig)) {
+	try {
+		$aclNew = New-Object Security.AccessControl.DirectorySecurity
+		$aclNew.SetSecurityDescriptorSddlForm("O:SYG:SYD:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;0x1200a9;;;BU)")
+		$aclNew.SetAccessRuleProtection($true, $false)
+		Set-Acl -Path $LocalConfig -AclObject $aclNew -ErrorAction Stop
+		Get-ChildItem $LocalConfig -Recurse -Force -ErrorAction SilentlyContinue|ForEach-Object {try {Set-Acl $_.FullName $aclNew -ErrorAction Stop} catch {LogWriter("Cannot change permission for $_.FullName")}}
+	} catch {
+		LogWriter("Error setting permission for $LocalConfig")
+		throw "Error setting permission for $LocalConfig"
+	}
+}
 
 $guid=(New-Guid).Guid
 $executionPath=Split-Path $MyInvocation.MyCommand.Path

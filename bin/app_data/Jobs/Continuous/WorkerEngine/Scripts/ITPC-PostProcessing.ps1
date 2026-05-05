@@ -1,5 +1,5 @@
 # This powershell script is part of WVDAdmin and Project Hydra
-# Current Version of this script: 1.1
+# Current Version of this script: 1.3
 
 # The purpose is to overwrite an existing script on the Azure backend (to destroy the caching)
 
@@ -11,7 +11,10 @@ function LogWriter($message) {
 
 LogWriter("Postprocessing script started.")
 try {
-	if (Test-Path -Path "$env:temp\RolloutCustomization-Finsihed.flag") {Remove-Item "$env:temp\RolloutCustomization-Finsihed.flag" -Force -ErrorAction SilentlyContinue}
+	if (Test-Path -Path "$env:temp\RolloutCustomization-Finished.flag") {
+		LogWriter("Removing $env:temp\RolloutCustomization-Finished.flag")
+		Remove-Item "$env:temp\RolloutCustomization-Finished.flag" -Force -ErrorAction SilentlyContinue
+	}
 	$path = $MyInvocation.MyCommand.Definition
 	$name = Split-Path $path -Leaf
 	$dir  = Split-Path $path -Parent
@@ -20,8 +23,7 @@ try {
 			if ($_.Attributes -band 'ReadOnly') { $_.Attributes = $_.Attributes -bxor 'ReadOnly' }
 		}
 	}
-	Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-	Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
 } catch {
 	LogWriter("Postprocessing caused an issue: $_")
 }
+LogWriter("Postprocessing script finished.")

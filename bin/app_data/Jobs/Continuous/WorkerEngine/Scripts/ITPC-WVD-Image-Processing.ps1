@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of WVDAdmin and Project Hydra - see https://blog.itprocloud.de/Windows-Virtual-Desktop-Admin/ for more information
-# Current Version of this script: 11.6
+# Current Version of this script: 11.9
 param(
 	[Parameter(Mandatory)]
 	[ValidateNotNullOrEmpty()]
@@ -131,6 +131,7 @@ function Wait-ForFileRelease ($filePath,$timeOutInSeconds) {
             $startTime = Get-Date
             while (Test-Path -Path $FilePath) {
                 if (((Get-Date) - $startTime).TotalSeconds -gt $timeOutInSeconds) {
+					LogWriter("Waiting for file release timed out.")
                     break
                 }
                 Start-Sleep -Seconds 1
@@ -143,36 +144,36 @@ function Wait-ForFileRelease ($filePath,$timeOutInSeconds) {
         LogWriter("Couldn't validate flag-file: $_")
     }
 }
-function CleanPsLog() {
+function CleanUp() {
 	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
     try {Disable-PSTrace} catch {}
 	try {
 		try {$l1 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Windows PowerShell"} catch {$l1=$null}
 		try {$l2 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Microsoft-Windows-PowerShell/Operational"} catch {$l2=$null}
-		Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
-		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {throw $_}
-		#Change permission
+		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {}
+		#Correct permission
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		$cleanIt=$false
 		try {
-		if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or (Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction SilentlyContinue) -or (Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction SilentlyContinue)) {
-			$cleanIt=$true
-		}
+			try {$x1=Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x1=$null}
+			try {$x2=Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x2=$null}
+			if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or $x1 -or $x2) {
+				$cleanIt=$true
+			}
 		} catch {
 			$cleanIt=$true
-			LogWriter("CleanPsLog caused an issue while checking the log configuration: $_")
+			LogWriter("CleanUp caused an issue while checking the log configuration: $_")
 		}
 		if ($cleanIt){
 			Stop-Service -Name EventLog -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
+			if ($l1 -and $l1.LogFilePath) {Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
+			if ($l2 -and $l2.LogFilePath) {Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
 			Start-Service -Name EventLog -ErrorAction SilentlyContinue
 		}
 	} catch {
-			LogWriter("CleanPsLog caused an issue: $_")
+			LogWriter("CleanUp caused an issue: $_")
 	}
 }
 function RedirectPageFileTo($drive) {
@@ -346,7 +347,7 @@ function CopyFileWithRetry($source, $destination) {
 	catch {}
 	do {
 		try {
-			Copy-Item $source -Destination $destination -ErrorAction Stop
+			Copy-Item $source -Destination $destination -Force -ErrorAction Stop
 			$ok = $true
 		}
 		catch {
@@ -408,7 +409,7 @@ function WaitForServiceExist ($serviceName,$timeOutSeconds,$repeat) {
 	while ( -not (Get-Service $serviceName -ErrorAction SilentlyContinue)) {
 		$retry = ($retryCount -lt $repeat)
 		if ($retry) { 
-			LogWriter("Service $serviceName was not found - Retrying again in $timeOutSeconds seconds, this will be retryed $retryCount")
+			LogWriter("Service $serviceName was not found - Retrying again in $timeOutSeconds seconds, this will be retried $retryCount")
 		} 
 		else {
 			LogWriter("Service $serviceName was not found - Retry limit exceeded: $serviceName didn't become available after $retry retries")
@@ -736,9 +737,45 @@ $LogFile = $LogDir + "\AVD.Customizing.log"
 # Main
 LogWriter("Starting ITPC-WVD-Image-Processing in mode $mode")
 
+# Interception for CleanFirst (one time operation)
+if ($Mode -eq "CleanFirstStart") {
+	$LogFile = $LogDir + "\AVD.CleanFirstStart-Helper.log"
+	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
+   	try {
+		Get-ChildItem -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*\Status" -Filter "*.status" -Recurse | Where-Object { $_.LastWriteTime -lt (Get-Date).AddMinutes(-10) } | ForEach-Object {
+			LogWriter("Removing $($_.FullName)")
+			Remove-Item -Path $_.PSPath -Force -ErrorAction SilentlyContinue
+		}
+	} catch {
+		LogWriter("Deleting status file failed: $_")
+	}
+		
+	# Restore deactivated services from the imaging process
+	LogWriter("Reconfiguring disabled services")
+	try {
+		(Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime").PSObject.Properties | Where-Object { $_.Name -like "Service.*" } | ForEach-Object {
+			$serviceName = $_.Name.split(".")[1]
+			LogWriter("Setting service $($serviceName) to $([System.ServiceProcess.ServiceStartMode]($_.Value))")
+			Set-Service -Name $serviceName -StartupType ([System.ServiceProcess.ServiceStartMode]($_.Value)) -ErrorAction SilentlyContinue
+		}
+	} catch {
+		LogWriter("Reconfiguring services failed: $_")
+	}
+
+	LogWriter("Disable scheduled task")
+	try {
+		# disable startup scheduled task
+		Disable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper' -ErrorAction Stop
+	}
+	catch {
+		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
+	}
+	return
+}
+
 ####CryptoKey####
 if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"; ChangeSignature "$($MyInvocation.MyCommand.Path)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"}
-CleanPsLog
+CleanUp
 AddRegistyKey "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime"
 
 # Generating variables from Base64-coding / encryption
@@ -759,26 +796,40 @@ if ($DomainJoinUserPassword64) { $DomainJoinUserPassword = [System.Text.Encoding
 if ($AltAvdAgentDownloadUrl64) { $AltAvdAgentDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdAgentDownloadUrl64)) }
 if ($AltAvdBootloaderDownloadUrl64) { $AltAvdBootloaderDownloadUrl = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AltAvdBootloaderDownloadUrl64)) }
 
+# prepare local folder
+New-Item $LocalConfig -ItemType Directory -ErrorAction Ignore
+if (Test-Path ($LocalConfig)) {
+	try { (Get-Item $LocalConfig -ErrorAction Ignore).attributes = "Hidden" } catch {}
+	try {
+		$aclNew = New-Object Security.AccessControl.DirectorySecurity
+		$aclNew.SetSecurityDescriptorSddlForm("O:SYG:SYD:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;0x1200a9;;;BU)")
+		$aclNew.SetAccessRuleProtection($true, $false)
+		Set-Acl -Path $LocalConfig -AclObject $aclNew -ErrorAction Stop
+		Get-ChildItem $LocalConfig -Recurse -Force -ErrorAction SilentlyContinue|ForEach-Object {try {Set-Acl $_.FullName $aclNew -ErrorAction Stop} catch {LogWriter("Cannot change permission for $_.FullName")}}
+	} catch {
+		LogWriter("Error setting permission for $LocalConfig")
+		throw "Error setting permission for $LocalConfig"
+	}
+}
 # check for the existend of the helper scripts
 if ((Test-Path ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
-	# Create local directory for script(s) and copy files (including the RD agent and boot loader - rename it to the specified name)
+	# Copy files (including the RD agent and boot loader - rename it to the specified name)
 	LogWriter("Copy files to local session host or downloading files from Microsoft")
-	New-Item $LocalConfig -ItemType Directory -ErrorAction Ignore
-	try { (Get-Item $LocalConfig -ErrorAction Ignore).attributes = "Hidden" } catch {}
 
 	if ((Test-Path ("${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1")) -eq $false) {
 		LogWriter("Creating ITPC-WVD-Image-Processing.ps1 from invocation")
 		if ($CallScript -and $CallScript -ne "") {
-			Copy-Item $CallScript -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1") -Container:$false
+			Copy-Item $CallScript -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1") -Container:$false -Force
 		} else {
-			Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1") -Container:$false
+			Copy-Item "$($MyInvocation.InvocationName)" -Destination ($LocalConfig + "\ITPC-WVD-Image-Processing.ps1") -Container:$false -Force
 		}
 	}
 	else {
 		LogWriter("Creating ITPC-WVD-Image-Processing.ps1 from PSScriptRoot")
-		Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig + "\") -ErrorAction SilentlyContinue
+		Copy-Item "${PSScriptRoot}\ITPC-WVD-Image-Processing.ps1" -Destination ($LocalConfig + "\") -ErrorAction SilentlyContinue -Force
 	}
 }
+
 if ($ComputerNewname -eq "" -or $DownloadNewestAgent -eq "1") {
 	if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
 		if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
@@ -1068,32 +1119,47 @@ if ($mode -eq "GeneralizeAfterRestart") {
 	$patchFile="$($env:WinDir)\OEM\ErrorHandler.cmd"
 	if (Test-Path -Path $patchFile) {
 		try {
-		LogWriter("Removing the old trigger file")
-		Remove-Item -Path "$($env:WinDir)\OEM\DoOnce.txt" -Force -ErrorAction SilentlyContinue	
-		LogWriter ("Checking file $patchFile")
-		if (-not (Get-Content $patchFile | Select-String -Pattern "ITPC")) {
-			LogWriter("Patching file")
+			LogWriter("Removing the old trigger file")
+			Remove-Item -Path "$($env:WinDir)\OEM\DoOnce.txt" -Force -ErrorAction SilentlyContinue	
+			LogWriter ("Checking file $patchFile")
+			if (-not (Get-Content $patchFile | Select-String -Pattern "ITPC")) {
+				LogWriter("Patching file")
 
-			$PatchContent = @(
-			"::ITPC - Patch",
-			"set FileTrigger=%windir%\OEM\DoOnce.txt",
-			"if not exist `"%FileTrigger%`" (",
-			"    ECHO ErrorHandler.cmd FILETRIGGER >> %windir%\Panther\WaSetup.log",
-			"    ECHO ErrorHandler.cmd FILETRIGGER >> %FileTrigger%",
-			"    reg delete `"HKEY_LOCAL_MACHINE\SYSTEM\Setup\SetupCl`" /f",
-			"    EXIT",
-			") "
-			)
-			Set-ItemProperty -Path $patchFile -Name IsReadOnly -Value $false
-			($PatchContent+(Get-Content $patchFile)) | Set-Content $patchFile
-			Set-ItemProperty -Path $patchFile -Name IsReadOnly -Value $true
-		}
+				$PatchContent = @(
+				"::ITPC - Patch",
+				"@echo off",
+				"set FileTrigger=%windir%\OEM\DoOnce.txt",
+				"set Counter=0",
+				"if exist `"%FileTrigger%`" (",
+				"    set /p Counter=<`"%FileTrigger%`"",
+				")",
+				"echo Counter: %Counter%",
+				":: Increase counter",
+				"set /a Counter+=1",
+				"echo New Counter: %Counter%",
+				"if %Counter% LSS 4 (",
+				"    ECHO ErrorHandler.cmd - Attempt %Counter% >> %windir%\Panther\WaSetup.log",
+				"    echo %Counter% > `"%FileTrigger%`"",
+				"    :: Clean-up last try and reboot",
+				"    reg delete `"HKEY_LOCAL_MACHINE\SYSTEM\Setup\SetupCl`" /f",
+				"    echo Exiting for a reboot",
+				"    EXIT",
+				")",
+				"REM Counter >= 3, not deployable right now",
+				"ECHO ErrorHandler.cmd - Max retries reached",
+				"ECHO ErrorHandler.cmd - Max retries reached >> %windir%\Panther\WaSetup.log"
+				)
+				Set-ItemProperty -Path $patchFile -Name IsReadOnly -Value $false
+				($PatchContent+(Get-Content $patchFile)) | Set-Content $patchFile
+				Set-ItemProperty -Path $patchFile -Name IsReadOnly -Value $true
+			}
 		} catch {
 			LogWriter("Error patching file: $_")
 		}
 	}
 	
 	LogWriter("Preparing sysprep to generalize session host")
+	LogWriter("ScriptReturnMessage:{PREIMAGING-READY}:ScriptReturnMessage")
 	if ([System.Environment]::OSVersion.Version.Major -le 6) {
 		#Windows 7
 		LogWriter("Enabling RDP8 on Windows 7")
@@ -1492,22 +1558,16 @@ elseif ($mode -eq "JoinDomain") {
 	# Final reboot
 	LogWriter("Finally restarting session host")
 	if ($IsHydra -eq "1") {
-		Set-Content -Path "$env:temp\RolloutCustomization-Finsihed.flag" -Value "" -ErrorAction SilentlyContinue
+		Set-Content -Path "$env:temp\RolloutCustomization-Finished.flag" -Value "" -ErrorAction SilentlyContinue
 		# A longer delayed restart while Hydra should do the last restart
-		#Start-Process -FilePath PowerShell.exe -ArgumentList "-noexit -command & {Start-Sleep -Seconds 200; Restart-Computer -Force -ErrorAction SilentlyContinue}"
-
 		Start-Process -FilePath PowerShell.exe -WorkingDirectory $LocalConfig -ArgumentList "-noexit -ExecutionPolicy Bypass -File `"$($LocalConfig)\ITPC-WVD-Image-Processing.ps1`" -Mode WaitForReboot"
-
-
-
-
 	} else {
 		Start-Process -FilePath PowerShell.exe -ArgumentList "-noexit -command & {Start-Sleep -Seconds 20; Restart-Computer -Force -ErrorAction SilentlyContinue}"
 	}
 }
 elseif ($Mode -eq "WaitForReboot") {
-	Wait-ForFileRelease "$env:temp\RolloutCustomization-Finsihed.flag" 150
-	LogWriter("Finally restarting session host now")
+	Wait-ForFileRelease "$env:temp\RolloutCustomization-Finished.flag" 150
+	LogWriter("Finally restarting session host in 5 seconds")
 	Start-Sleep -Seconds 5
 	Restart-Computer -Force -ErrorAction SilentlyContinue
 }
@@ -1713,32 +1773,6 @@ elseif ($Mode -eq "RDAgentBootloader") {
 elseif ($Mode -eq "ApplyOsSettings") {
 	ApplyOsSettings
 }
-elseif ($Mode -eq "CleanFirstStart") {
-	$LogFile = $LogDir + "\AVD.CleanFirstStart-Helper.log"
-	LogWriter("Cleaning up Azure Agent logs - current path is ${LocalConfig}")
-	Remove-Item -Path "C:\Packages\Plugins\Microsoft.CPlat.Core.RunCommandWindows\*" -Include *.status  -Recurse -Force -ErrorAction SilentlyContinue
-		
-	# Restore deactivated services from the imaging process
-	LogWriter("Reconfiguring disabled services")
-	try {
-		(Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime").PSObject.Properties | Where-Object { $_.Name -like "Service.*" } | ForEach-Object {
-			$serviceName = $_.Name.split(".")[1]
-			LogWriter("Setting serice $($serviceName) to $([System.ServiceProcess.ServiceStartMode]($_.Value))")
-			Set-Service -Name $serviceName -StartupType ([System.ServiceProcess.ServiceStartMode]($_.Value)) -ErrorAction SilentlyContinue
-		}
-	} catch {
-		LogWriter("Reconfiguring services failed: $_")
-	}
-
-	LogWriter("Disable scheduled task")
-	try {
-		# disable startup scheduled task
-		Disable-ScheduledTask -TaskName 'ITPC-AVD-CleanFirstStart-Helper' -ErrorAction Ignore
-	}
-	catch {
-		LogWriter("Disabling scheduled task failed: " + $_.Exception.Message)
-	}
-}
 elseif ($mode -eq "RestartBootloader") {
 	$LogFile = $LogDir + "\AVD.RDAgentBootloader-Monitor-1.log"
 	$lastTimestamp = Get-ItemProperty -Path "HKLM:\SOFTWARE\ITProCloud\WVD.Runtime" -Name "RestartBootloaderLastRun" -ErrorAction SilentlyContinue
@@ -1861,5 +1895,5 @@ elseif ($mode -eq "JoinMEMFromHybrid") {
 		}
 	}
 }
-CleanPsLog 
+CleanUp 
 # Last line in this script to make signing possible

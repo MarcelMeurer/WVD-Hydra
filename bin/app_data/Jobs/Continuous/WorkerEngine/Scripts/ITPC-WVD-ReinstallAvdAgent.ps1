@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 5.4
+# Current Version of this script: 5.5
 
 param(
     [string] $WvdRegistrationKey = '',
@@ -90,38 +90,36 @@ function RemoveReadOnlyFromScripts($path){
         LogWriter("Remove ReadOnly from scripts caused an issue: $_")
     }
 }
-function CleanPsLog() {
+function CleanUp() {
 	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
     try {Disable-PSTrace} catch {}
 	try {
 		try {$l1 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Windows PowerShell"} catch {$l1=$null}
 		try {$l2 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Microsoft-Windows-PowerShell/Operational"} catch {$l2=$null}
-		Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
-		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {throw $_}
-		#Change permission
+		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {}
+		#Correct permission
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		$cleanIt=$false
 		try {
-		if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or (Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction SilentlyContinue) -or (Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction SilentlyContinue)) {
-			$cleanIt=$true
-			LogWriter("CleanPsLog check is true")
-		}
+			try {$x1=Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x1=$null}
+			try {$x2=Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x2=$null}
+			if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or $x1 -or $x2) {
+				$cleanIt=$true
+			}
 		} catch {
 			$cleanIt=$true
-			LogWriter("CleanPsLog caused an issue while checking the log configuration: $_")
+			LogWriter("CleanUp caused an issue while checking the log configuration: $_")
 		}
 		if ($cleanIt){
-			LogWriter("CleanPsLog clean-up files")
 			Stop-Service -Name EventLog -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
+			if ($l1 -and $l1.LogFilePath) {Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
+			if ($l2 -and $l2.LogFilePath) {Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
 			Start-Service -Name EventLog -ErrorAction SilentlyContinue
 		}
 	} catch {
-			LogWriter("CleanPsLog caused an issue: $_")
+			LogWriter("CleanUp caused an issue: $_")
 	}
 }
 function DownloadFile($url, $outFile, $alternativeUrls) {
@@ -200,7 +198,7 @@ if ($AltAvdBootloaderDownloadUrl64) { $AltAvdBootloaderDownloadUrl = [System.Tex
 
 # Main
 LogWriter("Starting ITPC-WVD-ReinstallAvdAgent")
-CleanPsLog
+CleanUp
 
 ####CryptoKey####
 if ($CryptoKey) {RemoveCryptoKey "$($MyInvocation.MyCommand.Path)"} else {RemoveReadOnlyFromScripts "$($MyInvocation.MyCommand.Path)"}
@@ -215,28 +213,36 @@ Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentMonitoring-Monitor" -ErrorAction S
 Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-1" -ErrorAction SilentlyContinue
 Stop-ScheduledTask -TaskName "ITPC-AVD-RDAgentBootloader-Monitor-2" -ErrorAction SilentlyContinue
 
-# check for the existend of the helper scripts
-if ((Test-Path ($LocalConfig)) -eq $false) {
-        # Create local directory
-        LogWriter("Copy files to local session host or downloading files from Microsoft")
-        new-item $LocalConfig -ItemType Directory -ErrorAction Ignore
-        try { (Get-Item $LocalConfig -ErrorAction Ignore).attributes = "Hidden" } catch {}
-    }
+# prepare local folder
+New-Item $LocalConfig -ItemType Directory -ErrorAction Ignore
+if (Test-Path ($LocalConfig)) {
+	try { (Get-Item $LocalConfig -ErrorAction Ignore).attributes = "Hidden" } catch {}
+	try {
+		$aclNew = New-Object Security.AccessControl.DirectorySecurity
+		$aclNew.SetSecurityDescriptorSddlForm("O:SYG:SYD:(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;0x1200a9;;;BU)")
+		$aclNew.SetAccessRuleProtection($true, $false)
+		Set-Acl -Path $LocalConfig -AclObject $aclNew -ErrorAction Stop
+		Get-ChildItem $LocalConfig -Recurse -Force -ErrorAction SilentlyContinue|ForEach-Object {try {Set-Acl $_.FullName $aclNew -ErrorAction Stop} catch {LogWriter("Cannot change permission for $_.FullName")}}
+	} catch {
+		LogWriter("Error setting permission for $LocalConfig")
+		throw "Error setting permission for $LocalConfig"
+	}
+}
 
-    if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
-        if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
-            LogWriter("Downloading RDAgent")
-            DownloadFile "https://go.microsoft.com/fwlink/?linkid=2310011" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
-        }
-        else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
+if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
+    if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgent.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
+        LogWriter("Downloading RDAgent")
+        DownloadFile "https://go.microsoft.com/fwlink/?linkid=2310011" ($LocalConfig + "\Microsoft.RDInfra.RDAgent.msi") $AltAvdAgentDownloadUrl
     }
-    if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
-        if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
-            LogWriter("Downloading RDBootloader")
-            DownloadFile "https://go.microsoft.com/fwlink/?linkid=2311028" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
-        }
-        else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
+    else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgent.msi" -Destination ($LocalConfig + "\") }
+}
+if ((Test-Path ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi")) -eq $false -or $DownloadNewestAgent -eq "1") {
+    if ((Test-Path ($ScriptRoot + "\Microsoft.RDInfra.RDAgentBootLoader.msi ")) -eq $false -or $DownloadNewestAgent -eq "1") {
+        LogWriter("Downloading RDBootloader")
+        DownloadFile "https://go.microsoft.com/fwlink/?linkid=2311028" ($LocalConfig + "\Microsoft.RDInfra.RDAgentBootLoader.msi") $AltAvdBootloaderDownloadUrl
     }
+    else { Copy-Item "${PSScriptRoot}\Microsoft.RDInfra.RDAgentBootLoader.msi" -Destination ($LocalConfig + "\") }
+}
 
 
 LogWriter("Removing existing Remote Desktop Agent Boot Loader")
@@ -290,5 +296,4 @@ else {
     LogWriter("Installing AVDAgentManager")
     Start-Process -wait -FilePath "${LocalConfig}\Microsoft.RDInfra.WVDAgentManager.msi" -ArgumentList '/q'
 }
-
-CleanPsLog
+CleanUp

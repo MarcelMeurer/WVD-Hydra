@@ -1,10 +1,17 @@
 # AVD Hydra & WVD-Hydra
 
-
-
 <a href="https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-deploy-d1hydra-free-d1" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a>
 
-[Get free support for the deployment](mailto:info@itprocloud.com)
+
+## Hydra and ITProCloud GmbH are part of Login VSI
+Hydra and ITProCloud GmbH have been part of Login VSI since June 2025.
+
+As part of this integration, we are combining expertise and continuing to invest actively in Hydra as a product. This ensures ongoing development, innovation, and a strong long-term roadmap backed by the Login VSI organization.
+
+In addition, Login VSI provides Enterprise Support, offering customers dedicated assistance, structured support processes, and access to deep technical expertise across the full solution stack.
+
+You can find the official product documentation here: [https://docs.loginvsi.com/hydra](https://docs.loginvsi.com/hydra)
+
 
 
 
@@ -13,51 +20,13 @@
 
 The project is available as a **free community edition, even for commercial use** (up to 5 session hosts per host pool, 5 pools, 100 users, and a single tenant) and as a supported licensable product ($5 per concurrent user/month - high-water mark of simultaneously connected user in the subscription month). Hydra will generally work without limitation for the first 30 days and switched to the community edition. Please reach out to extend the trial period or license your Hydra instance through the Azure Subscription ([Billing subscription to Hydra](https://portal.azure.com/#create/itprocloudgmbh1628775137215.hydra-pay-c1)).
 
-The owner of this solution is [ITProCloud GmbH](https://www.itprocloud.com/), [info@itprocloud.com](mailto:info@itprocloud.com).
+The owner of this solution is [ITProCloud GmbH](https://www.itprocloud.com/), [Login VSI](https://www.loginvsi.com/), [support@loginvsi.com](mailto:support@loginvsi.com).
 
 Please make sure to send feedback and update the solution regularly.
 
 
 ## Get help
 If you are not familiar with the first configuration and creating a service principal in Azure, write us a mail to give you free support: [info@itprocloud.com](mailto:info@itprocloud.com)
-
-
-## **IMPORTANT**: Change of AVD Agent and Bootloader Donwload URL - Error: 502 - Bad Gateway Error
-We have seen from 03/25 that the Microsoft download source for the AVD Agent is throwing an error (like the Thursday before). You will see the issue during imaging or while rolling out a new session host (if the image doesn't contains the agents or if "Download newest Agent during Rollout" was selected):
-
-![](media/502-BadGateway.png)
-
-**The error message is 502 – Bad Gateway Error**
-
-If you update Hydra to the newest version **(1.1.0.7 or newer)**, Hydra will use an updated source of the AVD Agent and Bootloader and an automatic fallback to the current download URLs.
- 
-Please update Hydra to the newest version to use the updated download URLs and a fallback automatism. Updating Hydra has no affect to current user sessions. Make sure that nor rollout, imaging or automation is running during the update.
- 
-[How to update Hydra](#updates-and-releases)
-
-If you need to white-list the new URLs for the AVD Agent and Bootloader on your firewall or proxy, please whitelist these new URLs:
-- https://go.microsoft.com/fwlink/?linkid=2310011
-- https://go.microsoft.com/fwlink/?linkid=2311028
-
-
-## **IMPORTANT**: Action required: Update to DesktopVirtualization API v. 2024-04-08-preview
-Microsoft started to inform customers to update applications unsing the DesktopVirtualization API. The Hydra version **1.1.0.3** (expected mid of December) will use only the updated APIs. **To avoid service disruptions, update Hydra to version 1.1.0.3 or newer before March 2025.** [How to update Hydra](#updates-and-releases) 
-> *You're receiving this notice because you currently manage your Azure Virtual Desktop resources using Microsoft.DesktopVirtualization APIs that are being removed.* On 11 March 2025, the following DesktopVirtualization APIs will no longer be supported, and you'll need to update to either API v. 2024-04-08-preview or API v. 2024-04-03
-
-
-## Random error messages from the AVD Agent and hosts are going into "Need Assistance"
-Today, I got a lot of emails and team messages. Customers are seeing the following error message on session hosts in the Azure Portal and in Hydra:
-> NAT shape is Undetermined when probing [turn:20.202.248.2:3478?Udp] TURN relay health check failed for server [turn:20.202.248.2:3478?Udp] - One or more errors occurred.->Timed out waiting for Receive to complete - Code: -2147467259 - 2024-09-26T07:39:15.704086Z
-
-This causes several issues. [Read more](avd-agent-need-assistance.md)
-
-
-## Possible issues with version 1.0.7.3 to 1.0.8.0: Freeze of operations (Starting, Rollout, etc.)
-We got some feedback that, in very few situations, Hydra was unable to communicate with some resources in Azure. That stops the processing of some operations, like starting or creating hosts. That could also **stop autoscaling (scale-up)** from working. We guess that this issue was caused by the Microsoft package Azure.Core (1.4) and is resolved with the updated package (1.41), which is now integrated into Hydra version 1.0.8.1. Issue: [https://github.com/Azure/azure-sdk-for-net/pull/44882](https://github.com/Azure/azure-sdk-for-net/pull/44882)
-
-If you are running into this issue, perform the following steps:
-- Update to the newest version; Roboter icon in the top right corner -> Update Engine
-
 
 ## Features
 - Multi-tenancy
@@ -118,13 +87,14 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Note: Version 2.2.0.0 and higher are now only available in the Update Center in Hydra (menu in the upper right corner). 
 
-<details><summary>Open to see the release history. Current version is 2.3.0.0.</summary>
+<details><summary>Open to see the release history. Current version is 2.4.0.0.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---
+2.4.0.00 | 2026-04-22 | Changes: Provisioning Policy management page for Windows 365 with support for create, edit and delete;Updated Hydra Agent for Windows 365 supporting instant Intune sync and restart, get remote endpoint IP address, update agent and run scripts;Extend the REST API to create images based on Imaging definition and trigger a rollout of a host in a pool;Manually assign Azure Compute Gallery image version, image replica counts and disk type;Delete a session host object (if exists) in the clean-up phase during the rollout;User Sessions table has been modernized with improved filtering, sorting and selection;Updated favicon and Hydra Logo
 2.3.0.00 | 2026-03-18 | Changes: Custom Images Management page for Windows 365; A Feedback button for submitting feedback and feature requests; Hydra can now download cloud images to Azure Local using Hydra Proxy; Important messages in the header, e.g., trial license expiration; Warnings, have been moved to banners; Removed the Power-on-Connect toggle, previously used to allow scaling Session Hosts down to 0. Now, a warning banner is displayed when scaling down to 0 is configured; The session host object is now deleted before the VM. If the host can’t be deleted, the VM isn’t deleted; All gallery versions are shown in the rollout configuration. If a version is not ready yet, a note is shown behind the version ;The 'Delete and rebuild hosts after logoff' scaling option doesn’t rebuild temporary hosts. It deletes them only; Hybrid automations now use remote scripts by default for commands on Azure Hybrid and Azure Local when the compressed script size exceeds 400 bytes, and the VM must have HTTPS access to the Hydra instance; this behaviour can be changed in Global Settings under 'Use the remote script engine for Hybrid VMs if the size is higher than...'; Fix: Resolved an issue that caused failures when 20 or more Session Hosts were recreated or replaced simultaneously; When the same image version exists in multiple regions, duplicate entries are no longer shown in the Replace/recreate session hosts option; SID was not interpreted if FSLogix removes the profile if SIDDirNameMatch is using this variable
 2.2.0.00 | 2026-02-18 | Add: Community Mode limits for existing installations (1 Tenant, 5 Host Pools, 5 Session Hosts per Pool); Add: Windows 365 Updates (Azure Networking); Add: Remote Scripts Resiliency (In some cases the RuncommandAPI can throw an HRPC500 error related to script size. Now a customer can configure for the size of scripts, as needed);Add: UI Improvements
-2.1.1.00 | 2026-01-28 | Add: New action: Others - Quit on hosts with sessions; Windows 365 user and device setting configuration; Change: New limitation for the community edition for new deployments
+2.1.1.02 | 2026-01-28 | Add: New action: Others - Quit on hosts with sessions; Windows 365 user and device setting configuration; Change: New limitation for the community edition for new deployments
 2.1.0.04 | 2026-01-22 | Add: Allowing an "*" at the end of a naming schema for session hosts to over-count (e.g.: A-*= -8, -9, -10, -11, ...) ;Fix: UI hasn't shown the storage container selector for Azure Local (default/last setting was used) 
 2.1.0.03 | 2026-01-16 | Fix: Compute Gallery menu item was missing in some cases if an imaging definition should be reconfigured
 2.1.0.02 | 2026-01-14 | Change: HydraProxy download URL; Fix: Issue while showing WinGet Apps in the UI
@@ -901,6 +871,18 @@ Accessible APIs:
     - The body should contain the id of the script or collection as text
   - Return:
     - A guid to query the state of the task
+
+- Get the list of imaging definitions: /rest/azure/imagingDefinitions
+  - GET
+  - Return:
+    - A list of ImagingDefinition
+
+- Save and run a imaging definition: /rest/scenes/\<SceneId\>/StartStoredImageDefinition
+  - POST
+    - \<ImagingDefinition\>
+  - Return:
+    - A guid to query the state of the task
+
 
 - State of tasks
   - GET

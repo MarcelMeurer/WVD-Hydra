@@ -1,5 +1,5 @@
 ﻿# This powershell script is part of Hydra
-# Current Version of this script: 5.3
+# Current Version of this script: 5.5
 # {"Name": "Delete FSLogix user profile","Description":"Delete the FSLogix profile of the given user. The user must be logged off and the share accessible by the given service account"}
 param(
     [string]$paramLogFileName="AVD.DeleteFSLogixProfile.log",
@@ -80,38 +80,36 @@ function RemoveReadOnlyFromScripts($path){
         LogWriter("Remove ReadOnly from scripts caused an issue: $_")
     }
 }
-function CleanPsLog() {
+function CleanUp() {
 	AddRegistyKey "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
 	New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 0 -force -ErrorAction SilentlyContinue
     try {Disable-PSTrace} catch {}
 	try {
 		try {$l1 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Windows PowerShell"} catch {$l1=$null}
 		try {$l2 = New-Object System.Diagnostics.Eventing.Reader.EventLogConfiguration "Microsoft-Windows-PowerShell/Operational"} catch {$l2=$null}
-		Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'cl "Microsoft-Windows-PowerShell/Operational"' -Wait -ErrorAction SilentlyContinue
-		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {throw $_}
-		#Change permission
+		try {$l2.IsEnabled=$false;$l2.SaveChanges()} catch {}
+		#Correct permission
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Windows PowerShell" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		Start-Process -FilePath "$env:windir\system32\wevtutil.exe" -ArgumentList 'sl "Microsoft-Windows-PowerShell/Operational" /ca:"O:SYG:SYD:(A;;0x1;;;SY)"' -Wait -ErrorAction SilentlyContinue
 		$cleanIt=$false
 		try {
-		if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or (Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction SilentlyContinue) -or (Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction SilentlyContinue)) {
-			$cleanIt=$true
-			LogWriter("CleanPsLog check is true")
-		}
+			try {$x1=Get-WinEvent -LogName $l1.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x1=$null}
+			try {$x2=Get-WinEvent -LogName $l2.LogName -MaxEvents 1 -ErrorAction Stop} catch{$x2=$null}
+			if ($l1.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.SecurityDescriptor -ne "O:SYG:SYD:(A;;0x1;;;SY)" -or $l2.IsEnabled -or (Test-Path -Path "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))") -or $x1 -or $x2) {
+				$cleanIt=$true
+			}
 		} catch {
 			$cleanIt=$true
-			LogWriter("CleanPsLog caused an issue while checking the log configuration: $_")
+			LogWriter("CleanUp caused an issue while checking the log configuration: $_")
 		}
 		if ($cleanIt){
-			LogWriter("CleanPsLog clean-up files")
 			Stop-Service -Name EventLog -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
-			Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue
+			if ($l1 -and $l1.LogFilePath) {Remove-Item "$($l1.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
+			if ($l2 -and $l2.LogFilePath) {Remove-Item "$($l2.LogFilePath.Replace("%SystemRoot%",$env:windir))" -Force -ErrorAction SilentlyContinue}
 			Start-Service -Name EventLog -ErrorAction SilentlyContinue
 		}
 	} catch {
-			LogWriter("CleanPsLog caused an issue: $_")
+			LogWriter("CleanUp caused an issue: $_")
 	}
 }
 function ResolveEnvVariable($stringValue)
@@ -134,7 +132,7 @@ function ResolveEnvVariable($stringValue)
     return $stringValue
 }
 
-CleanPsLog
+CleanUp
 LogWriter("Remove FSLogix profile script starts. Parameter: $($users)")
 
 ####CryptoKey####
@@ -192,6 +190,7 @@ foreach ($user in $users.Split(";")) {
 				}
                 LogWriter("Active Directory not available. We assume a cloud only identity: $($samaccountname) with SID $sid")
             }
+            Set-Item -Path env:sid -Value $sid -ErrorAction SilentlyContinue
 
             # Test for custom naming
             $dirName=(Get-Item -Path HKLM:\SOFTWARE\FSLogix\Profiles -ErrorAction SilentlyContinue).GetValue("SIDDirNameMatch")
@@ -245,6 +244,6 @@ foreach ($user in $users.Split(";")) {
     }
 }
 
-CleanPsLog
+CleanUp
 # use the next line to give a return message
 Write-host("ScriptReturnMessage:{$($global:messages)}:ScriptReturnMessage")
