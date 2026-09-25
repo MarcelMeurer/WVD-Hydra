@@ -87,7 +87,9 @@ If the icon is not shown or working in your installation, update Hydra once on t
 
 Note: Version 2.2.0.0 and higher are now only available in the Update Center in Hydra (menu in the upper right corner). 
 
-<details><summary>Open to see the release history. Current version is 2.4.0.0.</summary>
+**Important**: All news and updates are now available on [https://docs.loginvsi.com/hydra/what-s-new-in-hydra?contextKey=whats-new-in-hydra&version=latest](https://docs.loginvsi.com/hydra/what-s-new-in-hydra?contextKey=whats-new-in-hydra&version=latest)
+
+<details><summary>Open to see the release history until April 2026.</summary>
 
 Release | Date | Changes & Notes
 --- | --- | ---

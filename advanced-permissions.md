@@ -87,7 +87,7 @@ Hydra can display users and groups in the directory for various purposes, such a
 |---|---|
 |API:|Microsoft Graph|
 |Type:|Application permissions|
-|Permission:|“Group.Read.All” and “User.ReadBasic.All”|
+|Permission:|“GroupMember.ReadBasic.All” and “User.ReadBasic.All”|
 
 **Note:** This permission is valid for all users and groups. Use it carefully and monitor your environment, probably. Use private endpoints for Hydra and disable public access to the Hydra app service.
 
